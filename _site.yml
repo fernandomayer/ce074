@@ -1,0 +1,35 @@
+name: "ce074"
+output_dir: "docs"
+exclude: ["README.md", "\\.sh"]
+output:
+  html_document:
+    theme: flatly
+    highlight: default
+    code_folding: hide
+    number_sections: false
+    toc: true
+    toc_depth: 4
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    includes:
+      in_header: analytics.html
+      after_body: footer.html
+navbar:
+  title: "CE074"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Aulas"
+      href: aulas.html
+    - text: "Referências"
+      href: referencias.html
+    - text: "Recursos"
+      href: recursos.html
+    - text: "Materiais"
+      menu:
+      - text: "Material"
+  right:
+    - text: GitHub
+      icon: fa-github fa-lg
+      href: https://github.com/fernandomayer/ce074
