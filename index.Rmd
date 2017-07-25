@@ -1,0 +1,48 @@
+---
+title: "CE074 - Controle de Processos Industriais"
+output:
+  html_document:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+source("setup_knitr.R")
+```
+
+# Detalhes da oferta da disciplina
+
+- **Curso:** Estatística (EST)
+- **Período:** segundo semestre de 2017
+- **Professor Responsável:** [Fernando de Pol Mayer][], ([LEG][]:
+  Laboratório de Estatística e Geoinformação)
+- **Horários e Locais:**
+    - Segunda, 20:40 - 22:00h, **A confirmar**
+    - Quinta, 19:00 - 20:30h, **A confirmar**
+- **Horários de atendimento do professor:**
+    - Quartas e sextas, 14:00-20:00 (preferenciais). Outros horários
+      podem ser agendados previamente por email.
+- **Frequência**: de acordo com as normas da Universidade, mínimo de 75%
+- **Avaliação**: A definir.
+- **Datas importantes:** De acordo com a [Resolução 62/16 - CEPE][]:
+    - **31/07**: Início do semestre letivo
+    - **02/12**: Final do semestre letivo
+    - **11/12-16/12**: Período de exames
+
+# Programa/objetivos da disciplina
+
+O objetivo desta disciplina é capacitar os alunos a entender, desenvolver, e
+analisar dados de experimentos que visam a melhoria e otimização de processos
+industriais através de experimentos planejados.
+
+O curso compreende os seguintes tópicos:
+
+- Planejamento fatorial: $2^k$ e $3^k$
+- Experimentos com confundimento
+- Experimentos fatoriais fracionados
+- Metodologia de superfície de resposta
+
+<!-- links -->
+
+[Fernando de Pol Mayer]: http://leg.ufpr.br/~fernandomayer
+[LEG]: http://www.leg.ufpr.br
+[Resolução 62/16 - CEPE]: http://www.est.ufpr.br/calendario/cepe6216.pdf
