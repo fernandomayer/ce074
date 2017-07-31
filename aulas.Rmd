@@ -66,10 +66,6 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
 
 Em breve.
 
-## Provas anteriores
-
-Em brave.
-
 ## Notas
 
 As notas estão disponíveis [nesta página](notas.html).
