@@ -1,0 +1,31 @@
+---
+title: "Referências Bibliográficas"
+output:
+  html_document:
+    toc: false
+---
+
+## Referências básicas
+
+- Box, GEP; Hunter, JS; Hunter, WG. [Statistics for experimenters:
+  Desingn Innovation and Discovery](http://statisticsforexperimenters.net).
+  John Wiley & Sons, 2005.
+- Brien, CJ. Design and randomization-based analysis of experiments in
+  R. URL: http://chris.brien.name/ee2. 2010.
+- Montgomery, DC.
+ [Design and analysis of experiments](http://www.wiley.com/WileyCDA/WileyTitle/productCd-EHEP002024.html). John Wiley & Sons, 2001.
+- Montgomery, DC.
+  [Introdução ao controle estatístico de qualidade](http://www.grupogen.com.br/introduc-o-ao-controle-estatistico-da-qualidade.html).
+  7 ed. Rio de Janeiro: LTC, 2016.
+- Pimentel-Gomes, F. [Curso de estatística experimental](http://fealq.org.br/produto/curso-de-estatistica-experimental-15a-edicao). 15 ed.
+  Piracicaba: FEALQ, 2009.
+
+## Referências complementares
+
+- Barros Neto, B; Scarminio, IS; Bruns, RE. [Como fazer experimentos](http://www.grupoa.com.br/livros/quimica/como-fazer-experimentos/9788577806522). 4 ed. Porto Alegre: Bookman, 2010.
+- Berthoux, PM; Brown, LC. [Statistics for environmental engineers](https://www.crcpress.com/Statistics-for-Environmental-Engineers-Second-Edition/Brown-Berthouex/9781566705929). 2 ed. Boca Raton: CRC Press, 2002.
+- Box, GEP; Draper, NR. [Response surfaces, mixtures, and ridge analysis](http://www.wiley.com/WileyCDA/WileyTitle/productCd-0470053577.html). New Jersey: Wiley & Sons, 2007.
+- Dean, A; Voss, D. [Design and analysis of experiments](http://www.springer.com/us/book/9780387985619). New York: Springer-Verlag, 1999.
+- Mason, RL; Richard FG; Hess, JL. [Statistical design and analysis of experiments: With applications to engineering and science](http://www.wiley.com/WileyCDA/WileyTitle/productCd-0471372161.html). John Wiley & Sons, 2003.
+- Neter, J; Kutner, MH; Nachtsheim, CJ; Wasserman, W. Applied linear
+  statistical models. 4 ed. Chicago: IRWIN, 1996.
