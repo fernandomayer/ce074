@@ -42,9 +42,46 @@ Box, Hunter e Hunter):
     - uma pesquisa na internet
     - ...
 
-Por exemplo:
+Por exemplo, ao chegar ao trabalho uma pessoa estaciona seu carro todos
+os dias na mesma vaga de garagem. Uma tarde, após sair do trabalho, ele
+é levado à seguinte sequência de aprendizado dedutivo-indutivo:
 
-DESCREVER PETER MINEREX
+<br>
+
+|         |   |
+|---------|-----------------------------------|
+|*Modelo*:| Hoje é um dia como outro qualquer  |
+|*Dedução*:| Meu carro estará na vaga de sempre|
+|*Dados*:| Não está|
+|*Indução*:| Alguém o pegou  |
+
+<br>
+
+|         |   |
+|---------|-----------------------------------|
+|*Modelo*:| Meu carro foi roubado|
+|*Dedução*:| Meu carro não estará no estacionamento|
+|*Dados*:| Não! Está lá!|
+|*Indução*:| Alguém pegou e o troxe de volta|
+
+<br>
+
+|         |   |
+|---------|-----------------------------------|
+|*Modelo*:| Um ladrão roubou e o trouxe de volta|
+|*Dedução*:| Meu carro estará arrombado|
+|*Dados*:| Está sem danos e trancado|
+|*Indução*:| Alguém que tem as chaves o pegou|
+
+<br>
+
+|         |   |
+|---------|-----------------------------------|
+|*Modelo*:| Minha esposa usou meu carro|
+|*Dedução*:| Ela provavelmente deixou um bilhete|
+|*Dados*:| Aqui está!|
+
+<br>
 
 Suponha que para resolver um problema, uma especulação inicial produz
 uma ideia:
@@ -162,7 +199,7 @@ consideradas. Além disso:
   concentração), causa interferência outra resposta (e.g. pureza)
 - Alguns fatores irão **interagir** na presença de outros
 - Por isso, o uso do "mudar um fator por vez" dificilmente produzirá
-  resultados satisfatórios e viáveis econimicamente
+  resultados satisfatórios e viáveis economicamente
 
 O uso de **planejamentos estatísticos experimentais** é a melhor forma
 de "testar" um grande número de fatores simultaneamente e conseguir uma
@@ -193,7 +230,7 @@ Oldenburg e o número de cegonhas, observados ao final de 7 anos
 
 O número de cegonhas **causou** o aumento da população?
 
-A correlaçõ entre duas variáveis $Y$ e $X$ geralmente ocorre porque
+A correlação entre duas variáveis $Y$ e $X$ geralmente ocorre porque
 ambas estão associadas com uma terceira variável $W$. (Nesse caso, $W$
 seria o *tempo*).
 
