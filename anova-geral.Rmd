@@ -1,0 +1,210 @@
+---
+title: "Diagrama de Hasse para planejamento e análise de dados experimentais"
+---
+
+# Objetivo
+
+Determinação do modelo e da tabela de análise de variância para
+experimentos planejados em qualquer tipo de delineamento.
+
+# Procedimentos gerais
+
+O procedimento consiste de 7 passos:
+
+1. Descrição das características pertinentes ao estudo
+2. Estrutura experimental
+3. Fontes de variação, obtidas através da fórmula estrutural
+4. Número de graus de liberdade e somas de quadrados
+5. Tabela de análise de variância
+6. Modelos de esperança e de variância (maximais)
+7. Esperanças dos quadrados médios
+
+## 1. Descrição das características pertinentes ao estudo
+
+Consiste em identificar:
+
+1. Unidade observacional
+2. Variável resposta
+3. Fatores não casualizados (**unrandomized**)
+4. Fatores casualizados (**randomized**)
+5. Tipo de estudo
+
+## 2. Estrutura experimental
+
+Para determinar a estrutura experimental:
+
+1. Descrever a relação de cruzamento ou aninhamento entre os fatores
+   **unrandomized** no experimento
+2. Descrever a relação de cruzamento ou aninhamento entre:
+    a. os fatores **randomized**
+    b. os fatores **randomized** e **unrandomized** (se houver)
+3. Acrescentar o número de níveis dos fatores em frente aos nomes
+
+Simbologia:
+
+| Fatores | Símbolo |
+|---------|---------|
+| Cruzados | $A * B$ |
+| Aninhados | $A/B$ |
+
+**Fórmula estrutural**
+
+Exemplo para DBC com $b$ blocos, $k$ parcelas e $t$ tratamentos:
+
+| Estrutura | Fórmula |
+|-----------|---------|
+| Unrandomized | $b$ blocos/$k$ parcelas |
+| Randomized | $t$ tratamentos |
+
+Exemplo para DQL com $k$ linhas e colunas, e $t$ tratamentos:
+
+| Estrutura | Fórmula |
+|-----------|---------|
+| Unrandomized | $k$ linhas $*$ $k$ colunas |
+| Randomized | $t$ tratamentos |
+
+## 3. Fontes de variação obtidas através da fórmula estrutural
+
+Regras para expendir a fórmula estrutural:
+
+$$
+A*B = A + B + A\#B
+$$
+
+$$
+A/B = A + B[fg(A)]
+$$
+
+Onde $fg(A)$ é chamado de **fator generalizado**. Um fator generalizado
+é formado a partir de vários fatores originais, cujos níveis são
+combinações dos níveis dos fatores originais. Sua representação é uma
+lista dos fatores constituintes, separados por "$\wedge$".
+
+Exemplo para DBC:
+
+$$
+\textrm{Blocos}/\textrm{Parcelas} = \textrm{Blocos} +
+\textrm{Parcelas[Blocos]}
+$$
+
+Exemplo para DQL:
+
+$$
+\textrm{Linhas}*\textrm{Colunas} = \textrm{Linhas} + \textrm{Colunas} +
+\textrm{Linhas # Colunas}
+$$
+
+## 4. Número de graus de liberdade e somas de quadrados
+
+O Diagrama de Hasse é uma representação de marginalidade entre os
+componentes envolvidos.
+
+**Marginalidade:** Um fator generalizado $V$ é marginal a outro fator
+generalizado $Z$, se os fatores de $V$ são um subconjunto de $Z$.
+Notação: $V \leq Z$.
+
+**Diagrama de Hasse:** o diagrama de Hasse para os fatores generalizados
+de uma fórmula estrutural é formado tal que, a posição das "caixas"
+representando tais fatores generalizados indique a **relação entre os
+fatores** presentes em cada fórmula estrutural:
+
+- Um fator generalizado (FG) deve estar acima do FG para o qual o
+  primeiro é marginal
+- Se dois FGs são **cruzados**, devem estar na mesma linha
+- Acima de todos os FGs, coloca-se a média universal $\mu$
+- À esquerda, escreve-se o FG e o número de níveis. À direita,
+  escreve-se o número de graus de liberdade e a fonte da variação
+- Os graus de liberdade são obtidos pela diferença entre o número de
+  níveis do FG e a soma dos graus de liberdade de todos os fatores
+  marginais à ele ("acima" dele)
+
+**Somas de quadrados:** são formas quadráticas do tipo $\mathbf{Y'QY}$.
+
+A matriz $\mathbf{Q}$ pode ser expressa em função das matrizes de
+projeção $\mathbf{M}$,
+$$
+\mathbf{M} = \mathbf{X(X'X)^{-1}X'}
+$$
+Onde $\mathbf{X}$ é a matriz de incidência, de **posto completo**.
+
+Portanto, $\mathbf{Q}$ é a diferença algébrica de matrizes $\mathbf{M}$.
+
+Exemplo para DBC:
+
+$$
+\begin{align}
+\textrm{SQB} &= \mathbf{Y'Q_{B}Y} \\
+\textrm{SQP[B]} &= \mathbf{Y'Q_{BP}Y} \\
+\textrm{SQTrat} &= \mathbf{Y'Q_{T}Y} \\
+\textrm{SQRes} &= \mathbf{Y'Q_{Res}Y}
+\end{align}
+$$
+
+Onde:
+
+$$
+\begin{align}
+\mathbf{Q_B} &= \mathbf{M_B - M_G} \\
+\mathbf{Q_{BP}} &= \mathbf{M_{BP} - M_G} \\
+\mathbf{Q_T} &= \mathbf{M_T - M_G} \\
+\mathbf{Q_{Res}} &= \mathbf{M_{BP} - M_{B} - M_{T} + M_G}
+\end{align}
+$$
+
+## 5. Tabela de análise de variância
+
+1. Listar todas as fontes **unrandomized**
+2. Alocar as fontes **randomized** sob as fontes unrandomized com as
+   quais estão confundidas (**identadas**)
+3. Adicionar fontes residuais às porções restantes das fontes
+   **unrandomized**
+
+Exemplo para DBC:
+
+
+| Fonte de variação | GL           | SQ                    |
+|-------------------|--------------|-----------------------|
+| Blocos            | $b-1$        | $\mathbf{Y'Q_{B}Y}$   |
+| Parcelas[Blocos]  | $b(t-1)$     | $\mathbf{Y'Q_{BP}Y}$  |
+|     Tratamentos   | $t-1$        | $\mathbf{Y'Q_{T}Y}$   |
+|     Resíduo       | $(b-1)(t-1)$ | $\mathbf{Y'Q_{Res}Y}$ |
+
+
+# Delineamento inteiramente casualizado (DIC)
+
+Considere um experimento em um delineamento inteiramente casualizado com
+$t$ tratamentos e $r$ repetições.
+
+O modelo associado à este experimento é
+
+$$
+y_{ij} = \mu + \tau_i + \epsilon_{ij}\, \qquad i = 1, \ldots, t;\, j = 1,
+\ldots, r
+$$
+
+Matricialmente o modelo pode ser escrito como:
+
+$$
+\mathbf{Y} = \mathbf{X}\boldsymbol{\theta} + \boldsymbol{\epsilon}_{ij}
+$$
+
+Ou
+
+$$
+\mathbf{Y} = \mathbf{X_G}\boldsymbol{\mu} +
+\mathbf{X_T}\boldsymbol{\tau} +
+\boldsymbol{\epsilon}_{ij}
+$$
+
+
+## Diagrama de Hasse
+
+![](img/DIC_geral.png)
+
+## Tabela de ANOVA
+
+| Fonte de variação | GL       | SQ                    | QM                                   | E[QM] (Fixo)             | E[QM] (Aleat.)              |
+|-------------------|----------|-----------------------|--------------------------------------|--------------------------|-----------------------------|
+| Parcelas          | $tr-1$   | $\mathbf{Y'Q_PY}$     |                                      |                          |                             |
+|     Tratamentos   | $t-1$    | $\mathbf{Y'Q_TY}$     | $\frac{\mathbf{Y'Q_TY}}{t-1}$        | $\sigma^2_P + q_T(\Psi)$ | $\sigma^2_P + r \sigma^2_T$ |
+|     Resíduo       | $t(r-1)$ | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{t(r-1)}$ | $\sigma^2_P$             | $\sigma^2_P$                |
