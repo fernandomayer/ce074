@@ -8,7 +8,7 @@ output:
 ## Referências básicas
 
 - Box, GEP; Hunter, JS; Hunter, WG. [Statistics for experimenters:
-  Desingn Innovation and Discovery](http://statisticsforexperimenters.net).
+  Design Innovation and Discovery](http://statisticsforexperimenters.net).
   John Wiley & Sons, 2005.
 - Brien, CJ. Design and randomization-based analysis of experiments in
   R. URL: http://chris.brien.name/ee2. 2010.
