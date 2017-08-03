@@ -27,7 +27,9 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
 
 - **31/07**: Apresentação da disciplina. Ler o artigo [Hasse Diagrams in
   Statistical Consulting and Teaching](PDF/Lohr_1995_TAS.pdf).
-- **03/08**:
+- **03/08**: Catalizando a geração de conhecimento. Ver
+  [material](catalizando-conhecimento.html). Fazer [exercícios de
+  revisão](exercicios/ex_revisao.pdf).
 - **07/08**:
 - **10/08**:
 - **14/08**:
@@ -65,7 +67,7 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
 
 ## Exercícios
 
-Em breve.
+- Revisão de conhecimento. [PDF](exercicios/ex_revisao.pdf).
 
 ## Notas
 

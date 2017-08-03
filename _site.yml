@@ -28,7 +28,13 @@ navbar:
       href: recursos.html
     - text: "Materiais"
       menu:
-      - text: "Material"
+      - text: "Introdução e revisão"
+      - text: "Catalizando a geração de conhecimento"
+        href: catalizando-conhecimento.html
+      - text: "----------"
+      - text: "Exercícios"
+      - text: "Revisão de conhecimento [PDF]"
+        href: exercicios/ex_revisao.pdf
   right:
     - text: GitHub
       icon: fa-github fa-lg
