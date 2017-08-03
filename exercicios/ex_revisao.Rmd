@@ -21,7 +21,7 @@ níveis do fator foram administrados. Nas pesquisas de opinião, evita-se
 que uma pessoa conheça a avaliação das demais. Por que são adotados tais
 procedimentos?
 1. (**Descreva**) Como é a aleatorização dos níveis em um experimento
-inteiramente cazualizado? (**Use o R**) Como você faria se tivesse um
+inteiramente casualizado? (**Use o R**) Como você faria se tivesse um
 fator com 3 níveis (A, B, C), e quisesse fazer 4 repetições para cada
 nível do fator?
 1. (**Descreva**) Como é a aleatorização dos níveis em um experimento de
