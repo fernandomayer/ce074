@@ -49,7 +49,7 @@ include_graphics("img/deduction-induction.png")
     - uma pesquisa na internet
     - ...
 
-Por exemplo, ao chegar ao trabalho uma pessoa estaciona seu carro todos
+Por exemplo, ao chegar no trabalho uma pessoa estaciona seu carro todos
 os dias na mesma vaga de garagem. Uma tarde, após sair do trabalho, ele
 é levado à seguinte sequência de aprendizado dedutivo-indutivo:
 
@@ -161,7 +161,7 @@ procurar ajuda.
 - O "Joga das 20 questões" ilustra bem esse processo, e segue o que foi
   exposto nas figuras acima
     - o "plano experimental" é a escolha da questão
-    - a resposta é a "dado"
+    - a resposta é o "dado"
     - que leva à uma nova conjectura e plano experimental (questão)
     - esse caminho claramente será diferente para diferentes jogadores
 
