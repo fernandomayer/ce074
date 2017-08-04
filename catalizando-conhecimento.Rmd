@@ -3,6 +3,10 @@ title: "Catalizando a geração de conhecimento"
 author: "Box, Hunter e Hunter, Cap. 1"
 ---
 
+```{r setup, include=FALSE}
+source("setup_knitr.R")
+```
+
 # O processo de aprendizado
 
 > "*Conhecimento é poder*"
@@ -26,7 +30,10 @@ author: "Box, Hunter e Hunter, Cap. 1"
 O aprendizado avança conforme ilustrado na figura abaixo (extraída de
 Box, Hunter e Hunter):
 
-![](img/deduction-induction.png)
+```{r, echo=FALSE, out.width='80%'}
+include_graphics("img/deduction-induction.png")
+```
+
 
 - Uma ideia inicial (modelo, hipótese, etc) é levada por um processo de
   **dedução** para algumas consequências
@@ -110,7 +117,9 @@ uma ideia:
 A figura abaixo mostra o processo dedutivo-indutivo como um "loop de
 feedback" (extraída de Box, Hunter e Hunter):
 
-![](img/feedback-loop.png)
+```{r, echo=FALSE, out.width='90%'}
+include_graphics("img/feedback-loop.png")
+```
 
 - Por **dedução**, você considera as consequências esperadas de $M_1$
     - O que aconteceria se $M_1$ fosse verdadeiro ou falso
@@ -226,7 +235,9 @@ A figura abaixo mostra a relação entre o tamanho da população de
 Oldenburg e o número de cegonhas, observados ao final de 7 anos
 (extraído de Box, Hunter e Hunter):
 
-![](img/correlation.png)
+```{r, echo=FALSE, out.width='80%'}
+include_graphics("img/correlation.png")
+```
 
 O número de cegonhas **causou** o aumento da população?
 
