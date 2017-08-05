@@ -1,6 +1,21 @@
 ---
 title: "Diagrama de Hasse para planejamento e análise de dados experimentais"
+output:
+  html_document:
+    code_folding: show
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    cache = TRUE,
+    tidy = FALSE,
+    comment = "#",
+    collapse = TRUE,
+    fig.align = "center",
+    fig.path = "figures/",
+    cache.path = "cache/"
+    )
+```
 
 # Objetivo
 
@@ -170,7 +185,126 @@ Exemplo para DBC:
 |     Resíduo       | $(b-1)(t-1)$ | $\mathbf{Y'Q_{Res}Y}$ |
 
 
-# Delineamento inteiramente casualizado (DIC)
+## 6. Modelos de esperança e variância
+
+1. Designar cada fator original como **fixo** ou **aleatório**
+2. Determinar se um fator generalizado (FG) é potencialmente de
+   esperança ou de variância:
+    a. fator generalizado de efeito fixo: **esperança**
+    b. pelo menos um fator generalizado de efeito aleatório: **termo de
+   variação**
+    c. termo consistindo de todos os fatores não casualizados é
+   considerado aleatório
+3. O **modelo de esperança maximal** ($\boldsymbol{\Psi}$) dá-se pela
+   soma dos termos de esperança
+4. O **modelo de variação maximal** dá-se pela soma dos termos de
+   variação
+
+**Efeito aleatório**:
+
+- Grande número de níveis na população
+- Comportamento aleatório
+- Seus níveis podem ser descritos por uma distribuição de probabilidade
+
+**Efeito fixo**:
+
+- Número pequeno ou grande de níveis
+- Comportamento sistemático
+- Não podem ser descritos por uma distribuição de probabilidade
+
+**Exemplo para DBC:**
+
+- Considerando todos os fatores de **efeito fixo**, o modelo maximal
+usual é:
+$$
+y_{ij} = \mu + \beta_j + \tau_i + \epsilon_{ij}\, \qquad
+j = 1, \ldots, b;\, i = 1, \ldots, t
+$$
+Assim:
+$$
+\begin{align}
+\text{E}(Y_{ij}) &= \mu + \beta_i + \tau_i \\
+\text{V}(Y_{ij}) &= \sigma^2_{BP} \\
+\text{Cov}(Y_{ij}, Y_{i'j'}) &= 0 \,, \quad i \neq i', j \neq j'
+\end{align}
+$$
+Matricialmente:
+$$
+\begin{align}
+\boldsymbol{\Psi} = \text{E}(\mathbf{Y}) &=
+\mathbf{X_G}\boldsymbol{\mu} + \mathbf{X_B}\boldsymbol{\beta} +
+\mathbf{X_T}\boldsymbol{\tau} \\
+\text{V}(\mathbf{Y}) &= \sigma^2_{BP} \mathbf{I_n}
+\end{align}
+$$
+Simbolicamente:
+$$
+\begin{align}
+\boldsymbol{\Psi} = \text{E}(\mathbf{Y}) &=
+\textrm{Bloco} + \textrm{Tratamento} \\
+\text{V}(\mathbf{Y}) &= \textrm{Bloco} \wedge \textrm{Parcela}
+\end{align}
+$$
+
+- Considerando **bloco de efeito aleatório**, o modelo maximal usual é:
+$$
+y_{ij} = \mu + \beta_j + \tau_i + \epsilon_{ij}\, \qquad
+j = 1, \ldots, b;\, i = 1, \ldots, t
+$$
+Assim:
+$$
+\begin{align}
+\text{E}(Y_{ij}) &= \mu + \tau_i \\
+\text{V}(Y_{ij}) &= \sigma^2_{BP} + \sigma^2_{B} \\
+\text{Cov}(Y_{ij}, Y_{i'j}) &= \sigma^2_{B} \,, \quad i \neq i' \\
+\text{Cov}(Y_{ij}, Y_{i'j'}) &= 0 \,, \quad i \neq i', j \neq j'
+\end{align}
+$$
+Matricialmente:
+$$
+\begin{align}
+\boldsymbol{\Psi} = \text{E}(\mathbf{Y}) &=
+\mathbf{X_G}\boldsymbol{\mu} + \mathbf{X_T}\boldsymbol{\tau} \\
+\text{V}(\mathbf{Y}) &= \sigma^2_{BP} \mathbf{I_n} +
+\sigma^2_{B} (\mathbf{I_b} \otimes \mathbf{J_t})
+\end{align}
+$$
+Simbolicamente:
+$$
+\begin{align}
+\boldsymbol{\Psi} = \text{E}(\mathbf{Y}) &= \textrm{Tratamento} \\
+\text{V}(\mathbf{Y}) &= \textrm{Bloco} +
+\textrm{Bloco} \wedge \textrm{Parcela}
+\end{align}
+$$
+
+## 7. Esperanças dos quadrados médios
+
+1. Se $F$ é um termo no **modelo de variação**, atribuir
+   $\frac{n}{f}\sigma^2_F$, onde $n$ é o número de unidades
+   experimentais, e $f$ é o número de níveis de $F$. Se $F$ é um termo
+   no **modelo de esperança**, atribuir $q_F(\Psi)$
+    - Do lado direito de cada FG, somar as contribuições para a
+      esperança do quadrado médio, $\textrm{E}[QM]$
+    - **Esse procedimento é o único que é realizado de baixo para cima
+      no diagrama de Hasse**
+2. Adicionar as contribuições dos fatores **unrandomized** na tabela
+3. Repetir o passo (2) e somar as contribuições àquelas que já estão na
+   tabela
+
+Exemplo para DBC:
+
+| Fonte de variação | E[QM] (Fixo)                | E[QM] (Bloco Aleat.)         |
+|-------------------|-----------------------------|------------------------------|
+| Blocos            | $\sigma^2_{BP} + q_B(\Psi)$ | $\sigma^2_{BP} + \sigma^2_B$ |
+| Parcelas[Blocos]  |                             |                              |
+|     Tratamentos   | $\sigma^2_{BP} + q_T(\Psi)$ | $\sigma^2_{BP} + q_T(\Psi)$  |
+|     Resíduo       | $\sigma^2_{BP}$             | $\sigma^2_{BP}$              |
+
+
+# Principais delineamentos
+
+## Delineamento inteiramente casualizado (DIC)
 
 Considere um experimento em um delineamento inteiramente casualizado com
 $t$ tratamentos e $r$ repetições.
@@ -185,26 +319,173 @@ $$
 Matricialmente o modelo pode ser escrito como:
 
 $$
-\mathbf{Y} = \mathbf{X}\boldsymbol{\theta} + \boldsymbol{\epsilon}_{ij}
-$$
-
-Ou
-
-$$
-\mathbf{Y} = \mathbf{X_G}\boldsymbol{\mu} +
+\begin{align}
+\mathbf{Y} &= \mathbf{X}\boldsymbol{\theta} +
+\boldsymbol{\epsilon}_{ij} \\
+\mathbf{Y} &= \mathbf{X_G}\boldsymbol{\mu} +
 \mathbf{X_T}\boldsymbol{\tau} +
 \boldsymbol{\epsilon}_{ij}
+\end{align}
 $$
 
+- Fórmula estrutural
 
-## Diagrama de Hasse
+| Estrutura | Fórmula |
+|-----------|---------|
+| Unrandomized | $tr$ parcelas |
+| Randomized | $t$ tratamentos |
 
-![](img/DIC_geral.png)
+- Diagrama de Hasse
 
-## Tabela de ANOVA
+```{r, echo=FALSE, out.width='100%'}
+include_graphics("img/DIC_geral.png")
+```
+
+
+- Tabela de ANOVA
 
 | Fonte de variação | GL       | SQ                    | QM                                   | E[QM] (Fixo)             | E[QM] (Aleat.)              |
 |-------------------|----------|-----------------------|--------------------------------------|--------------------------|-----------------------------|
 | Parcelas          | $tr-1$   | $\mathbf{Y'Q_PY}$     |                                      |                          |                             |
 |     Tratamentos   | $t-1$    | $\mathbf{Y'Q_TY}$     | $\frac{\mathbf{Y'Q_TY}}{t-1}$        | $\sigma^2_P + q_T(\Psi)$ | $\sigma^2_P + r \sigma^2_T$ |
 |     Resíduo       | $t(r-1)$ | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{t(r-1)}$ | $\sigma^2_P$             | $\sigma^2_P$                |
+
+Onde:
+
+$$
+\begin{align}
+\mathbf{Q_P} &= \mathbf{M_P - M_G} \\
+\mathbf{Q_{T}} &= \mathbf{M_{T} - M_G} \\
+\mathbf{Q_{Res}} &= \mathbf{Q_P - Q_T} \\
+                 &= \mathbf{M_P - M_G - (M_T - M_G)} \\
+                 &= \mathbf{M_P - M_T}
+\end{align}
+$$
+
+E:
+
+$$
+\begin{align}
+\mathbf{M_G} &= \mathbf{X_G(X'_G X_G)^{-1}X'_G} \\
+\mathbf{M_P} &= \mathbf{X_P(X'_P X_P)^{-1}X'_P} \\
+\mathbf{M_T} &= \mathbf{X_T(X'_T X_T)^{-1}X'_T}
+\end{align}
+$$
+
+- Hipóteses e teste $F$
+
+|            | Fixo                 | Aleatório             |
+|------------|----------------------|-----------------------|
+| Tratamento | $H_0: q_T(\Psi) = 0$ | $H_0: \sigma^2_T = 0$ |
+
+Testes:
+
+$$
+F_T = \frac{\textrm{QMT}}{\textrm{QMRes}}
+$$
+
+- Exemplo no R
+
+Os dados apresentados a seguir referem-se à produções (kg/m$^2$) de 3
+variedades de soja obtidas de um experimento instalado segundo o
+delineamento inteiramente casualizado (DIC) com 3 repetições. Aqui
+considera-se tratamento como de **efeito fixo**.
+
+```{r, collapse=TRUE}
+## Dados
+da.dic <- data.frame(variedade = rep(c("V1", "V2", "V4"), each = 3),
+                     producao = c(41, 40, 44,
+                         51, 48, 50,
+                         53, 54, 52))
+## Estrutura dos dados
+str(da.dic)
+```
+
+```{r, echo=FALSE, out.width='100%'}
+include_graphics("img/DIC_ex1.png")
+```
+
+Calculando todas as matrizes manualmente:
+
+```{r, collapse=TRUE}
+## Atribui nomes comuns para variável resposta e tratamento
+var.resp <- da.dic$producao
+tratamento <- da.dic$variedade
+##----------------------------------------------------------------------
+## Definições
+(t <- length(unique(tratamento)))
+(r <- unique(table(tratamento)))
+(n <- length(var.resp)) # t*r para o caso balanceado
+##----------------------------------------------------------------------
+## Matrizes
+## Vetor de respostas
+(Y <- matrix(var.resp, ncol = 1))
+## Matriz de médias
+(Xg <- matrix(rep(1, n), ncol = 1))
+## Matriz de tratamentos
+Xt <- matrix(0, nrow = n, ncol = t)
+Xt[cbind(seq_along(tratamento), tratamento)] <- 1; Xt
+##----------------------------------------------------------------------
+## Matrizes M
+## para média
+Mg <- Xg %*% solve(t(Xg) %*% Xg) %*% t(Xg)
+MASS::fractions(Mg)
+## para parcela
+(Mp <- diag(1, nrow = n))
+## para tratamento
+Mt <- Xt %*% solve(t(Xt) %*% Xt) %*% t(Xt)
+MASS::fractions(Mt)
+##----------------------------------------------------------------------
+## Matrizes de projeção ortogonal
+## para parcela
+Qp <- Mp - Mg
+MASS::fractions(Qp)
+## para tratamento
+Qt <- Mt - Mg
+MASS::fractions(Qt)
+## para resíduos
+Qr <- Mp - Mt
+MASS::fractions(Qr)
+##----------------------------------------------------------------------
+## Graus de liberdade
+(GLp <- sum(diag(Qp))) # n - 1
+(GLt <- sum(diag(Qt))) # t - 1
+(GLr <- sum(diag(Qr))) # n - t
+##----------------------------------------------------------------------
+## Soma de quadrados
+(SQp <- t(Y) %*% Qp %*% Y)
+(SQt <- t(Y) %*% Qt %*% Y)
+(SQr <- t(Y) %*% Qr %*% Y)
+##----------------------------------------------------------------------
+## Quadrado médio
+(QMt <- SQt/GLt)
+(QMr <- SQr/GLr)
+##----------------------------------------------------------------------
+## F calculado
+(Fcalc <- QMt/QMr)
+##----------------------------------------------------------------------
+## p-valor
+(p.valor <- pf(Fcalc, GLt, GLr, lower.tail = FALSE))
+##----------------------------------------------------------------------
+## Tabela final
+tab.final <- data.frame("GL" = c(GLp, GLt, GLr),
+                        "SQ" = c(SQp, SQt, SQr),
+                        "QM" = c(NA, QMt, QMr),
+                        "F"  = c(NA, Fcalc, NA),
+                        "p-valor" = c(NA, p.valor, NA),
+                        row.names = c("Parcela", "  Tratamento",
+                                      "  Resíduo"))
+tab.final
+```
+
+Compara os resultados usando a função `aov()`:
+
+```{r, collapse=TRUE}
+summary(aov(var.resp ~ tratamento))
+anova(lm(var.resp ~ tratamento))
+summary(lm(var.resp ~ tratamento))
+anova(lm(var.resp ~ tratamento,
+         contrasts = list(tratamento = "contr.sum")))
+summary(lm(var.resp ~ tratamento,
+           contrasts = list(tratamento = "contr.sum")))
+```

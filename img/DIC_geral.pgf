@@ -2,13 +2,13 @@
 \usetikzlibrary{positioning}
 
 \tikzset{state/.style={rectangle, draw=black, fill=white, thick, minimum height=2em, minimum width=12em,
-inner sep=30pt, text centered}, 
-	corner/.style={font=\footnotesize}, 
-	corner2/.style={font=\normalsize}}
+inner sep=30pt, text centered, font=\large}, 
+	corner/.style={font=\large}, 
+	corner2/.style={font=\Large}}
 \tikzset{state2/.style={rectangle, draw=black, fill=gray!20, thick, minimum height=2em,
-inner sep=10pt, text centered}}
+inner sep=10pt, text centered, font=\large}}
 \tikzset{state3/.style={rectangle, draw=black, fill=white, thick, minimum height=4em,minimum width=5em,
-inner sep=10pt, text centered}}
+inner sep=10pt, text centered, font=\large}}
 
 \begin{tikzpicture}[->, >=latex, line width=0.75pt]
 
@@ -23,36 +23,36 @@ inner sep=10pt, text centered}}
 \node[state, yshift=0cm, below of=node1, node distance=4cm, anchor=center] (node2) {  };
 \node[corner2,  anchor=west] at(node2.west) { Parcela };
 \node[corner2,anchor=east] at(node2.east) { P };
-\node[corner, anchor=south west] at (node2.south west) {$tr=n$};
+\node[corner, anchor=south west] at (node2.south west) {$tr$};
 \node[corner, anchor=north east] at (node2.south west) {$\mathbf{M_P}$};
 \node[corner, yshift=-2cm, text=red, anchor=north east] at (node2.south west) {$\frac{tr}{tr}\sigma^2_{P}$};
-\node[corner, anchor=south east] at (node2.south east) {$n-1$};
+\node[corner, anchor=south east] at (node2.south east) {$tr-1$};
 \node[corner, anchor=north west] at (node2.south east) {$\mathbf{M_P} -\mathbf{M_G} = \mathbf{Q_P}$};
 \node[corner, yshift=-2cm, text=red, anchor=north west] at (node2.south east) {$\sigma^2_{P}$};
 
-\draw[-] (node1) -- (node2);
+\draw[<-] (node1) -- (node2);
 \end{scope}
 
 \begin{scope}[xshift=12cm]
 \node [state2](node0) { R };
-\node[state3, yshift=0cm, below of=node0, node distance=2cm, anchor=center] (node1) { $\mu$ };
-\node[corner, anchor=south west] at (node1.south west) {1};
-\node[corner, anchor=north east] at (node1.south west) {$\mathbf{M_G}$};
-\node[corner, anchor=south east] at (node1.south east) {1};
-\node[corner, anchor=north west] at (node1.south east) {$\mathbf{M_G}$};
-\node[state, yshift=0cm, below of=node1, node distance=4cm, anchor=center] (node2) {  };
-\node[corner2, anchor=west] at (node2.west) {Tratamento};
-\node[corner2, anchor=east] at (node2.east) {T};
-\node[corner, anchor=south west] at (node2.south west) {t};
-\node[corner, anchor=north east] at (node2.south west) {$\mathbf{M_T}$};
-\node[corner, yshift=-1cm, text=blue, anchor=north east] at (node2.south west) {$q_T(\Psi)$};
-\node[corner, yshift=-2cm, text=red, anchor=north east] at (node2.south west) {$\frac{tr}{t}\sigma^2_{T}$};
-\node[corner, anchor=south east] at (node2.south east) {t-1};
-\node[corner, anchor=north west] at (node2.south east) {$\mathbf{M_T} -\mathbf{M_G} = \mathbf{Q_T}$};
-\node[corner, yshift=-1cm, text=blue, anchor=north west] at (node2.south east) {$q_T(\Psi)$};
-\node[corner, yshift=-2cm, text=red, anchor=north west] at (node2.south east) {$r\sigma^2_{T}$};
+\node[state3, yshift=0cm, below of=node0, node distance=2cm, anchor=center] (node3) { $\mu$ };
+\node[corner, anchor=south west] at (node3.south west) {1};
+\node[corner, anchor=north east] at (node3.south west) {$\mathbf{M_G}$};
+\node[corner, anchor=south east] at (node3.south east) {1};
+\node[corner, anchor=north west] at (node3.south east) {$\mathbf{M_G}$};
+\node[state, yshift=0cm, below of=node3, node distance=4cm, anchor=center] (node4) {  };
+\node[corner2, anchor=west] at (node4.west) {Tratamento};
+\node[corner2, anchor=east] at (node4.east) {T};
+\node[corner, anchor=south west] at (node4.south west) {$t$};
+\node[corner, anchor=north east] at (node4.south west) {$\mathbf{M_T}$};
+\node[corner, yshift=-1cm, text=blue, anchor=north east] at (node4.south west) {$q_T(\Psi)$};
+\node[corner, yshift=-2cm, text=red, anchor=north east] at (node4.south west) {$\frac{tr}{t}\sigma^2_{T}$};
+\node[corner, anchor=south east] at (node4.south east) {$t-1$};
+\node[corner, anchor=north west] at (node4.south east) {$\mathbf{M_T} -\mathbf{M_G} = \mathbf{Q_T}$};
+\node[corner, yshift=-1cm, text=blue, anchor=north west] at (node4.south east) {$q_T(\Psi)$};
+\node[corner, yshift=-2cm, text=red, anchor=north west] at (node4.south east) {$r\sigma^2_{T}$};
 
-\draw[-] (node1) -- (node2);
+\draw[<-] (node3) -- (node4);
 \end{scope}
-
+\draw[dash pattern=on5pt off3pt] (node4) -- (node2);
 \end{tikzpicture}
