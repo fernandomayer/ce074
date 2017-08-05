@@ -6,15 +6,16 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-    cache = TRUE,
-    tidy = FALSE,
-    comment = "#",
-    collapse = TRUE,
-    fig.align = "center",
-    fig.path = "figures/",
-    cache.path = "cache/"
-    )
+library(knitr, quietly = TRUE)
+opts_chunk$set(
+               cache = TRUE,
+               tidy = FALSE,
+               comment = "#",
+               collapse = TRUE,
+               fig.align = "center",
+               fig.path = "figures/",
+               cache.path = "cache/"
+           )
 ```
 
 # Objetivo
