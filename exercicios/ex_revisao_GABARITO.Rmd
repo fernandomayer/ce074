@@ -4,9 +4,20 @@ author: "CE074 - Controle de Processos Industriais"
 date: "2017/2"
 fontsize: 11pt
 header-includes:
-  - \usepackage{mathpazo}
-output: pdf_document
+    - \usepackage{mathpazo}
+    - \usepackage[scaled]{beramono}
+output:
+  pdf_document:
+    highlight: default
 ---
+
+```{r setup, include=FALSE}
+library(knitr, quietly = TRUE)
+opts_chunk$set(size = "small",
+               comment = "#",
+               tidy = FALSE
+               )
+```
 
 1. Quais as suposições de um experimento inteiramente casualizado?
 As UEs devem ser independentes.
@@ -115,9 +126,8 @@ n <- nf * b
 fator <- rep(LETTERS[1:6], each = b)
 blocos <- rep(c("I", "II", "III", "IV"), each = nf)
 set.seed(123)
-## Certo??
 (DBC <- data.frame(UE = 1:n, Blocos = blocos, Fator = sample(fator)))
-## Não. Fazer:
+## Está certo o que foi feito até aqui?
 set.seed(123)
 (DBC <- data.frame(UE = 1:n, Blocos = blocos,
                    Fator = as.vector(
@@ -221,6 +231,7 @@ presença/ausência dos níveis do fator.
 ## Um exemplo com cars
 set.seed(123)
 (carros <- cars[sample(1:nrow(cars), size = 15), ])
+plot(dist ~ speed, data = carros)
 model.matrix(dist ~ speed, data = carros)
 ## Um fator com 3 níveis e 4 repetições
 fator <- rep(c("A", "B", "C"), each = 4)
@@ -257,6 +268,7 @@ Xt <- t(X)
 Xt %*% X
 ## (X'X)^-1
 solve(Xt %*% X)
+MASS::fractions(solve(Xt %*% X))
 ```
 1. Por que fazemos análise dos resíduos?
 ```
