@@ -15,7 +15,8 @@ output:
 library(knitr, quietly = TRUE)
 opts_chunk$set(size = "small",
                comment = "#",
-               tidy = FALSE
+               tidy = FALSE,
+               fig.align = "center"
                )
 ```
 
@@ -227,7 +228,7 @@ mensurados da variável resposta, enquanto que a matriz do modelo de um
 experimento com um fator contém variáveis dummy para indicar a
 presença/ausência dos níveis do fator.
 ```
-```{r}
+```{r, out.width='60%'}
 ## Um exemplo com cars
 set.seed(123)
 (carros <- cars[sample(1:nrow(cars), size = 15), ])
