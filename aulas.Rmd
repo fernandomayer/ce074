@@ -30,7 +30,8 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
 - **03/08**: Catalizando a geração de conhecimento. Ver
   [material](catalizando-conhecimento.html). Fazer [exercícios de
   revisão](exercicios/ex_revisao.pdf).
-- **07/08**:
+- **07/08**: Exercícios de revisão. Ver
+  [Gabarito](exercicios/ex_revisao_GABARITO.pdf).
 - **10/08**:
 - **14/08**:
 - **17/08**:
@@ -67,7 +68,9 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
 
 ## Exercícios
 
-- Revisão de conhecimento. [PDF](exercicios/ex_revisao.pdf).
+- Revisão de conhecimento. [PDF](exercicios/ex_revisao.pdf) |
+[Gabarito](exercicios/ex_revisao_GABARITO.pdf) |
+[Script](exercicios/ex_revisao_GABARITO.R)
 
 ## Notas
 
