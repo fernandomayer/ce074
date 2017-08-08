@@ -81,7 +81,7 @@ Exemplo para DQL com $k$ linhas e colunas, e $t$ tratamentos:
 
 ## 3. Fontes de variação obtidas através da fórmula estrutural
 
-Regras para expendir a fórmula estrutural:
+Regras para expandir a fórmula estrutural:
 
 $$
 A*B = A + B + A\#B
@@ -310,7 +310,7 @@ Exemplo para DBC:
 Considere um experimento em um delineamento inteiramente casualizado com
 $t$ tratamentos e $r$ repetições.
 
-O modelo associado à este experimento é
+O modelo associado à este delineamento é
 
 $$
 y_{ij} = \mu + \tau_i + \epsilon_{ij}\, \qquad i = 1, \ldots, t;\, j = 1,
@@ -394,7 +394,8 @@ considera-se tratamento como de **efeito fixo**.
 
 ```{r, collapse=TRUE}
 ## Dados
-da.dic <- data.frame(variedade = rep(c("V1", "V2", "V4"), each = 3),
+da.dic <- data.frame(variedade = rep(c("V1", "V2", "V3"), each = 3),
+                     parcela = factor(1:9),
                      producao = c(41, 40, 44,
                          51, 48, 50,
                          53, 54, 52))
@@ -402,16 +403,36 @@ da.dic <- data.frame(variedade = rep(c("V1", "V2", "V4"), each = 3),
 str(da.dic)
 ```
 
+A **fórmula estrutural** é:
+
+| Estrutura | Fórmula |
+|-----------|---------|
+| Unrandomized | $9$ parcelas |
+| Randomized | $3$ tratamentos |
+
+O **diagrama de Hasse** fica desta forma:
+
 ```{r, echo=FALSE, out.width='100%'}
 include_graphics("img/DIC_ex1.png")
 ```
 
-Calculando todas as matrizes manualmente:
+A **tabela de ANOVA** fica:
+
+| Fonte de variação | GL       | SQ                    | QM                                   | E[QM] (Fixo)             |
+|-------------------|----------|-----------------------|--------------------------------------|--------------------------|
+| Parcelas          | $8$   | $\mathbf{Y'Q_PY}$     |                                      |                          |
+|     Tratamentos   | $2$    | $\mathbf{Y'Q_TY}$     | $\frac{\mathbf{Y'Q_TY}}{t-1}$        | $\sigma^2_P + q_T(\Psi)$ |
+|     Resíduo       | $6$ | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{t(r-1)}$ | $\sigma^2_P$             |
+
+
+Calculando as matrizes $\mathbf{Q}$ manualmente:
 
 ```{r, collapse=TRUE}
+##----------------------------------------------------------------------
 ## Atribui nomes comuns para variável resposta e tratamento
 var.resp <- da.dic$producao
 tratamento <- da.dic$variedade
+parcela <- da.dic$parcela
 ##----------------------------------------------------------------------
 ## Definições
 (t <- length(unique(tratamento)))
@@ -448,7 +469,7 @@ MASS::fractions(Qt)
 Qr <- Mp - Mt
 MASS::fractions(Qr)
 ##----------------------------------------------------------------------
-## Graus de liberdade
+## Graus de liberdade (usando propriedade de traço)
 (GLp <- sum(diag(Qp))) # n - 1
 (GLt <- sum(diag(Qt))) # t - 1
 (GLr <- sum(diag(Qr))) # n - t
@@ -483,10 +504,214 @@ Compara os resultados usando a função `aov()`:
 
 ```{r, collapse=TRUE}
 summary(aov(var.resp ~ tratamento))
-anova(lm(var.resp ~ tratamento))
-summary(lm(var.resp ~ tratamento))
-anova(lm(var.resp ~ tratamento,
-         contrasts = list(tratamento = "contr.sum")))
-summary(lm(var.resp ~ tratamento,
-           contrasts = list(tratamento = "contr.sum")))
+## Usando a função Error() para indicar o confundimento
+summary(aov(var.resp ~ tratamento + Error(parcela)))
+```
+
+## Delineamento em blocos completos (DBC)
+
+Considere um experimento em um delineamento em blocos completos com
+$t$ tratamentos e $b$ blocos.
+
+O modelo associado à este delineamento é
+
+$$
+y_{ij} = \mu + \beta_i + \tau_j + \epsilon_{ij}\,
+\qquad i = 1, \ldots,b;\, j = 1, \ldots, t
+$$
+
+Matricialmente o modelo pode ser escrito como:
+
+$$
+\begin{align}
+\mathbf{Y} &= \mathbf{X}\boldsymbol{\theta} +
+\boldsymbol{\epsilon}_{ij} \\
+\mathbf{Y} &= \mathbf{X_G}\boldsymbol{\mu} +
+\mathbf{X_B}\boldsymbol{\beta} +
+\mathbf{X_T}\boldsymbol{\tau} +
+\boldsymbol{\epsilon}_{ij}
+\end{align}
+$$
+
+- Fórmula estrutural
+
+| Estrutura | Fórmula |
+|-----------|---------|
+| Unrandomized | $b$ blocos/$t$ parcelas |
+| Randomized | $t$ tratamentos |
+
+- Diagrama de Hasse
+
+```{r, echo=FALSE, out.width='100%'}
+include_graphics("img/DIC_geral.png")
+```
+
+- Tabela de ANOVA
+
+| Fonte de variação | GL           | SQ                    | QM                                       | E[QM] (1)                   | E[QM] (2)                       | E[QM] (3)                     | E[QM] (4)                       |
+|-------------------|--------------|-----------------------|------------------------------------------|-----------------------------|---------------------------------|-------------------------------|---------------------------------|
+| Blocos            | $b-1$        | $\mathbf{Y'Q_{B}Y}$   | $\frac{\mathbf{Y'Q_{B}Y}}{b-1}$          | $\sigma^2_{PB} + q_B(\Psi)$ | $\sigma^2_{PB} + t\sigma^2_{B}$ | $\sigma^2_{PB} + q_B(\Psi)$   | $\sigma^2_{PB} + t\sigma^2_{B}$ |
+| Parcelas[Blocos]  | $b(t-1)$     | $\mathbf{Y'Q_{BP}Y}$  | $\frac{\mathbf{Y'Q_{BP}Y}}{b(t-1)}$      |                             |                                 |                               |                                 |
+|     Tratamentos   | $t-1$        | $\mathbf{Y'Q_{T}Y}$   | $\frac{\mathbf{Y'Q_{T}Y}}{t-1}$          | $\sigma^2_{PB} + q_T(\Psi)$ | $\sigma^2_{PB} + q_T(\Psi)$     | $\sigma^2_{PB} + b\sigma^2_T$ | $\sigma^2_{PB} + b\sigma^2_{T}$ |
+|     Resíduo       | $(b-1)(t-1)$ | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{(b-1)(t-1)}$ | $\sigma^2_{PB}$             | $\sigma^2_{PB}$                 | $\sigma^2_{PB}$               | $\sigma^2_{PB}$                 |
+
+Onde os números após a E[QM] são as combinações:
+
+- **(1)**: Bloco fixo, tratamento fixo
+- **(2)**: Bloco aleatório, tratamento fixo
+- **(3)**: Bloco fixo, tratamento aleatório
+- **(4)**: Bloco aleatório, tratamento aleatório
+
+E as matrizes são:
+
+$$
+\begin{align}
+\mathbf{Q_B} &= \mathbf{M_B - M_G} \\
+\mathbf{Q_{BP}} &= \mathbf{M_{BP} - M_B} \\
+\mathbf{Q_{T}} &= \mathbf{M_{T} - M_G} \\
+\mathbf{Q_{Res}} &= \mathbf{Q_{BP} - Q_T} \\
+                 &= \mathbf{M_{BP} - M_B - (M_T - M_G)} \\
+                 &= \mathbf{M_{BP} - M_B - M_T + M_G}
+\end{align}
+$$
+
+E:
+
+$$
+\begin{align}
+\mathbf{M_G} &= \mathbf{X_G(X'_G X_G)^{-1}X'_G} \\
+\mathbf{M_B} &= \mathbf{X_B(X'_B X_B)^{-1}X'_B} \\
+\mathbf{M_T} &= \mathbf{X_T(X'_T X_T)^{-1}X'_T} \\
+\mathbf{M_{BP}} &= \mathbf{X_{BP}(X'_{BP} X_{BP})^{-1}X'_{BP}}
+\end{align}
+$$
+
+- Hipóteses e teste $F$
+
+|            | (1)                  | (2)                   | (3)                   | (4)                   |
+|------------|----------------------|-----------------------|-----------------------|-----------------------|
+| Bloco      | $H_0: q_B(\Psi) = 0$ | $H_0: \sigma^2_B = 0$ | $H_0: q_B(\Psi) = 0$  | $H_0: \sigma^2_B = 0$ |
+| Tratamento | $H_0: q_T(\Psi) = 0$ | $H_0: q_T(\Psi) = 0$  | $H_0: \sigma^2_T = 0$ | $H_0: \sigma^2_T = 0$ |
+
+Testes:
+
+$$
+\begin{align}
+F_B &= \frac{\textrm{QMB}}{\textrm{QMRes}} \\
+F_T &= \frac{\textrm{QMT}}{\textrm{QMRes}}
+\end{align}
+$$
+
+(Para todos os casos).
+
+- Exemplo no R
+
+Os dados apresentados a seguir referem-se à produção média (2 plantas)
+de frutos, em kg/planta, de uma espécie de laranjeira, enxertada sobre
+13 clones, obtidos de um experimento casualizado em blocos.
+
+```{r, collapse=TRUE}
+da.dbc <- data.frame(tratamento = rep(paste("T", 1:4, sep= ""), 3),
+                     blocos = factor(rep(1:3, each = 4)),
+                     producao = c(24.45, 80.55, 76.45, 54.6,
+                                  21.85, 69.9, 64.2, 72.6,
+                                  32.45, 52.85, 60.9, 55.25))
+str(da.dbc)
+```
+
+Análise
+
+```{r, collapse=TRUE}
+##----------------------------------------------------------------------
+## Atribui nomes comuns para variável resposta e tratamento
+var.resp <- da.dbc$producao
+tratamento <- da.dbc$tratamento
+blocos <- da.dbc$blocos
+##----------------------------------------------------------------------
+## Definições
+(t <- length(unique(tratamento)))
+(b <- length(unique(blocos)))
+(n <- t*b)
+##----------------------------------------------------------------------
+## Matrizes
+## Vetor de respostas
+(Y <- matrix(var.resp, ncol = 1))
+## Matriz de médias
+(Xg <- matrix(rep(1, n), ncol = 1))
+## Matriz de tratamentos
+Xt <- matrix(0, nrow = n, ncol = t)
+Xt[cbind(seq_along(tratamento), tratamento)] <- 1; Xt
+## Matriz de blocos
+Xb <- matrix(0, nrow = n, ncol = b)
+Xb[cbind(seq_along(blocos), blocos)] <- 1; Xb
+##----------------------------------------------------------------------
+## Matrizes M
+## para média
+Mg <- Xg %*% solve(t(Xg) %*% Xg) %*% t(Xg)
+MASS::fractions(Mg)
+## para tratamento
+Mt <- Xt %*% solve(t(Xt) %*% Xt) %*% t(Xt)
+MASS::fractions(Mt)
+## para blocos
+Mb <- Xb %*% solve(t(Xb) %*% Xb) %*% t(Xb)
+MASS::fractions(Mb)
+## para bloco/parcela
+(Mbp <- diag(1, nrow = n))
+##----------------------------------------------------------------------
+## Matrizes de projeção ortogonal
+## para tratamento
+Qt <- Mt - Mg
+MASS::fractions(Qt)
+## para bloco
+Qb <- Mb - Mg
+MASS::fractions(Qb)
+## para bloco/parcela
+Qbp <- Mbp - Mb
+MASS::fractions(Qbp)
+## para resíduos
+Qr <- Mbp - Mt - Mb + Mg
+MASS::fractions(Qr)
+##----------------------------------------------------------------------
+## Graus de liberdade (usando propriedade de traço)
+(GLb <- sum(diag(Qb))) # b - 1
+(GLbp <- sum(diag(Qbp))) # b * (t - 1)
+(GLt <- sum(diag(Qt))) # t - 1
+(GLr <- sum(diag(Qr))) # (b - 1) * (t - 1)
+##----------------------------------------------------------------------
+## Soma de quadrados
+(SQb <- t(Y) %*% Qb %*% Y)
+(SQbp <- t(Y) %*% Qbp %*% Y)
+(SQt <- t(Y) %*% Qt %*% Y)
+(SQr <- t(Y) %*% Qr %*% Y)
+##----------------------------------------------------------------------
+## Quadrado médio
+(QMb <- SQb/GLb)
+(QMt <- SQt/GLt)
+(QMr <- SQr/GLr)
+##----------------------------------------------------------------------
+## F calculado
+(Fcalc.b <- QMb/QMr)
+(Fcalc.t <- QMt/QMr)
+##----------------------------------------------------------------------
+## p-valor
+(p.valor.b <- pf(Fcalc.b, GLb, GLr, lower.tail = FALSE))
+(p.valor.t <- pf(Fcalc.t, GLt, GLr, lower.tail = FALSE))
+##----------------------------------------------------------------------
+## Tabela final
+tab.final <- data.frame("GL" = c(GLb, GLbp, GLt, GLr),
+                        "SQ" = c(SQb, SQbp, SQt, SQr),
+                        "QM" = c(QMb, NA, QMt, QMr),
+                        "F"  = c(Fcalc.b, NA, Fcalc.t, NA),
+                        "p-valor" = c(p.valor.b, NA, p.valor.t, NA),
+                        row.names = c("Blocos", "Parcelas[Blocos]",
+                                      "  Tratamentos", "  Resíduo"))
+tab.final
+```
+
+Comparando os resultados com a função `aov()`:
+
+```{r}
+summary(aov(var.resp ~ blocos + tratamento))
+## Usando a função Error() para identificar o confundimento
+summary(aov(var.resp ~ blocos + tratamento + Error(blocos)))
 ```
