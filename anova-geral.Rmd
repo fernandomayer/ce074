@@ -543,7 +543,7 @@ $$
 - Diagrama de Hasse
 
 ```{r, echo=FALSE, out.width='100%'}
-include_graphics("img/DIC_geral.png")
+include_graphics("img/DBC_geral.png")
 ```
 
 - Tabela de ANOVA
@@ -618,6 +618,8 @@ da.dbc <- data.frame(tratamento = rep(paste("T", 1:4, sep= ""), 3),
                                   32.45, 52.85, 60.9, 55.25))
 str(da.dbc)
 ```
+
+INSERIR fórmula estrutural e diagrama de Hasse
 
 Análise
 
@@ -715,3 +717,105 @@ summary(aov(var.resp ~ blocos + tratamento))
 ## Usando a função Error() para identificar o confundimento
 summary(aov(var.resp ~ blocos + tratamento + Error(blocos)))
 ```
+
+## Delineamento em quadrado latino (DQL)
+
+Considere um experimento em um delineamento em quadrado latino com
+$t$ tratamentos, portanto com $t$ linhas e $t$ colunas.
+
+O modelo associado à este delineamento é
+
+$$
+y_{ij} = \mu + \alpha_i + \beta_j + \gamma_{k(ij)} + \epsilon_{ij}\,
+\qquad i = j = k = 1, \ldots, t
+$$
+
+Matricialmente o modelo pode ser escrito como:
+
+$$
+\begin{align}
+\mathbf{Y} &= \mathbf{X}\boldsymbol{\theta} +
+\boldsymbol{\epsilon}_{ij} \\
+\mathbf{Y} &= \mathbf{X_G}\boldsymbol{\mu} +
+\mathbf{X_L}\boldsymbol{\alpha} +
+\mathbf{X_C}\boldsymbol{\beta} +
+\mathbf{X_{LC}}\boldsymbol{\gamma} +
+\boldsymbol{\epsilon}_{ij}
+\end{align}
+$$
+
+- Fórmula estrutural
+
+| Estrutura | Fórmula |
+|-----------|---------|
+| Unrandomized | $t$ linhas $*$ $t$ colunas |
+| Randomized | $t$ tratamentos |
+
+- Diagrama de Hasse
+
+```{r, echo=FALSE, out.width='100%'}
+include_graphics("img/DQL_geral.png")
+```
+
+- Tabela de ANOVA
+
+| Fonte de variação | GL           | SQ                    | QM                                       | E[QM] (1)                   | E[QM] (2)                       | E[QM] (3)                     | E[QM] (4)                       |
+|-------------------|--------------|-----------------------|------------------------------------------|-----------------------------|---------------------------------|-------------------------------|---------------------------------|
+| Linha             | $t-1$        | $\mathbf{Y'Q_{L}Y}$   | $\frac{\mathbf{Y'Q_{L}Y}}{t-1}$          | $\sigma^2_{LC} + q_L(\Psi)$ | $\sigma^2_{LC} + q_L(\Psi)$     | $\sigma^2_{LC} + q_L(\Psi)$   | $\sigma^2_{LC} + t\sigma^2_{L}$ |
+| Coluna            | $t-1$        | $\mathbf{Y'Q_{C}Y}$   | $\frac{\mathbf{Y'Q_{C}Y}}{t-1}$          | $\sigma^2_{LC} + q_C(\Psi)$ | $\sigma^2_{LC} + t\sigma^2_{C}$ | $\sigma^2_{LC} + q_C(\Psi)$   | $\sigma^2_{LC} + t\sigma^2_{C}$ |
+| Linha#Coluna      | $(t-1)^2$    | $\mathbf{Y'Q_{LC}Y}$  | $\frac{\mathbf{Y'Q_{LC}Y}}{(t-1)^2}$     |                             |                                 |                               |                                 |
+| Tratamentos       | $t-1$        | $\mathbf{Y'Q_{T}Y}$   | $\frac{\mathbf{Y'Q_{T}Y}}{t-1}$          | $\sigma^2_{LC} + q_T(\Psi)$ | $\sigma^2_{LC} + q_T(\Psi)$     | $\sigma^2_{LC} + t\sigma^2_T$ | $\sigma^2_{LC} + t\sigma^2_{T}$ |
+| Resíduo           | $(t-1)(t-2)$ | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{(t-1)(t-2)}$ | $\sigma^2_{LC}$             | $\sigma^2_{LC}$                 | $\sigma^2_{LC}$               | $\sigma^2_{LC}$                 |
+
+Onde os números após a E[QM] são as combinações:
+
+- **(1)**: Linha fixo, coluna fixo, tratamento fixo
+- **(2)**: Linha fixo, coluna aleatório, tratamento fixo
+- **(3)**: Linha fixo, coluna aleatório, tratamento aleatório
+- **(4)**: Linha aleatório, coluna aleatório, tratamento aleatório
+
+E as matrizes são:
+
+$$
+\begin{align}
+\mathbf{Q_L} &= \mathbf{M_L - M_G} \\
+\mathbf{Q_C} &= \mathbf{M_C - M_G} \\
+\mathbf{Q_{LC}} &= \mathbf{M_{LC} - M_L - M_C + M_G} \\
+\mathbf{Q_{T}} &= \mathbf{M_{T} - M_G} \\
+\mathbf{Q_{Res}} &= \mathbf{Q_{LC} - Q_T} \\
+                 &= \mathbf{M_{LC} - M_L - M_C + M_G - (M_T - M_G)} \\
+                 &= \mathbf{M_{LC} - M_L - M_C + M_G - M_T + M_G}
+\end{align}
+$$
+
+E:
+
+$$
+\begin{align}
+\mathbf{M_G} &= \mathbf{X_G(X'_G X_G)^{-1}X'_G} \\
+\mathbf{M_L} &= \mathbf{X_L(X'_L X_L)^{-1}X'_L} \\
+\mathbf{M_C} &= \mathbf{X_C(X'_C X_C)^{-1}X'_C} \\
+\mathbf{M_T} &= \mathbf{X_T(X'_T X_T)^{-1}X'_T} \\
+\mathbf{M_{LC}} &= \mathbf{X_{LC}(X'_{LC} X_{LC})^{-1}X'_{LC}}
+\end{align}
+$$
+
+- Hipóteses e teste $F$
+
+|            | (1)                  | (2)                   | (3)                   | (4)                   |
+|------------|----------------------|-----------------------|-----------------------|-----------------------|
+| Linha      | $H_0: q_L(\Psi) = 0$ | $H_0: q_L(\Psi) = 0$  | $H_0: q_L(\Psi) = 0$  | $H_0: \sigma^2_L = 0$ |
+| Coluna     | $H_0: q_C(\Psi) = 0$ | $H_0: \sigma^2_C = 0$ | $H_0: q_C(\Psi) = 0$  | $H_0: \sigma^2_C = 0$ |
+| Tratamento | $H_0: q_T(\Psi) = 0$ | $H_0: q_T(\Psi) = 0$  | $H_0: \sigma^2_T = 0$ | $H_0: \sigma^2_T = 0$ |
+
+Testes:
+
+$$
+\begin{align}
+F_L &= \frac{\textrm{QML}}{\textrm{QMRes}} \\
+F_C &= \frac{\textrm{QMC}}{\textrm{QMRes}} \\
+F_T &= \frac{\textrm{QMT}}{\textrm{QMRes}}
+\end{align}
+$$
+
+(Para todos os casos).
