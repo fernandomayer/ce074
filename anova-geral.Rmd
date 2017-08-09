@@ -819,3 +819,132 @@ F_T &= \frac{\textrm{QMT}}{\textrm{QMRes}}
 $$
 
 (Para todos os casos).
+
+- Exemplo no R
+
+Os dados apresentados a seguir referem-se às produções de batata (kg/ha)
+obtidas de um experimento instalado no delineamento em quadrado latino,
+envolvendo quatro sistemas de plantio (S1, S2, S3, S4).
+
+```{r, collapse=TRUE}
+da.dql <- expand.grid(colunas = factor(1:4), linhas = factor(1:4))
+da.dql$sistemas <- factor(c("S1", "S2", "S4", "S3",
+                     "S4", "S1", "S3", "S2",
+                     "S2", "S3", "S1", "S4",
+                     "S3", "S4", "S2", "S1"))
+da.dql$producao <- c(92.6, 96.3, 73.1, 86.7,
+                     88.8, 100.3, 96.4, 97.2,
+                     112.6, 100.1, 90.6, 65.7,
+                     92.5, 43.7, 83.4, 70.2)
+str(da.dql, give.attr = FALSE)
+```
+
+INSERIR fórmula estrutural e diagrama de Hasse.
+
+Análise
+
+```{r, collapse=TRUE}
+##----------------------------------------------------------------------
+## Atribui nomes comuns para variável resposta, linhas e colunas
+var.resp <- da.dql$producao
+tratamento <- da.dql$sistemas
+linhas <- da.dql$linhas
+colunas <- da.dql$colunas
+##----------------------------------------------------------------------
+## Definicoes
+t <- length(unique(tratamento))
+n <- t^2
+##----------------------------------------------------------------------
+## Matrizes
+## Vetor de respostas
+(Y <- matrix(var.resp, ncol = 1))
+## Matriz de médias
+(Xg <- matrix(rep(1, n), ncol = 1))
+## Matriz de tratamentos
+Xt <- matrix(0, nrow = n, ncol = t)
+Xt[cbind(seq_along(tratamento), tratamento)] <- 1; Xt
+## Matriz de linhas
+Xl <- matrix(0, nrow = n, ncol = t)
+Xl[cbind(seq_along(linhas), linhas)] <- 1; Xl
+## Matriz de colunas
+Xc <- matrix(0, nrow = n, ncol = t)
+Xc[cbind(seq_along(colunas), colunas)] <- 1; Xc
+##----------------------------------------------------------------------
+## Matrizes M
+## para média
+Mg <- Xg %*% solve(t(Xg) %*% Xg) %*% t(Xg)
+MASS::fractions(Mg)
+## para linhas
+Ml <- Xl %*% solve(t(Xl) %*% Xl) %*% t(Xl)
+MASS::fractions(Ml)
+## para colunas
+Mc <- Xc %*% solve(t(Xc) %*% Xc) %*% t(Xc)
+MASS::fractions(Mc)
+## para tratamentos
+Mt <- Xt %*% solve(t(Xt) %*% Xt) %*% t(Xt)
+MASS::fractions(Mt)
+## para linha#coluna
+(Mlc <- diag(1, nrow = n))
+##----------------------------------------------------------------------
+## Matrizes de projeção ortogonal
+## para linhas
+Ql <- Ml - Mg
+MASS::fractions(Ql)
+## para colunas
+Qc <- Mc - Mg
+MASS::fractions(Qc)
+## para linhas#colunas
+Qlc <- Mlc - Ml - Mc + Mg
+MASS::fractions(Qlc)
+## para tratamentos
+Qt <- Mt - Mg
+MASS::fractions(Qt)
+## para resíduo
+Qres <- Mlc - Ml - Mc + Mg - Mt + Mg
+MASS::fractions(Qres)
+##----------------------------------------------------------------------
+## Graus de liberdade (usando propriedade de traço)
+(GLl <- sum(diag(Ql))) # t - 1
+(GLc <- sum(diag(Qc))) # t - 1
+(GLlc <- sum(diag(Qlc))) # (t - 1)^2
+(GLt <- sum(diag(Qt))) # t - 1
+(GLres <- sum(diag(Qres))) # (t - 1) * (t - 2)
+##----------------------------------------------------------------------
+## Soma de quadrados
+(SQl <- t(Y) %*% Ql %*% Y)
+(SQc <- t(Y) %*% Qc %*% Y)
+(SQlc <- t(Y) %*% Qlc %*% Y)
+(SQt <- t(Y) %*% Qt %*% Y)
+(SQres <- t(Y) %*% Qres %*% Y)
+## Quadrado médio
+(QMl <- SQl/GLl)
+(QMc <- SQc/GLc)
+(QMt <- SQt/GLt)
+(QMres <- SQres/GLres)
+## F calculado
+(Fcalc.l <- QMl/QMres)
+(Fcalc.c <- QMc/QMres)
+(Fcalc.t <- QMt/QMres)
+## p-valor
+(p.valor.l <- pf(Fcalc.l, GLl, GLres, lower.tail = FALSE))
+(p.valor.c <- pf(Fcalc.c, GLc, GLres, lower.tail = FALSE))
+(p.valor.t <- pf(Fcalc.t, GLt, GLres, lower.tail = FALSE))
+## Tabela final
+tab.final <- data.frame("GL" = c(GLl, GLc, GLlc, GLt, GLres),
+                        "SQ" = c(SQl, SQc, SQlc, SQt, SQres),
+                        "QM" = c(QMl, QMc, NA, QMt, QMres),
+                        "F"  = c(Fcalc.l, Fcalc.c, NA, Fcalc.t, NA),
+                        "p-valor" = c(p.valor.l, p.valor.c, NA, p.valor.t, NA),
+                        row.names = c("Linhas", "Colunas", "Linhas#Colunas",
+                                      "  Tratamentos", "  Resíduo"))
+tab.final
+```
+
+Comparando os resultados com a função `aov()`:
+
+```{r, collapse=TRUE}
+summary(aov(var.resp ~ linhas + colunas + tratamento))
+## Usando a função Error() para identificar o confundimento
+summary(aov(var.resp ~ linhas + colunas + tratamento +
+                Error(linhas*colunas)))
+```
