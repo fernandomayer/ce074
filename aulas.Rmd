@@ -32,7 +32,8 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
   revisão](exercicios/ex_revisao.pdf).
 - **07/08**: Exercícios de revisão. Ver
   [Gabarito](exercicios/ex_revisao_GABARITO.pdf).
-- **10/08**:
+- **10/08**: Aula cancelada em virtude da palestra [Data Science
+ Experience](https://www.facebook.com/PET.Estatistica.UFPR/photos/a.1642649022622718.1073741828.1641067472780873/2013970412157242/?type=3&theater).
 - **14/08**:
 - **17/08**:
 - **21/08**:
