@@ -948,3 +948,267 @@ summary(aov(var.resp ~ linhas + colunas + tratamento))
 summary(aov(var.resp ~ linhas + colunas + tratamento +
                 Error(linhas*colunas)))
 ```
+
+## Experimentos fatoriais
+
+Os experimentos fatoriais são aqueles que consideram dois ou mais
+fatores (tratamentos) em conjunto. Estes experimentos podem ser
+realizados em diversos delineamentos, como inteiramente casualizado
+(DIC), ou em blocos (DBC). Aqui veremos um exemplo de um experimento
+no esquema fatorial com o delineamento inteiramente ao acaso.
+
+Considere um experimento fatorial em um delineamento inteiramente
+casualizado, supondo que o fator A possui $a$ níveis, o fator B possui
+$b$ níveis, e ocorrem $r$ repetições de cada combinação dos fatores A e
+B.
+
+O modelo associado à este delineamento é
+
+$$
+y_{ijk} = \mu + \alpha_i + \beta_j + \gamma_{k(ij)} + \epsilon_{ijk}\,
+\qquad i = 1, \ldots, a;\, j = 1, \ldots, b; k = 1, \ldots, r
+$$
+
+Matricialmente o modelo pode ser escrito como:
+
+$$
+\begin{align}
+\mathbf{Y} &= \mathbf{X}\boldsymbol{\theta} +
+\boldsymbol{\epsilon}_{ijk} \\
+\mathbf{Y} &= \mathbf{X_G}\boldsymbol{\mu} +
+\mathbf{X_A}\boldsymbol{\alpha} +
+\mathbf{X_B}\boldsymbol{\beta} +
+\mathbf{X_{AB}}\boldsymbol{\gamma} +
+\boldsymbol{\epsilon}_{ijk}
+\end{align}
+$$
+
+- Fórmula estrutural
+
+| Estrutura | Fórmula |
+|-----------|---------|
+| Unrandomized | $n$ parcelas |
+| Randomized | $a$ A $*$ $b$ B |
+
+- Diagrama de Hasse
+
+```{r, echo=FALSE, out.width='100%'}
+include_graphics("img/DIC_FATORIAL_geral.png")
+```
+
+- Tabela de ANOVA
+
+| Fonte de variação | GL           | SQ                    | QM                                      | E[QM] (1)                     | E[QM] (2)                                      | E[QM] (3)                                      | E[QM] (4)                                      |
+|-------------------|--------------|-----------------------|-----------------------------------------|-------------------------------|------------------------------------------------|------------------------------------------------|------------------------------------------------|
+| Parcela           | $rab-1$      | $\mathbf{Y'Q_{P}Y}$   | $\frac{\mathbf{Y'Q_{P}Y}}{rab-1}$       |                               |                                                |                                                |                                                |
+| A                 | $a-1$        | $\mathbf{Y'Q_{A}Y}$   | $\frac{\mathbf{Y'Q_{A}Y}}{a-1}$         | $\sigma^2_{P} + q_A(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + rb\sigma^2_A$ | $\sigma^2_{P} + r\sigma^2_{AB} + q_A(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + rb\sigma^2_A$ |
+| B                 | $b-1$        | $\mathbf{Y'Q_{B}Y}$   | $\frac{\mathbf{Y'Q_{B}Y}}{b-1}$         | $\sigma^2_{P} + q_B(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + q_B(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + ra\sigma^2_B$ | $\sigma^2_{P} + r\sigma^2_{AB} + ra\sigma^2_B$ |
+| A#B               | $(a-1)(b-1)$ | $\mathbf{Y'Q_{AB}Y}$  | $\frac{\mathbf{Y'Q_{AB}Y}}{(a-1)(b-1)}$ | $\sigma^2_{P} + q_{AB}(\Psi)$ | $\sigma^2_{P} + r\sigma^2_{AB}$                | $\sigma^2_{P} + r\sigma^2_{AB}$                | $\sigma^2_{P} + r\sigma^2_{AB}$                |
+| Resíduo           | $ab(r-1)$    | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{ab(r-1)}$   | $\sigma^2_{P}$                | $\sigma^2_{P}$                                 | $\sigma^2_{P}$                                 | $\sigma^2_{P}$                                 |
+
+Onde os números após a E[QM] são as combinações:
+
+- **(1)**: Fator A fixo, fator B fixo, A#B fixo
+- **(2)**: Fator A aleatório, fator B fixo, A#B aleatório
+- **(3)**: Fator A fixo, Fator B aleatório, A#B aleatório
+- **(4)**: Fator A aleatório, fator B aleatório, A#B aleatório
+
+**Observação:** A interação entre um fator de efeito fixo e um fator de
+  efeito aleatório sempre será aleatória.
+
+As matrizes são:
+
+$$
+\begin{align}
+\mathbf{Q_P} &= \mathbf{M_P - M_G} \\
+\mathbf{Q_A} &= \mathbf{M_A - M_G} \\
+\mathbf{Q_B} &= \mathbf{M_B - M_G} \\
+\mathbf{Q_{AB}} &= \mathbf{M_{AB} - M_A - M_B + M_G} \\
+\mathbf{Q_{Res}} &= \mathbf{Q_{P} - Q_A - Q_B - Q_{AB}} \\
+                 &= \mathbf{M_P - M_G - (M_A - M_G) - (M_B - M_G) -
+                                (M_{AB} - M_A - M_B + M_G)} \\
+                 &= \mathbf{M_P - M_{AB}}
+\end{align}
+$$
+
+E:
+
+$$
+\begin{align}
+\mathbf{M_G} &= \mathbf{X_G(X'_G X_G)^{-1}X'_G} \\
+\mathbf{M_P} &= \mathbf{X_P(X'_P X_P)^{-1}X'_P} \\
+\mathbf{M_A} &= \mathbf{X_A(X'_A X_A)^{-1}X'_A} \\
+\mathbf{M_B} &= \mathbf{X_B(X'_B X_B)^{-1}X'_B} \\
+\mathbf{M_{AB}} &= \mathbf{X_{AB}(X'_{AB} X_{AB})^{-1}X'_{AB}}
+\end{align}
+$$
+
+- Hipóteses e teste $F$
+
+|         | (1)                     | (2)                      | (3)                      | (4)                      |
+|---------|-------------------------|--------------------------|--------------------------|--------------------------|
+| FatorA | $H_0: q_A(\Psi) = 0$    | $H_0: \sigma^2_A = 0$    | $H_0: q_A(\Psi) = 0$     | $H_0: \sigma^2_A = 0$    |
+| FatorB | $H_0: q_B(\Psi) = 0$    | $H_0: q_B(\Psi) = 0$     | $H_0: \sigma^2_B = 0$    | $H_0: \sigma^2_B = 0$    |
+| A#B     | $H_0: q_{AB}(\Psi) = 0$ | $H_0: \sigma^2_{AB} = 0$ | $H_0: \sigma^2_{AB} = 0$ | $H_0: \sigma^2_{AB} = 0$ |
+
+Testes:
+
+Considerando apenas o caso (1), todos os fatores de **efeito fixo**:
+
+$$
+\begin{align}
+F_A &= \frac{\textrm{QMA}}{\textrm{QMRes}} \\
+F_B &= \frac{\textrm{QMB}}{\textrm{QMRes}} \\
+F_{AB} &= \frac{\textrm{QMAB}}{\textrm{QMRes}}
+\end{align}
+$$
+
+Considerando os casos (2), (3), e (4), onde pelo menos um dos fatores é
+de **efeito aleatório**, e a interação é aleatória:
+
+$$
+\begin{align}
+F_A &= \frac{\textrm{QMA}}{\textrm{QMAB}} \\
+F_B &= \frac{\textrm{QMB}}{\textrm{QMAB}} \\
+F_{AB} &= \frac{\textrm{QMAB}}{\textrm{QMRes}}
+\end{align}
+$$
+
+
+
+- Exemplo no R:
+
+Os dados apresentados a seguir referem-se às produções (kg/m$^2$) de
+soja quando cultivadas sob diferentes tratamentos (adubo e torta). O
+experimento foi instalado segundo o delineamento inteiramente
+casualizado (DIC). **Importante**: ambos os tratamentos são considerados
+como fixos.
+
+```{r}
+##----------------------------------------------------------------------
+## Definições
+a <- 2
+b <- 2
+r <- 4
+n <- a * b * r
+##----------------------------------------------------------------------
+## Dados
+# T0 = sem torta; T1 = com torta
+# A0 = sem adubo; A1 = com adubo
+da.fat <- data.frame(parcela = factor(1:n),
+                     torta = rep(c("T0", "T1"), each = a*r),
+                     adubo = rep(c("A0", "A1"), each = r, times = b),
+                     tratamento = rep(c("Tr1", "Tr2", "Tr3", "Tr4"),
+                                      each = a*b),
+                     producao = c(28.2, 18.8, 19.6, 21.6,
+                                  30.8, 31.2, 28.8, 30.8,
+                                  29.8, 25.2, 24.8, 26,
+                                  29.4, 29.8, 28.6, 30.4))
+## Estrutura dos dados
+str(da.fat)
+##----------------------------------------------------------------------
+## Croqui do experimento
+## Sorteia aleatoriamente as variedades e dispõe em uma matriz 4x4
+set.seed(11)
+croqui.DIC.fat <- sample(paste(da.fat$adubo, da.fat$torta, sep = ":"),
+                         nrow(da.fat))
+croqui.DIC.fat <- matrix(croqui.DIC.fat, ncol = a*b,
+                         dimnames = list(1:(a*b), 1:(a*b)))
+croqui.DIC.fat
+```
+
+Análise:
+
+```{r, include=FALSE, eval=FALSE}
+source("scripts_teste/aov.dic.fat.R")
+aov.dic.fat(var.resp = da.fat$producao, tratamento = da.fat$tratamento,
+            fatorA = da.fat$adubo, fatorB = da.fat$torta)
+## Análise com aov() para comparação
+summary(aov(producao ~ adubo * torta, da.fat))
+summary(aov(producao ~ adubo * torta + Error(parcela), da.fat))
+require(ExpDes)
+fat2.crd(da.fat$adubo, da.fat$torta, da.fat$producao, sigF = 0.1)
+```
+
+```{r, collapse=TRUE}
+##----------------------------------------------------------------------
+## Atribui nomes comuns para variável resposta, linhas e colunas
+var.resp <- da.fat$producao
+parcela <- da.fat$parcela
+tratamento <- da.fat$tratamento
+fatorA <- da.fat$adubo
+fatorB <- da.fat$torta
+##----------------------------------------------------------------------
+## Definições
+a <- length(unique(fatorA))
+b <- length(unique(fatorB))
+r <- unique(table(tratamento))
+n <- a * b * r
+##----------------------------------------------------------------------
+## Matrizes
+(Y <- matrix(var.resp, ncol = 1))
+(Xg <- matrix(rep(1, n), ncol = 1))
+Xa <- matrix(0, nrow = n, ncol = a)
+Xa[cbind(seq_along(fatorA), fatorA)] <- 1; Xa
+Xb <- matrix(0, nrow = n, ncol = b)
+Xb[cbind(seq_along(fatorB), fatorB)] <- 1; Xb
+Xab <- matrix(0, nrow = n, ncol = a*b)
+Xab[cbind(seq_along(tratamento), tratamento)] <- 1; Xab
+##----------------------------------------------------------------------
+## Matrizes M
+Mp <- diag(1, nrow = n)
+Mg <- Xg %*% solve(t(Xg) %*% Xg) %*% t(Xg)
+Ma <- Xa %*% solve(t(Xa) %*% Xa) %*% t(Xa)
+Mb <- Xb %*% solve(t(Xb) %*% Xb) %*% t(Xb)
+Mab <- Xab %*% solve(t(Xab) %*% Xab) %*% t(Xab)
+##----------------------------------------------------------------------
+## Matrizes de projeção ortogonal
+Qp <- Mp - Mg
+Qa <- Ma - Mg
+Qb <- Mb - Mg
+Qab <- Mab - Ma - Mb + Mg
+Qr <- Mp - Mab
+## Graus de liberdade
+GLp <- sum(diag(Qp)) # n - 1
+GLa <- sum(diag(Qa)) # a - 1
+GLb <- sum(diag(Qb)) # b - 1
+GLab <- sum(diag(Qab)) # (a-1)(b-1)
+GLr <- sum(diag(Qr)) # ab(r - 1)
+## Soma de quadrados
+SQp <- t(Y) %*% Qp %*% Y
+SQa <- t(Y) %*% Qa %*% Y
+SQb <- t(Y) %*% Qb %*% Y
+SQab <- t(Y) %*% Qab %*% Y
+SQr <- t(Y) %*% Qr %*% Y
+## Quadrado médio
+QMa <- SQa/GLa
+QMb <- SQb/GLb
+QMab <- SQab/GLab
+QMr <- SQr/GLr
+## F calculado
+FcalcA <- QMa/QMr
+FcalcB <- QMb/QMr
+FcalcAB <- QMab/QMr
+## p-valor
+p.valorA <- pf(FcalcA, GLa, GLr, lower.tail = FALSE)
+p.valorB <- pf(FcalcB, GLb, GLr, lower.tail = FALSE)
+p.valorAB <- pf(FcalcAB, GLab, GLr, lower.tail = FALSE)
+## Tabela final
+tab.final <- data.frame("GL" = c(GLp, GLa, GLb, GLab, GLr),
+                        "SQ" = c(SQp, SQa, SQb, SQab, SQr),
+                        "QM" = c(NA, QMa, QMb, QMab, QMr),
+                        "F" = c(NA, FcalcA, FcalcB, FcalcAB, NA),
+                        "p-valor" = c(NA, p.valorA, p.valorB, p.valorAB, NA),
+                        row.names = c("Parcela", " A", " B",
+                                      " A#B", " Resíduo"))
+tab.final
+```
+
+Comparando os resultados com a função `aov()`:
+
+```{r, collapse=TRUE}
+summary(aov(var.resp ~ fatorA + fatorB + fatorA:fatorB))
+## Usando a função Error() para identificar o confundimento
+summary(aov(var.resp ~ fatorA + fatorB + fatorA:fatorB +
+            Error(parcela)))
+```
