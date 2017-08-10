@@ -1,0 +1,767 @@
+---
+title: "Modelos lineares"
+output:
+  html_document:
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+source("setup_knitr.R")
+```
+
+# Estimação por mínimos quadrados na forma matricial
+
+O modelo linear usual é definido por
+
+$$
+  \mathbf{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}
+$$
+
+A estimativa de $\boldsymbol{\hat\beta}$ pelo método de **mínimos
+quadrados** (MQ) é determinada pela minimização da soma de quadrados dos
+erros
+
+$$
+  \min{\{\boldsymbol{\epsilon'\epsilon}\}} = \min{\{(\mathbf{Y} -
+  \mathbf{X}\boldsymbol{\beta})'(\mathbf{Y} -
+  \mathbf{X}\boldsymbol{\beta})\}}
+$$
+
+Seja
+
+$$
+\begin{align}
+Q &= (\mathbf{Y} - \mathbf{X}\boldsymbol{\beta})'(\mathbf{Y} -
+ \mathbf{X}\boldsymbol{\beta}) \\
+  &= \mathbf{Y'Y} - \boldsymbol{\beta'}\mathbf{X'Y} -
+ \mathbf{Y'X}\boldsymbol{\beta} + \boldsymbol{\beta'} \mathbf{X'X}
+ \boldsymbol{\beta}
+\end{align}
+$$
+
+Note que $\boldsymbol{\beta'}\mathbf{X'Y}$ é $1 \times 1$, portanto
+ é igual a sua inversa, ou seja, $(\mathbf{Y'X}\boldsymbol{\beta})' =
+\boldsymbol{\beta'}\mathbf{X'Y}$. Portanto
+
+$$
+Q = \mathbf{Y'Y} - 2\boldsymbol{\beta'}\mathbf{X'Y} +
+ \boldsymbol{\beta'} \mathbf{X'X}\boldsymbol{\beta}
+$$
+
+Para encontrar os valores de $\boldsymbol{\beta}$ que minimizam $Q$,
+fazemos as derivadas parciais em relação à $\boldsymbol{\beta}$
+
+$$
+\frac{\partial Q}{\partial \boldsymbol{\beta}} =
+  \mathbf{0} - 2\mathbf{X'y} + 2\mathbf{X'X}\boldsymbol{\beta}
+$$
+
+Igualando o resultado a zero, obtemos o **sistema de equações
+  normais**
+
+$$
+  \mathbf{X'X}\boldsymbol{\hat\beta} = \mathbf{X'Y}
+$$
+
+Note que (para um modelo considerando apenas dois parâmetros,
+$\hat\beta_0$ e $\hat\beta_1$):
+
+$$
+\begin{align}
+\mathbf{X'X}\boldsymbol{\hat\beta} &= \mathbf{X'Y} \\
+\begin{bmatrix}
+n & \Sigma X_i \\
+\Sigma X_i & \Sigma X_i^2
+\end{bmatrix}
+\begin{bmatrix}
+\hat\beta_0 \\
+\hat\beta_1 \\
+\end{bmatrix} &=
+\begin{bmatrix}
+\Sigma Y_i \\
+\Sigma X_i Y_i
+\end{bmatrix} \\
+\begin{bmatrix}
+n \hat\beta_0 + \beta_1 \Sigma X_i \\
+\hat\beta_0 \Sigma X_i + \hat\beta_1 \Sigma X_i^2
+\end{bmatrix} &=
+\begin{bmatrix}
+\Sigma Y_i \\
+\Sigma X_i Y_i
+\end{bmatrix}
+\end{align}
+$$
+
+que é o sistema de equações normais usual para modelos de regressão com
+dois parâmetros.
+
+Para obter a solução para a estimativa dos parâmetros envolvidos, nós
+pré-multiplicamos ambos os lados da equação pela inversa de
+$\mathbf{X'X}$, assumindo que ela existe:
+
+$$
+  (\mathbf{X'X})^{-1}\mathbf{X'X}\boldsymbol{\hat\beta} =
+ (\mathbf{X'X})^{-1}\mathbf{X'Y}
+$$
+
+Sabendo que $(\mathbf{X'X})^{-1}\mathbf{X'X} = \mathbf{I}$ e
+ $\mathbf{I}\boldsymbol{\hat\beta} = \boldsymbol{\hat\beta}$, então
+
+$$
+  \boldsymbol{\hat\beta} = (\mathbf{X'X})^{-1}\mathbf{X'Y}
+$$
+
+
+**Observação**: essa solução só será possível quando $\mathbf{X'X}$ é de
+**posto completo**, é não singular e admite inversa.
+
+Os valores **ajustados** (ou **preditos**) pelo modelo serão então
+estimados por
+
+$$
+\mathbf{\hat{Y}} = \mathbf{X}\boldsymbol{\hat\beta}
+$$
+
+Mas podemos expressar essa expressão para $\mathbf{\hat{Y}}$, usando a
+expressão para \boldsymbol{\hat\beta},
+
+$$
+\begin{align}
+\mathbf{\hat{Y}} &= \mathbf{X}(\mathbf{X'X})^{-1}\mathbf{X'Y} \\
+  &= \mathbf{HY}
+\end{align}
+$$
+
+Onde
+
+$$
+\mathbf{H} = \mathbf{X}(\mathbf{X'X})^{-1}\mathbf{X'} \\
+$$
+
+é chamada de **matriz chapéu**, ou **matriz núcleo**, ou **matriz de
+projeção ortogonal**. Como veremos mais adiante, esta matriz é de
+fundamental importância em modelos lineares. A matrix $\mathbf{H}$
+possui duas propriedades fundamentais: é **simétrica** e
+    **idempotente**, ou seja,
+
+$$
+\mathbf{H}\mathbf{H} = \mathbf{H}
+$$
+
+Os **resíduos** também podem ser calculados através da matriz
+    $\mathbf{H}$, pois
+
+$$
+\begin{align}
+\boldsymbol{\epsilon} &= \mathbf{Y} - \mathbf{\hat{Y}} \\
+    &= \mathbf{Y} - \mathbf{X}\boldsymbol{\hat\beta} \\
+    &= \mathbf{Y} - \mathbf{HY} \\
+    &= (\mathbf{I} - \mathbf{H})\mathbf{Y}
+\end{align}
+$$
+
+Onda a matriz $(\mathbf{I} - \mathbf{H})$ também é simétrica e
+idempotente. Com isso, deve-se esperar que a matriz $\mathbf{H}$ também
+possua um papel importante no diagnóstico dos modelos baseado nos
+resíduos.
+
+# Modelo de regressão linear simples
+
+Modela a relação entre duas variáveis quantitativas.
+
+Especificando o modelo:
+
+$$
+  y_i = \beta_0 + \beta_1 x_i + \epsilon_i, \qquad i = 1, \ldots, n
+$$
+
+$$
+  \mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}
+$$
+
+$$
+\begin{bmatrix}
+  y_1 \\ y_2 \\ \vdots \\ y_n
+  \end{bmatrix}%_{n \times 1}
+  =
+  \begin{bmatrix}
+	1 & x_{1} \\
+	1 & x_{2} \\
+    \vdots & \vdots \\
+    1 & x_{n}
+  \end{bmatrix}%_{n \times (k+1)}
+  \begin{bmatrix}
+    \beta_0 \\ \beta_1
+  \end{bmatrix}%_{(k+1) \times 1}
+  +
+  \begin{bmatrix}
+    \epsilon_1 \\ \epsilon_2 \\ \vdots \\ \epsilon_n
+  \end{bmatrix}%_{n \times 1}
+  $$
+
+## Exemplo no R
+
+```{r}
+##----------------------------------------------------------------------
+## Conjunto de dados
+data(cars)
+## Estrutura
+str(cars)
+## Gráfico de dispersão
+plot(dist ~ speed, data = cars)
+
+##----------------------------------------------------------------------
+## Como x têm níveis quantitativos, ajustamos uma função
+m0 <- lm(dist ~ speed, data = cars)
+coef(m0)
+
+##----------------------------------------------------------------------
+## Fazendo estimação "na mão"
+
+## Matriz do modelo
+(X <- cbind(1, cars$speed))
+## Vetor de observações
+(y <- matrix(cars$dist, ncol = 1))
+## X'
+Xt <- t(X)
+## X'X
+(XtX <- Xt %*% X)
+## (X'X)^-1
+solve(XtX)
+## X'y
+(Xty <- Xt %*% y)
+## Ajuste por mínimos quadrados
+## (X'X)^-1 X'y
+solve(XtX) %*% Xty
+```
+
+# Modelo de regressão linear múltipla
+
+Modela a relação entre uma variável resposta e duas ou mais variáveis
+quantitativas.
+
+Especificando o modelo:
+
+$$
+  y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_k
+  x_{ik} +  \epsilon_i, \qquad i = 1, \ldots, n
+$$
+
+$$
+  \mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}
+$$
+
+$$
+\begin{bmatrix}
+  y_1 \\ y_2 \\ \vdots \\ y_n
+  \end{bmatrix}%_{n \times 1}
+  =
+  \begin{bmatrix}
+    1 & x_{11} & x_{12} & \cdots & x_{1k} \\
+    1 & x_{21} & x_{22} & \cdots & x_{2k} \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    1 & x_{n1} & x_{n2} & \cdots & x_{nk}
+  \end{bmatrix}%_{n \times (k+1)}
+  \begin{bmatrix}
+    \beta_0 \\ \beta_1 \\ \vdots \\ \beta_k
+  \end{bmatrix}%_{(k+1) \times 1}
+  +
+  \begin{bmatrix}
+    \epsilon_1 \\ \epsilon_2 \\ \vdots \\ \epsilon_n
+  \end{bmatrix}%_{n \times 1}
+$$
+
+## Exemplo no R
+
+```{r}
+##----------------------------------------------------------------------
+## Conjunto de dados
+data(stackloss)
+## Estrutura
+str(stackloss)
+## Gráfico de dispersão
+plot(stackloss)
+
+##----------------------------------------------------------------------
+## Como x têm níveis quantitativos, ajustamos uma função
+m1 <- lm(stack.loss ~ Air.Flow +  Water.Temp +  Acid.Conc.,
+         data = stackloss)
+coef(m1)
+
+##----------------------------------------------------------------------
+## Fazendo estimação "na mão"
+
+## Matriz do modelo
+(X <- with(stackloss,
+           cbind(1, Air.Flow, Water.Temp, Acid.Conc.)))
+## Vetor de observações
+(y <- matrix(stackloss$stack.loss, ncol = 1))
+## X'
+Xt <- t(X)
+## X'X
+(XtX <- Xt %*% X)
+## (X'X)^-1
+solve(XtX)
+## X'y
+(Xty <- Xt %*% y)
+## Ajuste por mínimos quadrados
+## (X'X)^-1 X'y
+solve(XtX) %*% Xty
+```
+
+# Modelo de Análise de Variância (ANOVA)
+
+O interesse é e comparar diversas populações, ou diversas condições de
+um experimento.
+
+Modelos de ANOVA podem ser considerados como modelos lineares de valores
+restritos de $x$, frequentemente 0 para indicar ausência de um nível, e
+1 para indicar presença de um nível.
+
+Especificando o modelo para um fator com 2 níveis ($i = 1, 2 = k$) e 3
+repetições ($j = 1,2,3 = r$):
+
+$$
+  y_{ij} = \mu + \alpha_i + \epsilon_{ij}, \qquad i = 1, 2 \quad j = 1,2,3
+$$
+
+Onde $\mu$ é a média geral das observações, $\tau_i$ é o **efeito**
+adicional na média geral para o nível $i$ do tratamento, e
+$\epsilon_{ij}$ é o erro aleatório associado à cada observação.
+
+O modelo na forma matricial é definido por:
+
+$$
+  \mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}
+$$
+
+$$
+\begin{bmatrix}
+  y_{11} \\ y_{12} \\ y_{13} \\ y_{21} \\ y_{22} \\ y_{23}
+\end{bmatrix}%_{n \times 1}
+  =
+  \begin{bmatrix}
+    1 & 1 & 0 \\
+    1 & 1 & 0 \\
+    1 & 1 & 0 \\
+    1 & 0 & 1 \\
+    1 & 0 & 1 \\
+    1 & 0 & 1
+  \end{bmatrix}%_{n \times (k+1)}
+  \begin{bmatrix}
+    \mu \\ \alpha_1 \\ \alpha_2
+  \end{bmatrix}%_{(k+1) \times 1}
+  +
+  \begin{bmatrix}
+ \epsilon_{11} \\ \epsilon_{12} \\ \epsilon_{13} \\ \epsilon_{21} \\ \epsilon_{22} \\ \epsilon_{23}
+  \end{bmatrix}%_{n \times 1}
+$$
+
+Qual o problema com  esse modelo, da forma como ele está definido?
+
+A matriz $\mathbf{X}$ é $6 \times 3$ e de **posto** 2, porque a primeira
+coluna é igual à soma da segunda e da terceira colunas, que são
+*linearmente independentes*.
+
+Como $\mathbf{X}$ não tem posto completo, os parâmetros $\mu$,
+$\alpha_1$ e $\alpha_2$ não podem ser estimados por
+$\boldsymbol{\hat\beta} = (\mathbf{X'X})^{-1}\mathbf{X'y}$ porque a
+inversa de $\mathbf{X'X}$ **não existe** (*i.e* a matriz é
+**singular**).
+
+Por isso, modelos de ANOVA são também chamados de **modelos de posto
+incompleto**.
+
+Com 3 parâmetros a seren estimados e $posto(\mathbf{X}) = 2$ o modelo é
+dito **superparametrizado**.
+
+## Exemplo no R
+
+```{r, error = TRUE}
+##----------------------------------------------------------------------
+## Fator com 2 níveis (k) e 3 repetições (r)
+k <- 2
+r <- 3
+fator <- factor(rep(c("A", "B"), each = r))
+
+## Cria a matriz do modelo sem nenhuma restrição
+X <- matrix(0, nrow = k*r, ncol = k)
+X[cbind(seq_along(fator), fator)] <- 1
+(X <- cbind(1, X))
+
+## X'
+Xt <- t(X)
+## X'X
+(XtX <- Xt %*% X)
+## (X'X)^-1
+solve(XtX)
+```
+
+Como podemos ver nesse exemplo, a matriz $\mathbf{X}$ sendo de posto
+incompleto é singular e não invertível.
+
+Algumas abordagens para remediar o problema de superparametrização:
+
+1. **Redefinir** o modelo com 2 novos parâmetros que sejam únicos =
+   *reparametrização* = modelo de médias de caselas (sem intercepto)
+2. **Restringir** os parâmetros (várias formas)
+3. **Combinar linearmente** os parâmetros (várias formas)
+
+## Redefinindo o modelo
+
+Usando a abordagem 1 acima podemos redefinir o modelo para que ele
+possua 2 parâmetros, fazendo com que a matriz $\mathbf{X}$ tenha posto
+completo, e por consequência seja invertível.
+
+Uma forma de redefinir esse modelo seria assumir que
+
+$$
+\mu_{ij} = \mu + \alpha_i
+$$
+
+Portanto o modelo se resumiria a
+
+$$
+y_{ij} = \mu + \alpha_i + \epsilon_{ij} = \mu_{ij} + \epsilon_{ij}
+$$
+
+Dessa forma, assumindo o mesmo exemplo com $i = 1,2$ níveis e $j =
+1,2,3$ repetições, temos um modelo com apenas dois parâmetros a serem
+estimados: $\mu_1$ e $\mu_2$, que agora representam o efeito médio do
+tratamento *após* a aplicação dos níveis 1 e 2, respectivamente.
+
+O modelo na forma matricial fica:
+
+$$
+  \mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}
+$$
+
+$$
+\begin{bmatrix}
+  y_{11} \\ y_{12} \\ y_{13} \\ y_{21} \\ y_{22} \\ y_{23}
+\end{bmatrix}%_{n \times 1}
+  =
+  \begin{bmatrix}
+    1 & 0 \\
+    1 & 0 \\
+    1 & 0 \\
+    0 & 1 \\
+    0 & 1 \\
+    0 & 1
+  \end{bmatrix}%_{n \times (k+1)}
+  \begin{bmatrix}
+    \mu_1 \\ \mu_2 \\
+  \end{bmatrix}%_{(k+1) \times 1}
+  +
+  \begin{bmatrix}
+ \epsilon_{11} \\ \epsilon_{12} \\ \epsilon_{13} \\ \epsilon_{21} \\ \epsilon_{22} \\ \epsilon_{23}
+  \end{bmatrix}%_{n \times 1}
+$$
+
+Dessa forma, o posto de $\mathbf{X}$ é 2 (pois temos duas colunas
+linearmente independentes), e a matriz é invertível. Usando o mesmo
+exemplo anterior no R:
+
+```{r}
+##----------------------------------------------------------------------
+## A matriz X para o modelo anterior é a mesma, com excessão da primeira
+## coluna. Portanto, chamando de X2 essa nova matriz,
+(X2 <- X[ , -1])
+
+## X'
+X2t <- t(X2)
+## X'X
+(X2tX2 <- X2t %*% X2)
+## (X'X)^-1
+solve(X2tX2)
+```
+
+Note que nesse caso específico, ficamos com uma matriz diagonal que é
+facilmente invertida
+
+```{r}
+MASS::fractions(solve(X2tX2))
+```
+
+Dessa forma, podemos estimar os parâmetros $\mu_1$ e $\mu_2$. O modelo
+como especificado dessa forma é também chamado de modelo de **média de
+caselas**.
+
+## Restringindo os parâmetros
+
+Usando a abordagem 2 acima, a ideia de restringir os parâmetros tem o
+mesmo objetivo: reduzir o número de parâmetros a serem estimados de
+forma que a matriz $\mathbf{X}$ tenha posto completo e seja invertível.
+
+Existem várias formas de restringir os parâmetros, como por exemplo,
+assumir que um determinado parâmetro é fixo, e estimar os demais
+desconhecidos. As restrições mais comuns, por serem mais fáceis de serem
+interpretadas, são:
+
+- Assumir que a soma de todos os parâmetros é igual a zero, ou seja,
+  $\sum_{i=1}^{k} \alpha_i = 0$
+- Assumir que o primeiro nível do fator é zero, ou seja, $\alpha_1 = 0$
+- Assumir que o último nível do fator é zero, ou seja, $\alpha_k = 0$
+
+Estas restrições reduzem o número de parâmetros a serem estimados. Como
+todas elas impõem algum tipo de relação entre os parâmetros, estas
+restrições também são chamadas de **contrastes**.
+
+### Soma zero
+
+O contraste do tipo soma zero, assume que a soma de todos os parâmetros
+é igual a zero. Continuando com o exemplo anterior, onde temos um fator
+com 2 níveis e 3 repetições, o contraste é
+
+$$
+	\sum_{i=1}^{k} \alpha_i = 0 \quad \Rightarrow \quad \alpha_1 +
+	\alpha_2 = 0
+$$
+
+Como
+
+$$
+\alpha_1 + \alpha_2 = 0 \quad \Rightarrow \quad \alpha_2 = -\alpha_1
+$$
+
+então o modelo fica
+
+$$
+y_{1j} = \mu + \alpha_1 + \epsilon_{1j} \\
+y_{2j} = \mu - \alpha_1 + \epsilon_{2j}
+$$
+
+E na forma matricial
+
+$$
+  \mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}
+$$
+
+$$
+\begin{bmatrix}
+  y_{11} \\ y_{12} \\ y_{13} \\ y_{21} \\ y_{22} \\ y_{23}
+\end{bmatrix}%_{n \times 1}
+  =
+  \begin{bmatrix}
+    1 & 1 \\
+    1 & 1 \\
+    1 & 1 \\
+    1 & -1 \\
+    1 & -1 \\
+    1 & -1
+  \end{bmatrix}%_{n \times (k+1)}
+  \begin{bmatrix}
+    \mu \\ \alpha_1 \\
+  \end{bmatrix}%_{(k+1) \times 1}
+  +
+  \begin{bmatrix}
+ \epsilon_{11} \\ \epsilon_{12} \\ \epsilon_{13} \\ \epsilon_{21} \\ \epsilon_{22} \\ \epsilon_{23}
+  \end{bmatrix}%_{n \times 1}
+$$
+
+Dessa forma, o posto de $\mathbf{X}$ é 2 (pois temos duas colunas
+linearmente independentes), e a matriz é invertível. Usando o mesmo
+exemplo anterior no R:
+
+```{r}
+##----------------------------------------------------------------------
+## A matriz X para o modelo anterior é a diferença entra as duas colunas
+## finais da matriz X original. Portanto, chamando de X3 essa nova
+## matriz,
+(X3 <- cbind(X[, 1], X[, 2] - X[, 3]))
+
+## X'
+X3t <- t(X3)
+## X'X
+(X3tX3 <- X3t %*% X3)
+## (X'X)^-1
+solve(X3tX3)
+```
+
+Note que nesse caso específico, ficamos com uma matriz diagonal que é
+facilmente invertida
+
+```{r}
+MASS::fractions(solve(X3tX3))
+```
+
+Dessa forma, podemos estimar os parâmetros $\mu$ e $\alpha_1$. Note que,
+pela definição da matriz do modelo, o parâmetro $\mu$ é a média geral
+das observações, e o parâmetro $\alpha_1$ é o acréscimo (ou decréscimo)
+associado a cada nível do tratamento em relação à média geral. Por
+exemplo, os efeitos (médias) de cada tratamento serão dados por
+
+$$
+\mu_{1j} = \mu + \alpha_1 \\
+\mu_{2j} = \mu - \alpha_1
+$$
+
+### Primeiro nível zero
+
+Assumir que o primeiro nível do fator é igual a zero implica em assumir
+que um parâmetro do modelo é conhecido, portanto não precisa ser
+estimado, e assim se reduz o número de parâmetros. Do exemplo anterior,
+assumindo
+
+$$
+\alpha_1 = 0
+$$
+
+o modelo fica
+
+$$
+y_{1j} = \mu + 0 + \epsilon_{1j} \\
+y_{2j} = \mu + \alpha_2 + \epsilon_{2j}
+$$
+
+E na forma matricial
+
+$$
+  \mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}
+$$
+
+$$
+\begin{bmatrix}
+  y_{11} \\ y_{12} \\ y_{13} \\ y_{21} \\ y_{22} \\ y_{23}
+\end{bmatrix}%_{n \times 1}
+  =
+  \begin{bmatrix}
+    1 & 0 \\
+    1 & 0 \\
+    1 & 0 \\
+    1 & 1 \\
+    1 & 1 \\
+    1 & 1
+  \end{bmatrix}%_{n \times (k+1)}
+  \begin{bmatrix}
+    \mu \\ \alpha_2 \\
+  \end{bmatrix}%_{(k+1) \times 1}
+  +
+  \begin{bmatrix}
+ \epsilon_{11} \\ \epsilon_{12} \\ \epsilon_{13} \\ \epsilon_{21} \\ \epsilon_{22} \\ \epsilon_{23}
+  \end{bmatrix}%_{n \times 1}
+$$
+
+Dessa forma, o posto de $\mathbf{X}$ é 2 (pois temos duas colunas
+linearmente independentes), e a matriz é invertível. Usando o mesmo
+exemplo anterior no R:
+
+```{r}
+##----------------------------------------------------------------------
+## A matriz X para o modelo anterior é igual a matriz X original, menos
+## a segunda coluna. Portanto, chamando de X4 essa nova matriz,
+(X4 <- X[, -2])
+
+## X'
+X4t <- t(X4)
+## X'X
+(X4tX4 <- X4t %*% X4)
+## (X'X)^-1
+solve(X4tX4)
+```
+
+Note que a matriz não é diagonal, mas é invertível. Dessa forma, podemos
+estimar os parâmetros $\mu$ e $\alpha_2$. Pela definição da matriz desse
+modelo, o parâmetro $\mu$ é a média do nível 1, pois na primeira equação
+temos
+
+$$
+y_{1j} = \mu + \epsilon_{1j} \quad \Rightarrow \quad \text{E}[y_{1j}] = \mu
+$$
+
+Como
+
+$$
+y_{2j} = \mu + \alpha_2 + \epsilon_{2j} \quad \Rightarrow \quad
+\text{E}[y_{2j}] = \mu + \alpha_2 = \text{E}[y_{1j}] + \alpha_2
+$$
+
+então o parâmetro $\alpha_2$ deve ser interpretado como a diferença
+entre a média do nível 1 com o efeito do nível 2 (um contraste). O sinal
+de $\alpha_2$ indicará se o efeito do nível 2 é maior ($+$) ou menor
+($-$) do que do nível 1.
+
+### Último nível zero
+
+Assumir que o último nível do fator é igual a zero implica em assumir
+que um parâmetro do modelo é conhecido, portanto não precisa ser
+estimado, e assim se reduz o número de parâmetros. Do exemplo anterior,
+assumindo
+
+$$
+\alpha_2 = 0
+$$
+
+o modelo fica
+
+$$
+y_{1j} = \mu + \alpha_1 + \epsilon_{1j} \\
+y_{2j} = \mu + 0 + \epsilon_{2j}
+$$
+
+E na forma matricial
+
+$$
+  \mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}
+$$
+
+$$
+\begin{bmatrix}
+  y_{11} \\ y_{12} \\ y_{13} \\ y_{21} \\ y_{22} \\ y_{23}
+\end{bmatrix}%_{n \times 1}
+  =
+  \begin{bmatrix}
+    1 & 1 \\
+    1 & 1 \\
+    1 & 1 \\
+    1 & 0 \\
+    1 & 0 \\
+    1 & 0
+  \end{bmatrix}%_{n \times (k+1)}
+  \begin{bmatrix}
+    \mu \\ \alpha_1 \\
+  \end{bmatrix}%_{(k+1) \times 1}
+  +
+  \begin{bmatrix}
+ \epsilon_{11} \\ \epsilon_{12} \\ \epsilon_{13} \\ \epsilon_{21} \\ \epsilon_{22} \\ \epsilon_{23}
+  \end{bmatrix}%_{n \times 1}
+$$
+
+Dessa forma, o posto de $\mathbf{X}$ é 2 (pois temos duas colunas
+linearmente independentes), e a matriz é invertível. Usando o mesmo
+exemplo anterior no R:
+
+```{r}
+##----------------------------------------------------------------------
+## A matriz X para o modelo anterior é igual a matriz X original, menos
+## a terceira coluna. Portanto, chamando de X5 essa nova matriz,
+(X5 <- X[, -3])
+
+## X'
+X5t <- t(X5)
+## X'X
+(X5tX5 <- X5t %*% X5)
+## (X'X)^-1
+solve(X5tX5)
+```
+
+Note que a matriz não é diagonal, mas é invertível. Dessa forma, podemos
+estimar os parâmetros $\mu$ e $\alpha_1$. Pela definição da matriz desse
+modelo, o parâmetro $\mu$ é a média do nível 2, pois na segunda equação
+temos
+
+$$
+y_{2j} = \mu + \epsilon_{2j} \quad \Rightarrow \quad \text{E}[y_{2j}] = \mu
+$$
+
+Como
+
+$$
+y_{1j} = \mu + \alpha_1 + \epsilon_{1j} \quad \Rightarrow \quad
+\text{E}[y_{1j}] = \mu + \alpha_1 = \text{E}[y_{2j}] + \alpha_1
+$$
+
+então o parâmetro $\alpha_1$ deve ser interpretado como a diferença
+entre a média do nível 2 com o efeito do nível 1 (um contraste). O sinal
+de $\alpha_1$ indicará se o efeito do nível 1 é maior ($+$) ou menor
+($-$) do que do nível 2.
