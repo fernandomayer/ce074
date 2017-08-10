@@ -1,0 +1,94 @@
+\usetikzlibrary{arrows,automata}
+\usetikzlibrary{positioning}
+
+\tikzset{state/.style={rectangle, draw=black, fill=white, thick, minimum height=4em, minimum width=16em,
+inner sep=30pt, text centered, font=\large}, 
+	corner/.style={font=\large}, 
+	corner2/.style={font=\Large}}
+\tikzset{state2/.style={rectangle, draw=black, fill=gray!20, thick, minimum height=2em,
+inner sep=10pt, text centered, font=\large}}
+\tikzset{state3/.style={rectangle, draw=black, fill=white, thick, minimum height=4em,minimum width=5em,
+inner sep=10pt, text centered, font=\large}}
+
+\begin{tikzpicture}[->, >=latex, line width=0.75pt]
+
+\begin{scope}
+\node [state2](node0) { UR };
+
+\node[state3, yshift=0cm, below of=node0, node distance=2cm, anchor=center] (node4) { $\mu$ };
+\node[corner, anchor=south west] at (node4.south west) {1};
+\node[corner, anchor=north east, xshift=0.5cm] at (node4.south west) {$\mathbf{M_G}$};
+\node[corner, anchor=south east] at (node4.south east) {1};
+\node[corner, anchor=north west, xshift=-0.5cm] at (node4.south east) {$\mathbf{M_G}$};
+
+\node[state, yshift=0cm, below of=node4, node distance=5cm, anchor=center] (node5) {  };
+\node[corner2, anchor=west] at (node5.west) {Parcela};
+\node[corner2, anchor=east] at (node5.east) {P};
+\node[corner, anchor=south west] at (node5.south west) {$rab$};
+\node[corner, anchor=north east, xshift=0.5cm] at (node5.south west) {$\mathbf{M_P}$};
+\node[corner, yshift=-2cm, text=red, anchor=north east, xshift=0.5cm] at (node5.south west) {$\frac{rab}{rab}\sigma^2_{P}$};
+\node[corner, anchor=south east] at (node5.south east) {$rab-1$};
+\node[corner, anchor=north west, xshift=-1.5cm] at (node5.south east) {$\mathbf{M_P} -\mathbf{M_G} = \mathbf{Q_P}$};
+\node[corner, yshift=-2cm, text=red, anchor=north west, xshift=-0.5cm] at (node5.south east) {$\sigma^2_{P}$};
+
+\draw[<-] (node4) -- (node5);
+\end{scope}
+
+\begin{scope}[xshift=17cm]
+\node [state2](node0) { R };
+
+\node[state3, yshift=0cm, below of=node0, node distance=2cm, anchor=center] (node1) { $\mu$ };
+\node[corner, anchor=south west] at (node1.south west) {1};
+\node[corner, anchor=north east, xshift=0.5cm] at (node1.south west) {$\mathbf{M_G}$};
+\node[corner, anchor=south east] at (node1.south east) {1};
+\node[corner, anchor=north west, xshift=-0.5cm] at (node1.south east) {$\mathbf{M_G}$};
+
+\node[state, yshift=0cm, xshift=1cm, below of=node1, right of=node1, node distance=5cm, anchor=center] (node2a) {  };
+\node[corner2,  anchor=west] at(node2a.west) { Fator B };
+\node[corner2,anchor=east] at(node2a.east) { B };
+\node[corner, anchor=south west] at (node2a.south west) {$b$};
+\node[corner, anchor=north east, xshift=0.5cm] at (node2a.south west) {$\mathbf{M_B}$};
+\node[corner, yshift=-1cm, text=blue, anchor=north east, xshift=0.5cm] at (node2a.south west) {$q_B(\Psi)$};
+\node[corner, yshift=-2cm, text=red, anchor=north east, xshift=0.5cm] at (node2a.south west) {$\frac{rab}{b}\sigma^2_{B}$};
+\node[corner, anchor=south east] at (node2a.south east) {$b-1$};
+\node[corner, anchor=north west, xshift=-1.5cm] at (node2a.south east) {$\mathbf{M_B} -\mathbf{M_G} = \mathbf{Q_B}$};
+\node[corner, yshift=-1cm, text=blue, anchor=north west, xshift=-1cm] at (node2a.south east) {$q_B(\Psi)$};
+\node[corner, yshift=-2cm, text=red, anchor=north west, xshift=-1cm] at (node2a.south east) {$ra\sigma^2_{B}$};
+
+\node[state, yshift=0cm, xshift=-1cm, below of=node1, left of=node1, node distance=5cm, anchor=center] (node2b) {  };
+\node[corner2,  anchor=west] at(node2b.west) { Fator A };
+\node[corner2,anchor=east] at(node2b.east) { A };
+\node[corner, anchor=south west] at (node2b.south west) {$a$};
+\node[corner, anchor=north east, xshift=0.5cm] at (node2b.south west) {$\mathbf{M_A}$};
+\node[corner, yshift=-1cm, text=blue, anchor=north east, xshift=0.5cm] at (node2b.south west) {$q_A(\Psi)$};
+\node[corner, yshift=-2cm, text=red, anchor=north east, xshift=0.5cm] at (node2b.south west) {$\frac{rab}{a}\sigma^2_{A}$};
+\node[corner, anchor=south east] at (node2b.south east) {$a-1$};
+\node[corner, anchor=north west, xshift=-1.5cm] at (node2b.south east) {$\mathbf{M_A} -\mathbf{M_G} = \mathbf{Q_A}$};
+\node[corner, yshift=-1cm, text=blue, anchor=north west, xshift=-1cm] at (node2b.south east) {$q_A(\Psi)$};
+\node[corner, yshift=-2cm, text=red, anchor=north west, xshift=-1cm] at (node2b.south east) {$rb\sigma^2_{A}$};
+
+%\draw[<-] (node1) -- (node2a);
+
+\node[state, yshift=0cm, below of=node2a,, below of=node1, node distance=6cm, anchor=center] (node3) {  };
+\node[corner2,  anchor=west] at(node3.west) { Fator A$*$Fator B };
+\node[corner2,anchor=east] at(node3.east) { A$\#$B };
+\node[corner, anchor=south west] at (node3.south west) {$ab$};
+\node[corner, anchor=north east, xshift=0.5cm] at (node3.south west) {$\mathbf{M_{AB}}$};
+\node[corner, yshift=-1cm, text=blue, anchor=north east, xshift=0.5cm] at (node3.south west) {$q_{AB}(\Psi)$};
+\node[corner, yshift=-2cm, text=red, anchor=north east, xshift=0.5cm] at (node3.south west) {$\frac{rab}{ab}\sigma^2_{AB}$};
+\node[corner, anchor=south east] at (node3.south east) {$(a-1)(b-1)$};
+\node[corner, anchor=north west, xshift=-1.5cm] at (node3.south east) {$\mathbf{M_{AB}} - \mathbf{M_A} - \mathbf{M_B} + \mathbf{M_G} = \mathbf{Q_{AB}}$};
+\node[corner, yshift=-1cm, text=blue, anchor=north west, xshift=-0.5cm] at (node3.south east) {$q_{AB}(\Psi)$};
+\node[corner, yshift=-2cm, text=red, anchor=north west, xshift=-0.5cm] at (node3.south east) {$r\sigma^2_{AB}$};
+
+\draw[<-] (node1) -- (node2a);
+\draw[<-] (node2a) -- (node3);
+\draw[->] (node3) -- (node2b);
+\draw[->] (node2b) -- (node1);
+
+\end{scope}
+
+%\draw[dash pattern=on5pt off3pt] (node5) -- (node3);
+\path[dash pattern=on5pt off3pt] (node3) edge[out=-180, in=-90] (node5);
+
+\end{tikzpicture}
