@@ -39,11 +39,22 @@ O procedimento consiste de 7 passos:
 
 Consiste em identificar:
 
-1. Unidade observacional
-2. Variável resposta
-3. Fatores não casualizados (**unrandomized**)
-4. Fatores casualizados (**randomized**)
-5. Tipo de estudo
+1. Unidade observacional: entidade física medida
+2. Variável resposta: variávelde intersse
+3. Fatores não casualizados (**unrandomized**): aqueles que indexariam
+as unidades observacionais se nenhuma casualização fosse empregada
+4. Fatores casualizados (**randomized**): aqueles associados às unidades
+observacionais como resultado da casualização
+5. Tipo de estudo: delineamento experimental associado ao esquema de
+tratamento ou método de amostragem
+
+**Observação**: Para determinar se um fator é **randomized** ou
+**unrandomized**, deve-se fazer a seguinte pergunta:
+
+- Para uma unidade observacional os níveis do fator podem ser
+identificados se a casualização ainda não foi realizada?
+    - Se **sim**, então o fator é **unrandomized**
+    - Se **não**, então o fator é **randomized**
 
 ## 2. Estrutura experimental
 
@@ -198,7 +209,7 @@ Exemplo para DBC:
    considerado aleatório
 3. O **modelo de esperança maximal** ($\boldsymbol{\Psi}$) dá-se pela
    soma dos termos de esperança
-4. O **modelo de variação maximal** dá-se pela soma dos termos de
+4. O **modelo de variação maximal** dá-se pela soma de todos os termos de
    variação
 
 **Efeito aleatório**:
@@ -258,7 +269,7 @@ $$
 \text{E}(Y_{ij}) &= \mu + \tau_i \\
 \text{V}(Y_{ij}) &= \sigma^2_{BP} + \sigma^2_{B} \\
 \text{Cov}(Y_{ij}, Y_{i'j}) &= \sigma^2_{B} \,, \quad i \neq i' \\
-\text{Cov}(Y_{ij}, Y_{i'j'}) &= 0 \,, \quad i \neq i', j \neq j'
+\text{Cov}(Y_{ij}, Y_{i'j'}) &= 0 \,, \quad j \neq j'
 \end{align}
 $$
 Matricialmente:
@@ -302,6 +313,71 @@ Exemplo para DBC:
 |     Tratamentos   | $\sigma^2_{BP} + q_T(\Psi)$ | $\sigma^2_{BP} + q_T(\Psi)$  |
 |     Resíduo       | $\sigma^2_{BP}$             | $\sigma^2_{BP}$              |
 
+**Nota sobre $E[QM]$**:
+
+Na tabela de análise de variância, temos um valor F, que é a razão de
+dois quadrados médios. Por que isso é apropriado? Para responder essa
+pergunta devemos olhar para o que os dois quadrados médios medem, e isso
+é feito através dos valores esperados dos quadrados médios.
+
+A esperança do quadrado médio são os valores médios dos quadrados médios
+na população que é descrita pelo modelo considerado, ou seja, um
+quadrado médio esperado é o verdadeiro valor na população. Isto é
+análogo à dizer que o valor esperado de uma observação na opulação é sua
+média. Assim, se tivessemos a população completa para todos os
+tratamentos, e calculassemos os quadrados médios destes dados completos,
+então os valores seriam aqueles dados pela tabela.
+
+Note que os valores médios na população envolvem $\sigma^2$, a variação
+devido ao acaso (não controlada) entre as unidades do mesmo tratamento.
+No entanto, esse valor médio também depende de uma quantidade
+$q_F(\Psi)$ (onde $F$ é um fator qualquer).
+
+Mas o que é $q_F(\Psi)$? Note que o subscrito $F$ denota que ele envolve
+a matriz $Q_F$. Por exemplo, considere o termo pata tratamento,
+$q_T(\Psi)$. De fato,
+
+$$
+\begin{align}
+q_T(\Psi) &=
+    \frac{\boldsymbol{\Psi}'\mathbf{Q_T}\boldsymbol{\Psi}}{(t-1)} \\
+  &= \frac{\Sigma_{i=1}^{t} r_i (\tau_i - \bar\tau_{.})^2}{(t-1)}
+\end{align}
+$$
+
+cujo denominador é o mesmo que uma soma de quadrados,
+ exceto que é uma forma quadrática em $\boldsymbol{\Psi}$
+ ao invés de $\mathbf{Y}$, onde
+
+$$
+\boldsymbol{\Psi} =
+\begin{bmatrix}
+E(Y_1) \\
+E(Y_2) \\
+\vdots \\
+E(Y_n)
+\end{bmatrix}
+$$
+
+Em todo caso, $q_T(\Psi)$ é uma forma quadrática e deve ser não negativa.
+ De fato, a magnitude dessa quantidade vai depender do tamanho das diferenças
+entre as médias de tratamento e a média geral. Se os efeitos forem próximos,
+então serão parecidos com a média, enquanto que se forem mais espaçados haverá
+maior distância de média. Consequentemente, a média de quadrado de tratamento
+será (em média) maior do que e média de quadrado residual, pois é influenciada
+tanto pela variação não controlada e a magnitude dos efeitos.
+
+Portanto, $q_T(\Psi)$ só será zero quando os efeitos de tratamento forem
+iguais, ou seja, quando a hipótese nula for verdadeira. Dessa forma,
+os quadrados médios serão parecidos e o valor de F será próximo de 1. Assim,
+as seguintes hipóteses são equivalentes:
+
+$$
+\begin{align}
+H_0 &: q_T(\Psi) = 0 \\
+H_0 &: \tau_i = \tau_2 = \ldots = \tau_t
+\end{align}
+$$
 
 # Principais delineamentos
 
@@ -1146,53 +1222,72 @@ r <- unique(table(tratamento))
 n <- a * b * r
 ##----------------------------------------------------------------------
 ## Matrizes
+## Vetor de respostas
 (Y <- matrix(var.resp, ncol = 1))
+## Matriz de médias
 (Xg <- matrix(rep(1, n), ncol = 1))
+## Matriz do fator A
 Xa <- matrix(0, nrow = n, ncol = a)
 Xa[cbind(seq_along(fatorA), fatorA)] <- 1; Xa
+## Matriz do fator B
 Xb <- matrix(0, nrow = n, ncol = b)
 Xb[cbind(seq_along(fatorB), fatorB)] <- 1; Xb
+## Matriz da interação A:B
 Xab <- matrix(0, nrow = n, ncol = a*b)
 Xab[cbind(seq_along(tratamento), tratamento)] <- 1; Xab
 ##----------------------------------------------------------------------
 ## Matrizes M
-Mp <- diag(1, nrow = n)
+## para parcelas
+(Mp <- diag(1, nrow = n))
+## para média
 Mg <- Xg %*% solve(t(Xg) %*% Xg) %*% t(Xg)
+MASS::fractions(Mg)
+## para fator A
 Ma <- Xa %*% solve(t(Xa) %*% Xa) %*% t(Xa)
+MASS::fractions(Ma)
+## para fator B
 Mb <- Xb %*% solve(t(Xb) %*% Xb) %*% t(Xb)
+MASS::fractions(Mb)
+## para interação A:B
 Mab <- Xab %*% solve(t(Xab) %*% Xab) %*% t(Xab)
+MASS::fractions(Mab)
 ##----------------------------------------------------------------------
 ## Matrizes de projeção ortogonal
 Qp <- Mp - Mg
+MASS::fractions(Qp)
 Qa <- Ma - Mg
+MASS::fractions(Qa)
 Qb <- Mb - Mg
+MASS::fractions(Qb)
 Qab <- Mab - Ma - Mb + Mg
+MASS::fractions(Qab)
 Qr <- Mp - Mab
+MASS::fractions(Qr)
 ## Graus de liberdade
-GLp <- sum(diag(Qp)) # n - 1
-GLa <- sum(diag(Qa)) # a - 1
-GLb <- sum(diag(Qb)) # b - 1
-GLab <- sum(diag(Qab)) # (a-1)(b-1)
-GLr <- sum(diag(Qr)) # ab(r - 1)
+(GLp <- sum(diag(Qp))) # n - 1
+(GLa <- sum(diag(Qa))) # a - 1
+(GLb <- sum(diag(Qb))) # b - 1
+(GLab <- sum(diag(Qab))) # (a-1)(b-1)
+(GLr <- sum(diag(Qr))) # ab(r - 1)
 ## Soma de quadrados
-SQp <- t(Y) %*% Qp %*% Y
-SQa <- t(Y) %*% Qa %*% Y
-SQb <- t(Y) %*% Qb %*% Y
-SQab <- t(Y) %*% Qab %*% Y
-SQr <- t(Y) %*% Qr %*% Y
+(SQp <- t(Y) %*% Qp %*% Y)
+(SQa <- t(Y) %*% Qa %*% Y)
+(SQb <- t(Y) %*% Qb %*% Y)
+(SQab <- t(Y) %*% Qab %*% Y)
+(SQr <- t(Y) %*% Qr %*% Y)
 ## Quadrado médio
-QMa <- SQa/GLa
-QMb <- SQb/GLb
-QMab <- SQab/GLab
-QMr <- SQr/GLr
+(QMa <- SQa/GLa)
+(QMb <- SQb/GLb)
+(QMab <- SQab/GLab)
+(QMr <- SQr/GLr)
 ## F calculado
-FcalcA <- QMa/QMr
-FcalcB <- QMb/QMr
-FcalcAB <- QMab/QMr
+(FcalcA <- QMa/QMr)
+(FcalcB <- QMb/QMr)
+(FcalcAB <- QMab/QMr)
 ## p-valor
-p.valorA <- pf(FcalcA, GLa, GLr, lower.tail = FALSE)
-p.valorB <- pf(FcalcB, GLb, GLr, lower.tail = FALSE)
-p.valorAB <- pf(FcalcAB, GLab, GLr, lower.tail = FALSE)
+(p.valorA <- pf(FcalcA, GLa, GLr, lower.tail = FALSE))
+(p.valorB <- pf(FcalcB, GLb, GLr, lower.tail = FALSE))
+(p.valorAB <- pf(FcalcAB, GLab, GLr, lower.tail = FALSE))
 ## Tabela final
 tab.final <- data.frame("GL" = c(GLp, GLa, GLb, GLab, GLr),
                         "SQ" = c(SQp, SQa, SQb, SQab, SQr),

@@ -165,6 +165,8 @@ idempotente. Com isso, deve-se esperar que a matriz $\mathbf{H}$ também
 possua um papel importante no diagnóstico dos modelos baseado nos
 resíduos.
 
+
+
 # Modelo de regressão linear simples
 
 Modela a relação entre duas variáveis quantitativas.
