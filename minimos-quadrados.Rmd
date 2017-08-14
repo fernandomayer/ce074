@@ -9,6 +9,111 @@ output:
 source("setup_knitr.R")
 ```
 
+# Modelo linear tradicional
+
+Considerando um modelo linear com uma variável resposta e apenas um
+preditor linear, temos que
+
+$$
+Y_i = \beta_0 + \beta_1 X_i + \epsilon_i\, \qquad i = 1, \ldots, n
+$$
+
+onde:
+
+- $Y_i$ é o valor da variável resposta da $i$-ésima observação
+- $\beta_0$ e $\beta_1$ são parâmetros desconhecidos
+- $X_i$ é o valor do preditor da $i$-ésima observação (uma constante
+  conhecida)
+- $\epsilon_i$ é o erro aleatório (devido ao acaso) com $E(\epsilon_i) =
+  0$, e $V(\epsilon_i) = \sigma^2$. Além disso, $\epsilon_i$ e
+  $\epsilon_j$ são não correlacionados, ou seja, $Cov(\epsilon_i,
+  \epsilon_j) = 0, \forall\, i, j; i \neq j$
+
+**Considerações importantes**:
+
+1. A variável resposta $Y_i$ é a soma de dois componentes: (1) um termo
+   constante $\beta_0 + \beta_1 X_i$, e (2) um termo aleatório
+   $\epsilon_i$. Portanto, $Y_i$ é uma **variável aleatória**.
+2. Como $E(\epsilon_i) = 0$,
+$$
+\begin{align}
+E(Y_i) &= E(\beta_0 + \beta_1 X_i + \epsilon_i) \\
+       &= \beta_0 + \beta_1 X_i + E(\epsilon_i) \\
+       &= \beta_0 + \beta_1 X_i
+\end{align}
+$$
+3. A variável resposta $Y_i$ "desvia" da função de regressão por uma
+   quantidade $\epsilon_i$
+4. Os erros aleatórios possuem variância constante $\sigma^2$. Segue-se
+   que dessa forma, a variável $Y_i$ possui a mesma variância
+$$
+\begin{align}
+Var(Y_i) &= Var(\beta_0 + \beta_1 X_i + \epsilon_i) \\
+       &= Var(\epsilon_i) \\
+       &= \sigma^2
+\end{align}
+$$
+Portanto, o modelo assume que $Y$ possui a mesma variâncis,
+   **independente do nível da variável $X$**.
+5. Como os erros $\epsilon_i$ e $\epsilon_j$ são não correlacionados, as
+   variáveis $Y_i$ e $Y_j$ também são não correlacionadas (*i.e*
+   independentes)
+
+**Métodos de estimação**
+
+Para encontrar as estimativas dos parâmetros desconhecidos $\beta_0$ e
+$\beta_1$, podemos usar o método da **máxima verossimilhança** ou o
+**método dos mínimos quadrados**. Aqui iremos abordar somento o último.
+
+O método dos mínimos quadrados consiste em encontrar os estimadores que
+minimizam a diferença entre uma observação $Y_i$ e seu valor esperado
+$E(Y_i)$, ou seja,
+$$
+\begin{align}
+Y_i &- E(Y_i) \\
+Y_i &- (\beta_0 + \beta_1 X_i)
+\end{align}
+$$
+Em particular, o método requer a soma dos $n$ desvios ao quadrado, ou
+seja,
+$$
+Q = \sum_{i=1}^{n} (Y_i - \beta_0 - \beta_1 X_i)^2
+$$
+
+De acordo com o método dos mínimos quadrados, as estimativas de
+$\beta_0$ e $\beta_1$ são obtidas quando o critério $Q$ é mínimo.
+Lembre-se que para encontrar o mínimo de uma função, fazemos sua
+derivada (parcial, em relação à cada parâmetro), e igualamos o resultado
+a zero. Ao derivar $Q$ em relação à $\beta_0$ e $\beta_1$, temos as
+seguintes equações
+$$
+\begin{align}
+\frac{\partial Q}{\beta_0} &= -2 \Sigma (Y_i - \beta_0 - \beta_1 X_i) \\
+\frac{\partial Q}{\beta_1} &= -2 \Sigma X_i (Y_i - \beta_0 - \beta_1 X_i)
+\end{align}
+$$
+
+Igualando cada expressão a zero e expandindo os somatórios temos
+$$
+\begin{align}
+n \hat\beta_0 + \hat\beta_1 \Sigma X_i &= \Sigma Y_i \\
+\hat\beta_0 \Sigma X_i + \hat\beta_1 \Sigma X_i^2 &= \Sigma X_i Y_i
+\end{align}
+$$
+que é chamado de **sistema de equações normais**, e $\hat\beta_0$ e
+$\hat\beta_1$ são as estimativas pontuais para $\beta_0$ e \beta_1$,
+respectivamente. Isolando esses termos, encontramos as soluções:
+$$
+\begin{align}
+\hat\beta_1 &= \frac{\Sigma (X_i - \bar{X})(Y_i - \bar{Y})}
+{\Sigma (X_i - \bar{X})^2} \\
+\hat\beta_0 &= \bar{Y} - \hat\beta_1 \bar{X}
+\end{align}
+$$
+que são as chamadas **soluções de mínimos quadrados**.
+
+**Resíduos**
+
 # Estimação por mínimos quadrados na forma matricial
 
 O modelo linear usual é definido por
@@ -82,7 +187,7 @@ n & \Sigma X_i \\
 \Sigma X_i Y_i
 \end{bmatrix} \\
 \begin{bmatrix}
-n \hat\beta_0 + \beta_1 \Sigma X_i \\
+n \hat\beta_0 + \hat\beta_1 \Sigma X_i \\
 \hat\beta_0 \Sigma X_i + \hat\beta_1 \Sigma X_i^2
 \end{bmatrix} &=
 \begin{bmatrix}
