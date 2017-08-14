@@ -1,0 +1,24 @@
+# Pimentel Gomes, F. (2009). Curso de estatÃ­stica experimental (15th ed., p. 451). FEALQ.
+# pg 62
+racoes	ganhopeso
+A	35
+A	19
+A	31
+A	15
+A	30
+B	40
+B	35
+B	46
+B	41
+B	33
+C	39
+C	27
+C	20
+C	29
+C	45
+D	27
+D	12
+D	13
+D	28
+D	30
+
