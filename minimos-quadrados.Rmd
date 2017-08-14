@@ -114,7 +114,37 @@ que são as chamadas **soluções de mínimos quadrados**.
 
 **Resíduos**
 
-# Estimação por mínimos quadrados na forma matricial
+O $i$-ésimo resíduo é a diferença entre o valor observado $Y_i$ e seu
+correspondente valor predito $\hat{Y}_i$, onde
+$$
+\hat{Y}_i = \hat\beta_0 + \hat\beta_1 X_i\, \qquad i = 1, \ldots, n
+$$
+é o valor **ajustado** ou **predito** para cada nível $X$ da variável
+preditora.
+
+Sendo assim, o resíduo $e_i$ é
+$$
+\begin{align}
+e_i &= Y_i - \hat{Y}_i \\
+    &= Y_i - (\hat\beta_0 + \hat\beta_1 X_i) \\
+    &= Y_i - \hat\beta_0 - \hat\beta_1 X_i
+\end{align}
+$$
+
+É importante notar a diferença entre
+$$
+\epsilon_i = Y_i - E(Y_i)
+$$
+e
+$$
+e_i = Y_i - \hat{Y}_i
+$$
+O primeiro envolve a diferença entra $Y_i$ e a verdadeira equação de
+regressão, que é desconhecida. O segundo é a diferença entre $Y_i$ e o
+valor ajustado $\hat{Y}_i$ da equação de regressão estimada, ou seja, é
+conhecido.
+
+# Modelo linear na forma matricial
 
 O modelo linear usual é definido por
 
