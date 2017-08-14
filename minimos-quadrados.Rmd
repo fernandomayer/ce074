@@ -53,7 +53,7 @@ Var(Y_i) &= Var(\beta_0 + \beta_1 X_i + \epsilon_i) \\
        &= \sigma^2
 \end{align}
 $$
-Portanto, o modelo assume que $Y$ possui a mesma variâncis,
+Portanto, o modelo assume que $Y$ possui a mesma variâncias,
    **independente do nível da variável $X$**.
 5. Como os erros $\epsilon_i$ e $\epsilon_j$ são não correlacionados, as
    variáveis $Y_i$ e $Y_j$ também são não correlacionadas (*i.e*
@@ -101,7 +101,7 @@ n \hat\beta_0 + \hat\beta_1 \Sigma X_i &= \Sigma Y_i \\
 \end{align}
 $$
 que é chamado de **sistema de equações normais**, e $\hat\beta_0$ e
-$\hat\beta_1$ são as estimativas pontuais para $\beta_0$ e \beta_1$,
+$\hat\beta_1$ são as estimativas pontuais para $\beta_0$ e $\beta_1$,
 respectivamente. Isolando esses termos, encontramos as soluções:
 $$
 \begin{align}
@@ -175,7 +175,7 @@ Q &= (\mathbf{Y} - \mathbf{X}\boldsymbol{\beta})'(\mathbf{Y} -
 $$
 
 Note que $\boldsymbol{\beta'}\mathbf{X'Y}$ é $1 \times 1$, portanto
- é igual a sua inversa, ou seja, $(\mathbf{Y'X}\boldsymbol{\beta})' =
+ é igual a sua transposta, ou seja, $(\mathbf{Y'X}\boldsymbol{\beta})' =
 \boldsymbol{\beta'}\mathbf{X'Y}$. Portanto
 
 $$
@@ -188,7 +188,7 @@ fazemos as derivadas parciais em relação à $\boldsymbol{\beta}$
 
 $$
 \frac{\partial Q}{\partial \boldsymbol{\beta}} =
-  \mathbf{0} - 2\mathbf{X'y} + 2\mathbf{X'X}\boldsymbol{\beta}
+  \mathbf{0} - 2\mathbf{X'Y} + 2\mathbf{X'X}\boldsymbol{\beta}
 $$
 
 Igualando o resultado a zero, obtemos o **sistema de equações
@@ -257,8 +257,8 @@ $$
 \mathbf{\hat{Y}} = \mathbf{X}\boldsymbol{\hat\beta}
 $$
 
-Mas podemos expressar essa expressão para $\mathbf{\hat{Y}}$, usando a
-expressão para \boldsymbol{\hat\beta},
+Mas podemos escrever essa equação para $\mathbf{\hat{Y}}$, usando a
+expressão para $\boldsymbol{\hat\beta}$,
 
 $$
 \begin{align}
@@ -275,7 +275,7 @@ $$
 
 é chamada de **matriz chapéu**, ou **matriz núcleo**, ou **matriz de
 projeção ortogonal**. Como veremos mais adiante, esta matriz é de
-fundamental importância em modelos lineares. A matrix $\mathbf{H}$
+fundamental importância em modelos lineares. A matriz $\mathbf{H}$
 possui duas propriedades fundamentais: é **simétrica** e
     **idempotente**, ou seja,
 
@@ -288,7 +288,7 @@ Os **resíduos** também podem ser calculados através da matriz
 
 $$
 \begin{align}
-\boldsymbol{\epsilon} &= \mathbf{Y} - \mathbf{\hat{Y}} \\
+\mathbf{e} &= \mathbf{Y} - \mathbf{\hat{Y}} \\
     &= \mathbf{Y} - \mathbf{X}\boldsymbol{\hat\beta} \\
     &= \mathbf{Y} - \mathbf{HY} \\
     &= (\mathbf{I} - \mathbf{H})\mathbf{Y}
@@ -380,8 +380,8 @@ quantitativas.
 Especificando o modelo:
 
 $$
-  y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_k
-  x_{ik} +  \epsilon_i, \qquad i = 1, \ldots, n
+  y_{ij} = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_k
+  x_{ik} +  \epsilon_i, \qquad i = 1, \ldots, n,\, j = 1, \ldots, k
 $$
 
 $$
@@ -462,7 +462,7 @@ $$
   y_{ij} = \mu + \alpha_i + \epsilon_{ij}, \qquad i = 1, 2 \quad j = 1,2,3
 $$
 
-Onde $\mu$ é a média geral das observações, $\tau_i$ é o **efeito**
+Onde $\mu$ é a média geral das observações, $\alpha_i$ é o **efeito**
 adicional na média geral para o nível $i$ do tratamento, e
 $\epsilon_{ij}$ é o erro aleatório associado à cada observação.
 
@@ -559,7 +559,10 @@ $$
 Portanto o modelo se resumiria a
 
 $$
-y_{ij} = \mu + \alpha_i + \epsilon_{ij} = \mu_{ij} + \epsilon_{ij}
+\begin{align}
+y_{ij} &= \mu + \alpha_i + \epsilon_{ij} \\
+       &= \mu_{ij} + \epsilon_{ij}
+\end{align}
 $$
 
 Dessa forma, assumindo o mesmo exemplo com $i = 1,2$ níveis e $j =
@@ -635,7 +638,7 @@ assumir que um determinado parâmetro é fixo, e estimar os demais
 desconhecidos. As restrições mais comuns, por serem mais fáceis de serem
 interpretadas, são:
 
-- Assumir que a soma de todos os parâmetros é igual a zero, ou seja,
+- Assumir que a soma de todos os efeitos é igual a zero, ou seja,
   $\sum_{i=1}^{k} \alpha_i = 0$
 - Assumir que o primeiro nível do fator é zero, ou seja, $\alpha_1 = 0$
 - Assumir que o último nível do fator é zero, ou seja, $\alpha_k = 0$
@@ -646,7 +649,7 @@ restrições também são chamadas de **contrastes**.
 
 ### Soma zero
 
-O contraste do tipo soma zero, assume que a soma de todos os parâmetros
+O contraste do tipo soma zero, assume que a soma de todos os efeitos
 é igual a zero. Continuando com o exemplo anterior, onde temos um fator
 com 2 níveis e 3 repetições, o contraste é
 
