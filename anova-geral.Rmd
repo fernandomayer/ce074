@@ -584,6 +584,13 @@ summary(aov(var.resp ~ tratamento))
 summary(aov(var.resp ~ tratamento + Error(parcela)))
 ```
 
+```{r, include=FALSE}
+## Usando fórmulas tradicionais
+## SQTot
+sum((var.resp - mean(var.resp))^2)
+3*sum((tapply(var.resp, tratamento, mean) - mean(var.resp))^2)
+```
+
 ## Delineamento em blocos completos (DBC)
 
 Considere um experimento em um delineamento em blocos completos com
