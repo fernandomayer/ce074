@@ -81,8 +81,10 @@ set.seed(123)
 plot(dist ~ speed, data = carros)
 model.matrix(dist ~ speed, data = carros)
 ## Um fator com 3 níveis e 4 repetições
-fator <- rep(c("A", "B", "C"), each = 4)
-model.matrix(~fator)
+fator <- factor(rep(c("A", "B", "C"), each = 4))
+X <- matrix(0, nrow = 12, ncol = 3)
+X[cbind(seq_along(fator), fator)] <- 1
+(X <- cbind(1, X))
 
 ## ---- error=TRUE---------------------------------------------------------
 ## Fator com 3 níveis e 4 repetições
