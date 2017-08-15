@@ -34,7 +34,8 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
   [Gabarito](exercicios/ex_revisao_GABARITO.pdf).
 - **10/08**: Aula cancelada em virtude da palestra [Data Science
  Experience](https://www.facebook.com/PET.Estatistica.UFPR/photos/a.1642649022622718.1073741828.1641067472780873/2013970412157242/?type=3&theater).
-- **14/08**:
+- **14/08**: Modelos lineares na forma matricial e reparametrizações
+  para modelos de posto incompleto. Ver [material](modelos-lineares.html).
 - **17/08**:
 - **21/08**:
 - **24/08**:

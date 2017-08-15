@@ -31,6 +31,8 @@ navbar:
       - text: "Introdução e revisão"
       - text: "Catalizando a geração de conhecimento"
         href: catalizando-conhecimento.html
+      - text: "Modelos lineares e reparametrizações"
+        href: modelos-lineares.html
       - text: "----------"
       - text: "Exercícios"
       - text: "Revisão de conhecimento [PDF]"
