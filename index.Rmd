@@ -11,15 +11,9 @@ source("setup_knitr.R")
 
 [![Build Status](https://travis-ci.org/fernandomayer/ce074.svg?branch=master)](https://travis-ci.org/fernandomayer/ce074)
 
-<div class="alert alert-danger" role="alert">
-**ATENÇÃO!**
-
-A aula de hoje (10/08) está cancelada em virtude da palestra
-[Data Science
- Experience](https://www.facebook.com/PET.Estatistica.UFPR/photos/a.1642649022622718.1073741828.1641067472780873/2013970412157242/?type=3&theater)
-da IBM. Aula normal na próxima segunda-feira.
-
-</div>
+<!-- <div class="alert alert-danger" role="alert"> -->
+<!-- **ATENÇÃO!** -->
+<!-- </div> -->
 
 # Detalhes da oferta da disciplina
 
