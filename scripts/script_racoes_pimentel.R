@@ -4,9 +4,12 @@
 
 ##----------------------------------------------------------------------
 ## Carrega base de dados
+## Disponível em:
+# url <- "http://leg.ufpr.br/~fernandomayer/data/pimentel_racoes.txt"
 da <- read.table("dados/pimentel_racoes.txt",
                  header = TRUE, sep = "\t")
 str(da)
+xtabs(~ racoes, da)
 
 ##----------------------------------------------------------------------
 ## Visualização
@@ -28,6 +31,8 @@ with(da, tapply(ganhopeso, racoes, mean))
 ## E SE... tivessem apenas 2 racoes? O que voce faria? De que forma?
 
 ## Carrega a funcao subsetDropAll para fazer o subset
+## Disponível em:
+## http://leg.ufpr.br/~fernandomayer/aulas/ce074/scripts/subsetDropAll.R
 source("scripts/subsetDropAll.R")
 da2 <- subsetDropAll(da, racoes %in% c("A", "B"))
 str(da2)
@@ -63,7 +68,7 @@ MASS::fractions(solve(Xt %*% X))
 Xt %*% y
 solve(Xt %*% X) %*% Xt %*% y
 
-## Remove segunda coluna = assumir que o primeiro nivel do fator eh
+## Remove segunda coluna = assumir que o primeiro nivel do fator é
 ## igual a zero
 (X <- X[, -2])
 ## X'
