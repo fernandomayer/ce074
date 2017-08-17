@@ -33,6 +33,12 @@ navbar:
         href: catalizando-conhecimento.html
       - text: "Modelos lineares e reparametrizações"
         href: modelos-lineares.html
+      - text: "ANOVA por meio de Diagramas de Hasse"
+        href: anova-geral.html
+      - text: "----------"
+      - text: "Scripts"
+      - text: "Tipos de contrastes em modelos lineares [R]"
+        href: scripts/script_racoes_pimentel.R
       - text: "----------"
       - text: "Exercícios"
       - text: "Revisão de conhecimento [PDF]"
