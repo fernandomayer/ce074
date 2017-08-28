@@ -836,8 +836,8 @@ $t$ tratamentos, portanto com $t$ linhas e $t$ colunas.
 O modelo associado à este delineamento é
 
 $$
-y_{ij} = \mu + \alpha_i + \beta_j + \gamma_{ij} + \epsilon_{ij}\,
-\qquad i = j = 1, \ldots, t
+y_{ij} = \mu + \alpha_i + \beta_j + \gamma_{k(ij)} + \epsilon_{ij}\,
+\qquad i = j = k = 1, \ldots, t
 $$
 
 Matricialmente o modelo pode ser escrito como:
