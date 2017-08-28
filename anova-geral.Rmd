@@ -398,10 +398,10 @@ Matricialmente o modelo pode ser escrito como:
 $$
 \begin{align}
 \mathbf{Y} &= \mathbf{X}\boldsymbol{\theta} +
-\boldsymbol{\epsilon}_{ij} \\
+\boldsymbol{\epsilon} \\
 \mathbf{Y} &= \mathbf{X_G}\boldsymbol{\mu} +
 \mathbf{X_T}\boldsymbol{\tau} +
-\boldsymbol{\epsilon}_{ij}
+\boldsymbol{\epsilon}
 \end{align}
 $$
 
@@ -477,6 +477,9 @@ da.dic <- data.frame(variedade = rep(c("V1", "V2", "V3"), each = 3),
                          53, 54, 52))
 ## Estrutura dos dados
 str(da.dic)
+## Croqui do experimento
+set.seed(11)
+matrix(sample(da.dic$variedade), ncol = 3)
 ```
 
 A **fórmula estrutural** é:
@@ -497,8 +500,8 @@ A **tabela de ANOVA** fica:
 | Fonte de variação | GL       | SQ                    | QM                                   | E[QM] (Fixo)             |
 |-------------------|----------|-----------------------|--------------------------------------|--------------------------|
 | Parcelas          | $8$   | $\mathbf{Y'Q_PY}$     |                                      |                          |
-|     Tratamentos   | $2$    | $\mathbf{Y'Q_TY}$     | $\frac{\mathbf{Y'Q_TY}}{t-1}$        | $\sigma^2_P + q_T(\Psi)$ |
-|     Resíduo       | $6$ | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{t(r-1)}$ | $\sigma^2_P$             |
+|     ¬¬Tratamentos | $2$    | $\mathbf{Y'Q_TY}$     | $\frac{\mathbf{Y'Q_TY}}{t-1}$        | $\sigma^2_P + q_T(\Psi)$ |
+|     ¬¬Resíduo     | $6$ | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{t(r-1)}$ | $\sigma^2_P$             |
 
 
 Calculando as matrizes $\mathbf{Q}$ manualmente:
@@ -523,16 +526,19 @@ parcela <- da.dic$parcela
 ## Matriz de tratamentos
 Xt <- matrix(0, nrow = n, ncol = t)
 Xt[cbind(seq_along(tratamento), tratamento)] <- 1; Xt
+## Matriz de parcelas (identidade)
+(Xp <- diag(1, nrow = n))
 ##----------------------------------------------------------------------
 ## Matrizes M
 ## para média
 Mg <- Xg %*% solve(t(Xg) %*% Xg) %*% t(Xg)
 MASS::fractions(Mg)
-## para parcela
-(Mp <- diag(1, nrow = n))
 ## para tratamento
 Mt <- Xt %*% solve(t(Xt) %*% Xt) %*% t(Xt)
 MASS::fractions(Mt)
+## para parcela
+Mp <- Xp %*% solve(t(Xp) %*% Xp) %*% t(Xp)
+MASS::fractions(Mp)
 ##----------------------------------------------------------------------
 ## Matrizes de projeção ortogonal
 ## para parcela
@@ -608,11 +614,11 @@ Matricialmente o modelo pode ser escrito como:
 $$
 \begin{align}
 \mathbf{Y} &= \mathbf{X}\boldsymbol{\theta} +
-\boldsymbol{\epsilon}_{ij} \\
+\boldsymbol{\epsilon} \\
 \mathbf{Y} &= \mathbf{X_G}\boldsymbol{\mu} +
 \mathbf{X_B}\boldsymbol{\beta} +
 \mathbf{X_T}\boldsymbol{\tau} +
-\boldsymbol{\epsilon}_{ij}
+\boldsymbol{\epsilon}
 \end{align}
 $$
 
@@ -635,8 +641,8 @@ include_graphics("img/DBC_geral.png")
 |-------------------|--------------|-----------------------|------------------------------------------|-----------------------------|---------------------------------|-------------------------------|---------------------------------|
 | Blocos            | $b-1$        | $\mathbf{Y'Q_{B}Y}$   | $\frac{\mathbf{Y'Q_{B}Y}}{b-1}$          | $\sigma^2_{PB} + q_B(\Psi)$ | $\sigma^2_{PB} + t\sigma^2_{B}$ | $\sigma^2_{PB} + q_B(\Psi)$   | $\sigma^2_{PB} + t\sigma^2_{B}$ |
 | Parcelas[Blocos]  | $b(t-1)$     | $\mathbf{Y'Q_{BP}Y}$  | $\frac{\mathbf{Y'Q_{BP}Y}}{b(t-1)}$      |                             |                                 |                               |                                 |
-|     Tratamentos   | $t-1$        | $\mathbf{Y'Q_{T}Y}$   | $\frac{\mathbf{Y'Q_{T}Y}}{t-1}$          | $\sigma^2_{PB} + q_T(\Psi)$ | $\sigma^2_{PB} + q_T(\Psi)$     | $\sigma^2_{PB} + b\sigma^2_T$ | $\sigma^2_{PB} + b\sigma^2_{T}$ |
-|     Resíduo       | $(b-1)(t-1)$ | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{(b-1)(t-1)}$ | $\sigma^2_{PB}$             | $\sigma^2_{PB}$                 | $\sigma^2_{PB}$               | $\sigma^2_{PB}$                 |
+|     ¬¬Tratamentos | $t-1$        | $\mathbf{Y'Q_{T}Y}$   | $\frac{\mathbf{Y'Q_{T}Y}}{t-1}$          | $\sigma^2_{PB} + q_T(\Psi)$ | $\sigma^2_{PB} + q_T(\Psi)$     | $\sigma^2_{PB} + b\sigma^2_T$ | $\sigma^2_{PB} + b\sigma^2_{T}$ |
+|     ¬¬Resíduo     | $(b-1)(t-1)$ | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{(b-1)(t-1)}$ | $\sigma^2_{PB}$             | $\sigma^2_{PB}$                 | $\sigma^2_{PB}$               | $\sigma^2_{PB}$                 |
 
 Onde os números após a E[QM] são as combinações:
 
@@ -690,8 +696,9 @@ $$
 - Exemplo no R
 
 Os dados apresentados a seguir referem-se à produção média (2 plantas)
-de frutos, em kg/planta, de uma espécie de laranjeira, enxertada sobre
-13 clones, obtidos de um experimento casualizado em blocos.
+de frutos, em kg/planta, de uma espécie de laranjeira, enxertada sobre 4
+clones (tratamento), obtidos de um experimento casualizado em blocos, e
+considerando blocos e parcelas como de efeito fixo.
 
 ```{r, collapse=TRUE}
 da.dbc <- data.frame(tratamento = rep(paste("T", 1:4, sep= ""), 3),
@@ -700,11 +707,28 @@ da.dbc <- data.frame(tratamento = rep(paste("T", 1:4, sep= ""), 3),
                                   21.85, 69.9, 64.2, 72.6,
                                   32.45, 52.85, 60.9, 55.25))
 str(da.dbc)
+## Croqui do experimento
+set.seed(11)
+croqui.DBC <- do.call(cbind, tapply(as.character(da.dbc$tratamento),
+                                    da.dbc$bloco, sample))
+dimnames(croqui.DBC) <- list(1:4, paste("Bloco", 1:3))
+croqui.DBC
 ```
 
-INSERIR fórmula estrutural e diagrama de Hasse
+A **fórmula estrutural** fica:
 
-Análise
+| Estrutura | Fórmula |
+|-----------|---------|
+| Unrandomized | $3$ blocos/$4$ parcelas |
+| Randomized | $4$ tratamentos |
+
+E o **disgrama de Hasse** fica desta forma:
+
+```{r, echo=FALSE, out.width='100%'}
+include_graphics("img/DBC_ex1.png")
+```
+
+Os cálculos feitos à mão no R:
 
 ```{r, collapse=TRUE}
 ##----------------------------------------------------------------------
@@ -729,6 +753,8 @@ Xt[cbind(seq_along(tratamento), tratamento)] <- 1; Xt
 ## Matriz de blocos
 Xb <- matrix(0, nrow = n, ncol = b)
 Xb[cbind(seq_along(blocos), blocos)] <- 1; Xb
+## Matriz de blocos/parcelas (identidade)
+(Xbp <- diag(1, nrow = n))
 ##----------------------------------------------------------------------
 ## Matrizes M
 ## para média
@@ -741,7 +767,8 @@ MASS::fractions(Mt)
 Mb <- Xb %*% solve(t(Xb) %*% Xb) %*% t(Xb)
 MASS::fractions(Mb)
 ## para bloco/parcela
-(Mbp <- diag(1, nrow = n))
+Mbp <- Xbp %*% solve(t(Xbp) %*% Xbp) %*% t(Xbp)
+MASS::fractions(Mbp)
 ##----------------------------------------------------------------------
 ## Matrizes de projeção ortogonal
 ## para tratamento
@@ -809,8 +836,8 @@ $t$ tratamentos, portanto com $t$ linhas e $t$ colunas.
 O modelo associado à este delineamento é
 
 $$
-y_{ij} = \mu + \alpha_i + \beta_j + \gamma_{k(ij)} + \epsilon_{ij}\,
-\qquad i = j = k = 1, \ldots, t
+y_{ij} = \mu + \alpha_i + \beta_j + \gamma_{ij} + \epsilon_{ij}\,
+\qquad i = j = 1, \ldots, t
 $$
 
 Matricialmente o modelo pode ser escrito como:
@@ -818,12 +845,12 @@ Matricialmente o modelo pode ser escrito como:
 $$
 \begin{align}
 \mathbf{Y} &= \mathbf{X}\boldsymbol{\theta} +
-\boldsymbol{\epsilon}_{ij} \\
+\boldsymbol{\epsilon} \\
 \mathbf{Y} &= \mathbf{X_G}\boldsymbol{\mu} +
 \mathbf{X_L}\boldsymbol{\alpha} +
 \mathbf{X_C}\boldsymbol{\beta} +
 \mathbf{X_{LC}}\boldsymbol{\gamma} +
-\boldsymbol{\epsilon}_{ij}
+\boldsymbol{\epsilon}
 \end{align}
 $$
 
@@ -847,14 +874,14 @@ include_graphics("img/DQL_geral.png")
 | Linha             | $t-1$        | $\mathbf{Y'Q_{L}Y}$   | $\frac{\mathbf{Y'Q_{L}Y}}{t-1}$          | $\sigma^2_{LC} + q_L(\Psi)$ | $\sigma^2_{LC} + q_L(\Psi)$     | $\sigma^2_{LC} + q_L(\Psi)$   | $\sigma^2_{LC} + t\sigma^2_{L}$ |
 | Coluna            | $t-1$        | $\mathbf{Y'Q_{C}Y}$   | $\frac{\mathbf{Y'Q_{C}Y}}{t-1}$          | $\sigma^2_{LC} + q_C(\Psi)$ | $\sigma^2_{LC} + t\sigma^2_{C}$ | $\sigma^2_{LC} + q_C(\Psi)$   | $\sigma^2_{LC} + t\sigma^2_{C}$ |
 | Linha#Coluna      | $(t-1)^2$    | $\mathbf{Y'Q_{LC}Y}$  | $\frac{\mathbf{Y'Q_{LC}Y}}{(t-1)^2}$     |                             |                                 |                               |                                 |
-| Tratamentos       | $t-1$        | $\mathbf{Y'Q_{T}Y}$   | $\frac{\mathbf{Y'Q_{T}Y}}{t-1}$          | $\sigma^2_{LC} + q_T(\Psi)$ | $\sigma^2_{LC} + q_T(\Psi)$     | $\sigma^2_{LC} + t\sigma^2_T$ | $\sigma^2_{LC} + t\sigma^2_{T}$ |
-| Resíduo           | $(t-1)(t-2)$ | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{(t-1)(t-2)}$ | $\sigma^2_{LC}$             | $\sigma^2_{LC}$                 | $\sigma^2_{LC}$               | $\sigma^2_{LC}$                 |
+| ¬¬Tratamentos     | $t-1$        | $\mathbf{Y'Q_{T}Y}$   | $\frac{\mathbf{Y'Q_{T}Y}}{t-1}$          | $\sigma^2_{LC} + q_T(\Psi)$ | $\sigma^2_{LC} + q_T(\Psi)$     | $\sigma^2_{LC} + t\sigma^2_T$ | $\sigma^2_{LC} + t\sigma^2_{T}$ |
+| ¬¬Resíduo         | $(t-1)(t-2)$ | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{(t-1)(t-2)}$ | $\sigma^2_{LC}$             | $\sigma^2_{LC}$                 | $\sigma^2_{LC}$               | $\sigma^2_{LC}$                 |
 
 Onde os números após a E[QM] são as combinações:
 
 - **(1)**: Linha fixo, coluna fixo, tratamento fixo
 - **(2)**: Linha fixo, coluna aleatório, tratamento fixo
-- **(3)**: Linha fixo, coluna aleatório, tratamento aleatório
+- **(3)**: Linha fixo, coluna fixo, tratamento aleatório
 - **(4)**: Linha aleatório, coluna aleatório, tratamento aleatório
 
 E as matrizes são:
@@ -920,11 +947,24 @@ da.dql$producao <- c(92.6, 96.3, 73.1, 86.7,
                      112.6, 100.1, 90.6, 65.7,
                      92.5, 43.7, 83.4, 70.2)
 str(da.dql, give.attr = FALSE)
+## Croqui do experimento
+matrix(da.dql$sistemas, ncol = 4, byrow = TRUE)
 ```
 
-INSERIR fórmula estrutural e diagrama de Hasse.
+A **fórmula estrutural** é:
 
-Análise
+| Estrutura | Fórmula |
+|-----------|---------|
+| Unrandomized | $4$ linhas $*$ $4$ colunas |
+| Randomized | $4$ tratamentos |
+
+E o **diagrama de Hasse** fica:
+
+```{r, echo=FALSE, out.width='100%'}
+include_graphics("img/DQL_ex1.png")
+```
+
+A análise feita no R:
 
 ```{r, collapse=TRUE}
 ##----------------------------------------------------------------------
@@ -952,6 +992,8 @@ Xl[cbind(seq_along(linhas), linhas)] <- 1; Xl
 ## Matriz de colunas
 Xc <- matrix(0, nrow = n, ncol = t)
 Xc[cbind(seq_along(colunas), colunas)] <- 1; Xc
+## Matriz de linhas#colunas (identidade)
+(Xlc <- diag(1, nrow = n))
 ##----------------------------------------------------------------------
 ## Matrizes M
 ## para média
@@ -967,7 +1009,8 @@ MASS::fractions(Mc)
 Mt <- Xt %*% solve(t(Xt) %*% Xt) %*% t(Xt)
 MASS::fractions(Mt)
 ## para linha#coluna
-(Mlc <- diag(1, nrow = n))
+Mlc <- Xlc %*% solve(t(Xlc) %*% Xlc) %*% t(Xlc)
+MASS::fractions(Mlc)
 ##----------------------------------------------------------------------
 ## Matrizes de projeção ortogonal
 ## para linhas
