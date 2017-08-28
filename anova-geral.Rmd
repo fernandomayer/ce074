@@ -1200,8 +1200,6 @@ F_{AB} &= \frac{\textrm{QMAB}}{\textrm{QMRes}}
 \end{align}
 $$
 
-
-
 - Exemplo no R:
 
 Os dados apresentados a seguir referem-se às produções (kg/m$^2$) de
