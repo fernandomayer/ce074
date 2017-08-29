@@ -43,7 +43,8 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
   Exemplo numérico no R. Ver [material](anova-geral.html).
 - **24/08**: **Não haverá aula**. Ler o [material](anova-geral.html)
   sobre diagramas de Hasse até experimentos fatoriais.
-- **28/08**:
+- **28/08**: Diagramas de Hasse para experimentos em blocos completos
+  (DBC) e quadrado latino (DQL). Ver [material](anova-geral.html).
 - **31/08**:
 - **04/09**:
 - **07/09**: Feriado.
