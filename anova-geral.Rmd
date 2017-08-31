@@ -1100,12 +1100,12 @@ Matricialmente o modelo pode ser escrito como:
 $$
 \begin{align}
 \mathbf{Y} &= \mathbf{X}\boldsymbol{\theta} +
-\boldsymbol{\epsilon}_{ijk} \\
+\boldsymbol{\epsilon} \\
 \mathbf{Y} &= \mathbf{X_G}\boldsymbol{\mu} +
 \mathbf{X_A}\boldsymbol{\alpha} +
 \mathbf{X_B}\boldsymbol{\beta} +
 \mathbf{X_{AB}}\boldsymbol{\gamma} +
-\boldsymbol{\epsilon}_{ijk}
+\boldsymbol{\epsilon}
 \end{align}
 $$
 
@@ -1113,8 +1113,8 @@ $$
 
 | Estrutura | Fórmula |
 |-----------|---------|
-| Unrandomized | $n$ parcelas |
-| Randomized | $a$ A $*$ $b$ B |
+| Unrandomized | $abr$ parcelas |
+| Randomized | $a$ Fator A $*$ $b$ Fator B |
 
 - Diagrama de Hasse
 
@@ -1127,10 +1127,10 @@ include_graphics("img/DIC_FATORIAL_geral.png")
 | Fonte de variação | GL           | SQ                    | QM                                      | E[QM] (1)                     | E[QM] (2)                                      | E[QM] (3)                                      | E[QM] (4)                                      |
 |-------------------|--------------|-----------------------|-----------------------------------------|-------------------------------|------------------------------------------------|------------------------------------------------|------------------------------------------------|
 | Parcela           | $rab-1$      | $\mathbf{Y'Q_{P}Y}$   | $\frac{\mathbf{Y'Q_{P}Y}}{rab-1}$       |                               |                                                |                                                |                                                |
-| A                 | $a-1$        | $\mathbf{Y'Q_{A}Y}$   | $\frac{\mathbf{Y'Q_{A}Y}}{a-1}$         | $\sigma^2_{P} + q_A(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + rb\sigma^2_A$ | $\sigma^2_{P} + r\sigma^2_{AB} + q_A(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + rb\sigma^2_A$ |
-| B                 | $b-1$        | $\mathbf{Y'Q_{B}Y}$   | $\frac{\mathbf{Y'Q_{B}Y}}{b-1}$         | $\sigma^2_{P} + q_B(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + q_B(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + ra\sigma^2_B$ | $\sigma^2_{P} + r\sigma^2_{AB} + ra\sigma^2_B$ |
-| A#B               | $(a-1)(b-1)$ | $\mathbf{Y'Q_{AB}Y}$  | $\frac{\mathbf{Y'Q_{AB}Y}}{(a-1)(b-1)}$ | $\sigma^2_{P} + q_{AB}(\Psi)$ | $\sigma^2_{P} + r\sigma^2_{AB}$                | $\sigma^2_{P} + r\sigma^2_{AB}$                | $\sigma^2_{P} + r\sigma^2_{AB}$                |
-| Resíduo           | $ab(r-1)$    | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{ab(r-1)}$   | $\sigma^2_{P}$                | $\sigma^2_{P}$                                 | $\sigma^2_{P}$                                 | $\sigma^2_{P}$                                 |
+| ¬¬Fator A         | $a-1$        | $\mathbf{Y'Q_{A}Y}$   | $\frac{\mathbf{Y'Q_{A}Y}}{a-1}$         | $\sigma^2_{P} + q_A(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + rb\sigma^2_A$ | $\sigma^2_{P} + r\sigma^2_{AB} + q_A(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + rb\sigma^2_A$ |
+| ¬¬Fator B         | $b-1$        | $\mathbf{Y'Q_{B}Y}$   | $\frac{\mathbf{Y'Q_{B}Y}}{b-1}$         | $\sigma^2_{P} + q_B(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + q_B(\Psi)$    | $\sigma^2_{P} + r\sigma^2_{AB} + ra\sigma^2_B$ | $\sigma^2_{P} + r\sigma^2_{AB} + ra\sigma^2_B$ |
+| ¬¬A#B             | $(a-1)(b-1)$ | $\mathbf{Y'Q_{AB}Y}$  | $\frac{\mathbf{Y'Q_{AB}Y}}{(a-1)(b-1)}$ | $\sigma^2_{P} + q_{AB}(\Psi)$ | $\sigma^2_{P} + r\sigma^2_{AB}$                | $\sigma^2_{P} + r\sigma^2_{AB}$                | $\sigma^2_{P} + r\sigma^2_{AB}$                |
+| ¬¬Resíduo         | $ab(r-1)$    | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{ab(r-1)}$   | $\sigma^2_{P}$                | $\sigma^2_{P}$                                 | $\sigma^2_{P}$                                 | $\sigma^2_{P}$                                 |
 
 Onde os números após a E[QM] são as combinações:
 
@@ -1205,12 +1205,12 @@ $$
 Os dados apresentados a seguir referem-se às produções (kg/m$^2$) de
 soja quando cultivadas sob diferentes tratamentos (adubo e torta). O
 experimento foi instalado segundo o delineamento inteiramente
-casualizado (DIC). **Importante**: ambos os tratamentos são considerados
-como fixos.
+casualizado (DIC), com 4 repetições. **Importante**: ambos os
+tratamentos são considerados como fixos.
 
 ```{r}
 ##----------------------------------------------------------------------
-## Definições
+## Definições prévias do experimento
 a <- 2
 b <- 2
 r <- 4
@@ -1241,7 +1241,7 @@ croqui.DIC.fat <- matrix(croqui.DIC.fat, ncol = a*b,
 croqui.DIC.fat
 ```
 
-Análise:
+Análise passo a passo:
 
 ```{r, include=FALSE, eval=FALSE}
 source("scripts_teste/aov.dic.fat.R")
@@ -1274,6 +1274,8 @@ n <- a * b * r
 (Y <- matrix(var.resp, ncol = 1))
 ## Matriz de médias
 (Xg <- matrix(rep(1, n), ncol = 1))
+## Matriz de parcelas (identidade)
+(Xp <- diag(1, nrow = n))
 ## Matriz do fator A
 Xa <- matrix(0, nrow = n, ncol = a)
 Xa[cbind(seq_along(fatorA), fatorA)] <- 1; Xa
@@ -1285,11 +1287,12 @@ Xab <- matrix(0, nrow = n, ncol = a*b)
 Xab[cbind(seq_along(tratamento), tratamento)] <- 1; Xab
 ##----------------------------------------------------------------------
 ## Matrizes M
-## para parcelas
-(Mp <- diag(1, nrow = n))
 ## para média
 Mg <- Xg %*% solve(t(Xg) %*% Xg) %*% t(Xg)
 MASS::fractions(Mg)
+## para parcelas
+Mp <- Xp %*% solve(t(Xp) %*% Xp) %*% t(Xp)
+MASS::fractions(Mp)
 ## para fator A
 Ma <- Xa %*% solve(t(Xa) %*% Xa) %*% t(Xa)
 MASS::fractions(Ma)
@@ -1354,4 +1357,84 @@ summary(aov(var.resp ~ fatorA + fatorB + fatorA:fatorB))
 ## Usando a função Error() para identificar o confundimento
 summary(aov(var.resp ~ fatorA + fatorB + fatorA:fatorB +
             Error(parcela)))
+```
+
+Analisando os **efeitos** dos termos do modelo:
+
+```{r, collapse=TRUE}
+##----------------------------------------------------------------------
+## ANOVA usando a função aov() com Error()
+m0 <- aov(var.resp ~ fatorA + fatorB + fatorA:fatorB +
+              Error(parcela))
+## Tabela ANOVA
+summary(m0)
+##----------------------------------------------------------------------
+## Existe interação?
+interaction.plot(fatorA, fatorB, var.resp)
+lattice::wireframe(var.resp ~ fatorA*fatorB)
+##----------------------------------------------------------------------
+## Tabela de médias
+model.tables(m0, type = "means")
+## é o mesmo que:
+mean(var.resp)
+tapply(var.resp, fatorA, mean)
+tapply(var.resp, fatorB, mean)
+tapply(var.resp, fatorA:fatorB, mean)
+##----------------------------------------------------------------------
+## EFEITOS estimados
+model.tables(m0, type = "effects")
+## O que são os efeitos?
+## Fator A
+tapply(var.resp, fatorA, mean)
+diff(tapply(var.resp, fatorA, mean))
+diff(tapply(var.resp, fatorA, mean))/2
+## fator B
+tapply(var.resp, fatorB, mean)
+diff(tapply(var.resp, fatorB, mean))
+diff(tapply(var.resp, fatorB, mean))/2
+## Interação
+(int.med <- tapply(var.resp, fatorA:fatorB, mean))
+((int.med["A1:T1"] + int.med["A0:T0"])/2 -
+ (int.med["A1:T0"] + int.med["A0:T1"])/2)
+((int.med["A1:T1"] + int.med["A0:T0"])/2 -
+ (int.med["A1:T0"] + int.med["A0:T1"])/2)/2
+## Os "efeitos" são então diferenças entre médias, e também são chamados
+## de efeitos de Yates
+dae::yates.effects(m0, error.term = "parcela")
+## A metade da diferença entre médias são os coeficientes
+## Enquanto os efeitos de Yates medem a diferença na variável resposta
+## pela mudança em 2 unidades de cada fator, os coeficientes medem a
+## diferença pela mudança em uma unidade em cada fator (igual aos
+## modelos de regressão)
+dae::yates.effects(m0, error.term = "parcela")/2
+##----------------------------------------------------------------------
+## Usando lm() com contraste soma zero
+m0lm <- lm(var.resp ~ fatorA + fatorB + fatorA:fatorB,
+           contrasts = list(fatorA = contr.sum,
+                            fatorB = contr.sum))
+## A ANOVA é a mesma
+anova(m0lm)
+## Os efeitos também estão aqui
+summary(m0lm)
+mean(var.resp) # média geral = intercepto
+## Médias do fatorA
+tapply(var.resp, fatorA, mean)
+mean(var.resp) + coef(m0lm)[2] # media do fator A0
+mean(var.resp) - coef(m0lm)[2] # media do fator A1
+## Médias do fatorB
+tapply(var.resp, fatorB, mean)
+mean(var.resp) + coef(m0lm)[3] # media do fator B0
+mean(var.resp) - coef(m0lm)[3] # media do fator B0
+##----------------------------------------------------------------------
+## E SE você considerasse a interação como não significativa?
+m1 <- aov(var.resp ~ fatorA + fatorB + Error(parcela))
+summary(m1)
+yates.effects(m1, error.term = "parcela")
+## Usando lm()
+m1lm <- lm(var.resp ~ fatorA + fatorB,
+           contrasts = list(fatorA = contr.sum,
+                            fatorB = contr.sum))
+anova(m1lm)
+summary(m1lm)
+anova(m0lm, m1lm)
 ```
