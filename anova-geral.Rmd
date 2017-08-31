@@ -1429,7 +1429,7 @@ mean(var.resp) - coef(m0lm)[3] # media do fator B0
 ## E SE você considerasse a interação como não significativa?
 m1 <- aov(var.resp ~ fatorA + fatorB + Error(parcela))
 summary(m1)
-yates.effects(m1, error.term = "parcela")
+dae::yates.effects(m1, error.term = "parcela")
 ## Usando lm()
 m1lm <- lm(var.resp ~ fatorA + fatorB,
            contrasts = list(fatorA = contr.sum,
