@@ -45,7 +45,11 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
   sobre diagramas de Hasse até experimentos fatoriais.
 - **28/08**: Diagramas de Hasse para experimentos em blocos completos
   (DBC) e quadrado latino (DQL). Ver [material](anova-geral.html).
-- **31/08**:
+- **31/08**: Diagramas de Hasse para experimentos fatoriais em
+  delineamentos inteiramente casualizados (DIC). Ver
+  [material](anova-geral.html). **Trazer para a próxima aula** o
+  diagrama de Hasse com a tabela de ANOVA completa para um experimento
+  fatorial em um delineamento em blocos completos (DBC).
 - **04/09**:
 - **07/09**: Feriado.
 - **11/09**:
