@@ -1359,9 +1359,9 @@ summary(aov(var.resp ~ fatorA + fatorB + fatorA:fatorB +
             Error(parcela)))
 ```
 
-Analisando os **efeitos** dos termos do modelo:
+<!-- Analisando os **efeitos** dos termos do modelo: -->
 
-```{r, collapse=TRUE}
+```{r, collapse=TRUE, include=FALSE}
 ##----------------------------------------------------------------------
 ## ANOVA usando a função aov() com Error()
 m0 <- aov(var.resp ~ fatorA + fatorB + fatorA:fatorB +
