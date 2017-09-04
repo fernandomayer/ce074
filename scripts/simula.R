@@ -231,3 +231,66 @@ sum(da2$Resp[da2$Trat == "C"])/1500 -
 ## O que são os efeitos então?
 model.tables(m2aov, type = "effects")
 yates.effects(m2aov, data = da2)
+
+##======================================================================
+## Modelos com DOIS fator
+##======================================================================
+
+## Seja o modelo
+## y_ij = \mu + \alpha_i + \beta_j + \gamma_ij +  e_ij
+## i = 1, ..., a
+## j = 1, ..., b
+## e_ij ~ N(0, \sigma^2)
+## Dessa forma,
+## Y_ij ~ N(\mu, \sigma^2)
+
+##----------------------------------------------------------------------
+## Especificação dos componentes do modelo
+## Considerando a = 2, b = 2 e r = a*b (sem repetição)
+a <- 2
+b <- 2
+r <- a*b
+## Média geral \mu
+mu <- 50
+## Efeito do primeiro nível do primeiro tratamento \alpha_1
+alpha1 <- 4
+## Efeito do segundo nível do primeiro tratamento \alpha_2
+alpha2 <- -2
+## Efeito do primeiro nível do segundo tratamento \beta_1
+beta1 <- 9
+## Efeito do segundo nível do segundo tratamento \beta_2
+beta2 <- -5
+## Variância comum \sigma^2
+sigma2 <- 12
+## Valores de Y para o tratamento 1
+set.seed(11)
+tratA <- rnorm(r, mu + tau1, sqrt(sigma2))
+mean(tratA); var(tratA)
+## Valores de Y para o tratamento 2
+tratB <- rnorm(r, mu + tau2, sqrt(sigma2))
+mean(tratB); var(tratB)
+## Média geral
+mean(c(tratA, tratB))
+
+## Monta a base de dados
+da1 <- data.frame(Trat = rep(c("A", "B"), each = r),
+                  Resp = c(tratA, tratB))
+str(da1)
+summary(da1)
+
+## Gráficos
+boxplot(Resp  ~ Trat, data = da1)
+abline(h = mean(da1$Resp), col = 2, lty = 2)
+
+## Ajuste dos modelos
+## ANOVA usando aov()
+m1aov <- aov(Resp ~ Trat, data = da1)
+summary(m1aov)
+## ANOVA usando lm() - contr.treatment
+m1lm1 <- lm(Resp ~ Trat, data = da1,
+            contrasts = list(Trat = contr.treatment))
+anova(m1lm1)
+## ANOVA usando lm() - contr.sum
+m1lm2 <- lm(Resp ~ Trat, data = da1,
+            contrasts = list(Trat = contr.sum))
+anova(m1lm2)
