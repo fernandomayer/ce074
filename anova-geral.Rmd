@@ -1251,6 +1251,7 @@ aov.dic.fat(var.resp = da.fat$producao, tratamento = da.fat$tratamento,
 summary(aov(producao ~ adubo * torta, da.fat))
 summary(aov(producao ~ adubo * torta + Error(parcela), da.fat))
 require(ExpDes)
+fat2.crd(da.fat$adubo, da.fat$torta, da.fat$producao, sigF = 0.05)
 fat2.crd(da.fat$adubo, da.fat$torta, da.fat$producao, sigF = 0.1)
 ```
 
