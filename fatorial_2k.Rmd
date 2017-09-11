@@ -562,18 +562,18 @@ $$
 
 
 
-# Exemplo
+<!-- # Exemplo -->
 
-Voltando ao exemplo de um fatorial $2^2$ utilizado nas [aulas
-anteriores](anova-geral.html#experimentos_fatoriais):
+<!-- Voltando ao exemplo de um fatorial $2^2$ utilizado nas [aulas -->
+<!-- anteriores](anova-geral.html#experimentos_fatoriais): -->
 
-Os dados apresentados a seguir referem-se às produções (kg/m$^2$) de
-soja quando cultivadas sob diferentes tratamentos (adubo e torta). O
-experimento foi instalado segundo o delineamento inteiramente
-casualizado (DIC), com 4 repetições. **Importante**: ambos os
-tratamentos são considerados como fixos.
+<!-- Os dados apresentados a seguir referem-se às produções (kg/m$^2$) de -->
+<!-- soja quando cultivadas sob diferentes tratamentos (adubo e torta). O -->
+<!-- experimento foi instalado segundo o delineamento inteiramente -->
+<!-- casualizado (DIC), com 4 repetições. **Importante**: ambos os -->
+<!-- tratamentos são considerados como fixos. -->
 
-```{r}
+```{r, eval=FALSE, include=FALSE}
 ##----------------------------------------------------------------------
 ## Definições prévias do experimento
 a <- 2
