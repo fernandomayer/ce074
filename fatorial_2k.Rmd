@@ -1,0 +1,745 @@
+---
+title: "Experimentos fatoriais $2^k$"
+output:
+  html_document:
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+library(knitr, quietly = TRUE)
+opts_chunk$set(
+               cache = TRUE,
+               tidy = FALSE,
+               comment = "#",
+               collapse = TRUE,
+               fig.align = "center",
+               fig.path = "figures/",
+               cache.path = "cache/"
+           )
+```
+
+# Introdução
+
+Para realizar um experimento fatorial, seleciona-se um número fixo de
+**níveis** de cada um dos **fatores** (variáveis explicativas ou
+tratamentos), e realiza-se os experimentos em todas as possíveis
+combinações. Vamos analisar inicialmente experimentos que possuem apenas
+dois níveis para cada fator, por isso são chamados de experimentos
+$2^k$.
+
+```
+                       |-> número de fatores
+                     2^k =  número de observações (mas pode ter repetições)
+  número de níveis <-|
+```
+
+
+Os fatores podem ser qualitativos ou quantitativos. Dessa forma, dois
+níveis de uma variável quantitativa podem ser duas temperaturas, ou duas
+concentrações diferentes. Para fatores qualitativos, os níveis podem ser
+dois tipos de catalisador ou a presença/ausência de alguma substância.
+
+Experimentos fatorias com dois níveis são extremamente importantes
+porque:
+
+1. Requerem relativamente poucas "corridas" para cada fator estudado.
+2. A interpretação dos resultados obtidos pode ser feita de forma
+   direta, através do senso comum, aritmética simples e gráficos.
+3. Quando os fatores são quantitativos, embora não seja possível
+   explorar uma vasta região do espaço do fator, pode-se determinar uma
+   direção para experimentos futuros.
+4. Os experimentos podem ser convenientemente aumentados quando uma
+   exploração mais completa for necessária, um processo chamado de
+   **exploração sequencial**.
+5. Eles formam a base para os experimentos **fatoriais fracionados**,
+   onde apenas uma parte (cuidadosamente escolhida) de um fatorial
+   completo é realizada. Estes experimentos são de particular interesse
+   quando se deseja fazer uma *triagem* para determinar os fatores mais
+   importantes de um conjunto muito grande de variáveis (*factor
+   screening*).
+6. Experimentos fatorias ou fatorias fracionados são naturalmente
+   utilizados como uma estratégia sequencial de geração de conhecimento,
+   conforme visto [anteriormente](catalizando-conhecimento.html).
+
+Por isso, os experimentos fatoriais são utilizados em fases
+exploratórias da região experimental pois permitem estudar com baixo
+custo um número grande de fatores. Isso permite selecionar os fatores de
+importância e indica uma nova região experimental para um próximo
+ensaio. Decorrente do uso de apenas 2 níveis por fator, assume-se que a
+resposta seja aproximadamente linear ao redor dos níveis dos fatores
+estudados.
+
+# Modelo estatístico
+
+O modelo mais simples de um experimento fatorial $2^2$ é aquele que
+possui apenas uma observação para cada combinação dos dois fatores
+envolvidos, ou seja, não existem repetições, e o experimento possui
+apenas 4 observações. Nesse caso o modelo é
+
+$$
+y_{ij} = \mu + \alpha_i + \beta_j + \gamma_{ij} + \epsilon_{ij}
+$$
+
+onde $\mu$ é a média geral do experimento, $\alpha_{i}$ é o efeito do
+$i$-ésimo nível do fator A, $\beta_{j}$ é o efeito do $j$-ésimo nível do
+fator B, $\gamma_{ij}$ é o efeito da interação entre A e B, e
+$\epsilon_{ij}$ é o erro aleatório. Nesse caso particular de um
+experimento $2^2$, temos $i = 1, \ldots, a$, e $j = 1, \ldots, b$, onde
+$a = b = 2$.
+
+Se o experimento possui mais de uma observação por combinação dos
+fatores A e B, então dizemos que o experimento possui $r$ **réplicas**
+ou **repetições**. Nesse caso, uma observação na {$ij$}-ésima
+célula para a $k$-ésima repetição é denotada por $y_{ijk}$, e o modelo
+fica
+
+$$
+y_{ijk} = \mu + \alpha_i + \beta_j + \gamma_{ij} + \epsilon_{ijk}
+$$
+
+com $k = 1, \ldots, r$ representando as repetições. Dessa forma, o
+número total de observações do experimento será $n = abr$.
+
+# Análise de Variância (ANOVA)
+
+Conforme visto [anteriormente](anova-geral.html#experimentos_fatoriais),
+vamos considerar um experimento fatorial em um delineamento inteiramente
+casualizado, supondo que o fator A possui $a$ níveis, o fator B possui
+$b$ níveis, e ocorrem $r$ repetições de cada combinação dos fatores A e
+B. Também vamos considerar aqui que todos os fatores são de **efeito
+fixo**.
+
+Os modelos acima podem ser escritos na forma matricial como:
+
+$$
+\begin{align}
+\mathbf{Y} &= \mathbf{X}\boldsymbol{\theta} +
+\boldsymbol{\epsilon} \\
+\mathbf{Y} &= \mathbf{X_G}\boldsymbol{\mu} +
+\mathbf{X_A}\boldsymbol{\alpha} +
+\mathbf{X_B}\boldsymbol{\beta} +
+\mathbf{X_{AB}}\boldsymbol{\gamma} +
+\boldsymbol{\epsilon}
+\end{align}
+$$
+
+Onde as matrizes $\mathbf{X}$ são partições da matriz de delineamento
+geral do modelo. Pelo diagrama de Hasse, chegamos à tabela geral de
+ANOVA para experimentos fatoriais em DIC:
+
+| Fonte de variação | GL           | SQ                    | QM                                      | E[QM]                         |
+|-------------------|--------------|-----------------------|-----------------------------------------|-------------------------------|
+| Parcela           | $rab-1$      | $\mathbf{Y'Q_{P}Y}$   | $\frac{\mathbf{Y'Q_{P}Y}}{rab-1}$       |                               |
+| ¬¬Fator A         | $a-1$        | $\mathbf{Y'Q_{A}Y}$   | $\frac{\mathbf{Y'Q_{A}Y}}{a-1}$         | $\sigma^2_{P} + q_A(\Psi)$    |
+| ¬¬Fator B         | $b-1$        | $\mathbf{Y'Q_{B}Y}$   | $\frac{\mathbf{Y'Q_{B}Y}}{b-1}$         | $\sigma^2_{P} + q_B(\Psi)$    |
+| ¬¬A#B             | $(a-1)(b-1)$ | $\mathbf{Y'Q_{AB}Y}$  | $\frac{\mathbf{Y'Q_{AB}Y}}{(a-1)(b-1)}$ | $\sigma^2_{P} + q_{AB}(\Psi)$ |
+| ¬¬Resíduo         | $ab(r-1)$    | $\mathbf{Y'Q_{Res}Y}$ | $\frac{\mathbf{Y'Q_{Res}Y}}{ab(r-1)}$   | $\sigma^2_{P}$                |
+
+As hipóteses a serem testadas, como vistas pela $E[QM]$ são então:
+
+$$
+\text{H}_0: q_A(\Psi) = 0 \qquad \text{H}_0: q_B(\Psi) = 0 \qquad
+\text{H}_0: q_{AB}(\Psi) = 0
+$$
+
+Que são hipóteses equivalentes a:
+
+$$
+\begin{align}
+\text{H}_0 &: \alpha_1 = \cdots = \alpha_a = 0 \\
+\text{H}_1 &: \text{pelo menos um}\ \alpha_i \neq 0 \\
+\end{align}
+$$
+
+$$
+\begin{align}
+\text{H}_0 &: \beta_1 = \cdots = \beta_b = 0 \\
+\text{H}_1 &: \text{pelo menos um}\ \beta_j \neq 0 \\
+\end{align}
+$$
+
+$$
+\begin{align}
+\text{H}_0 &: \gamma_{11} = \cdots = \gamma_{ab} = 0 \\
+\text{H}_1 &: \text{pelo menos um}\ \gamma_{ij} \neq 0 \\
+\end{align}
+$$
+
+Dessa forma os testes F associados às hipóteses acima são:
+
+$$
+\begin{align}
+F_A &= \frac{\textrm{QMA}}{\textrm{QMRes}} \\
+F_B &= \frac{\textrm{QMB}}{\textrm{QMRes}} \\
+F_{AB} &= \frac{\textrm{QMAB}}{\textrm{QMRes}}
+\end{align}
+$$
+
+Geralmente na ANOVA fatorial, a interação é analisada por primeiro. Caso
+a interação seja significativa, então os efeitos principais (que podem
+ou não ser também significativos) não possuem muito valor prático, pois
+não faz sentido analisar os efeitos isoladamente quando eles dependem
+entre si. Caso a interação não seja significativa, ela pode ser retirada
+do modelo e a interpretação sobre os efeitos principais é direta.
+
+# Estimação dos efeitos
+
+A ANOVA para experimentos fatoriais determina quais fatores são
+importantes, ou seja, aqueles que possuem influência na variável
+resposta. Como mencionado anteriormente, caso a interação entre dois
+fatores seja significativa, analisa-se apenas a interação, pois o
+comportamente de uma variável é influenciado pela presença da outra (e
+vice-versa), e não faz sentido analisá-las individualmente. Nesse caso
+não importa se os outros fatores são significativos ou não, mas sempre
+deve-se preservá-los no modelo pelo [princípio da
+marginalidade](https://en.wikipedia.org/wiki/Principle_of_marginality).
+
+Caso a interação seja não significativa, esse termo pode ser removido do
+modelo, e analisa-se os efeitos dos fatores individuais. Caso um dos
+fatores seja também não significativo, então remove-se esse termo do
+modelo e obtém-se um modelo de um fator simples. (Se nenhum deles for
+significativo, seu melhor modelo é a média geral!)
+
+Após realizar a ANOVA e verificar quais fatores são importantes, o
+interesse está então em se analisar qual o **efeito** que cada nível de
+cada fator (ou da interação) possui sob a variável resposta. A análise
+dos efeitos irá demonstrar se determinado nível possui influência
+positiva ou negativa sob a variável, e se essa influência é
+estatisticamente significativa (através de um teste $t$ sob a hipótese
+nula de que o efeito é zero).
+
+Os efeitos nada mais são do que os coeficientes dos parâmetros estimados
+do modelo. Nesse caso, lembre-se que em modelos de ANOVA, para que os
+parâmetros possam ser estimados é necessário redefinir o modelo, ou
+utilizar algum tipo de restrição para qua a matriz $\mathbf{X}$ do
+modelo seja de posto completo e possa ser invertida. Sendo assim, é de
+se esperar que **as estimativas dos efeitos sejam dependentes do tipo de
+parametrização ou restrição adotada**. (Isso é o oposto do que acontece
+na ANOVA, pois as somas de quadrados são invariantes quanto ao tipo de
+restrição adotada).
+
+[Vimos que existem várias
+formas](modelos-lineares.html#modelo_de_análise_de_variância_(anova)) de
+restrição para tornar a matriz $\mathbf{X}$ de posto completo, entre
+elas a restrição de zerar o primeiro nível de um fator (padrão no R) e a
+restrição soma zero.
+
+Apesar da restrição de zerar o primeiro nível ser muito comum
+(principalmente por ser o padrão no R), existem vários motivos (que
+veremos mais adiante) para se utilizar a restrição do tipo soma zero.
+Entre esses motivos estão questões históricas (o desenvolvimento
+principal da teoria foi realizada com esta restrição por Frank Yates), e
+a facilidade da interpretação dos efeitos estimados. Convém ressaltar
+que o tipo de restrição muda apenas a forma como se interpretam os
+efeitos, e não tem a capacidade de alterar a interpretação final dos
+resultados (um nível significativo sempre será significativo,
+independente da restrição adotada).
+
+## Usando restrição soma zero
+
+Os experimentos fatorias em geral satisfazem as condições regulares
+(fatores ortogonais e balanceamento) e nesse caso as médias amostrais
+podem ser usadas para estimar os efeitos dos fatores. Isso facilita a
+execução da análise que pode ser feita no local do experimento com lápis
+e papel, outro experimento pode ser realizado em seguida a partir das
+conclusões tiradas.
+
+Os efeitos como contrastes entre médias são obtidos através do
+**contraste soma zero**. Para obter esse contraste em um experimento
+fatorial com dois fatores, considere que:
+
+$$
+\sum_{i=1}^{a} \alpha_i = 0 \qquad \sum_{j=1}^{b} \beta_j = 0
+\qquad \sum_{i=1}^{a}\sum_{j=1}^{b} \gamma_{ij} = 0
+$$
+
+Se considerarmos um experimento fatorial $2^2$ sem repetição então temos
+as seguintes equivalências:
+
+$$
+\begin{align}
+\alpha_1 + \alpha_2 = 0 \quad &\Rightarrow \quad \alpha_2 = -\alpha_1 \\
+\beta_1 + \beta_2 = 0 \quad &\Rightarrow \quad \beta_2 = -\beta_1 \\
+\gamma_{11} + \gamma_{12} + \gamma_{21} + \gamma_{22} = 0 \quad
+&\Rightarrow \quad \gamma_{22} = -\gamma_{11} - \gamma_{12} - \gamma_{21}
+\end{align}
+$$
+
+Portanto, o modelo fica:
+
+$$
+\begin{align}
+y_{11} &= \mu + \alpha_1 + \beta_1 + \gamma_{11} + \epsilon_{11} \\
+y_{12} &= \mu + \alpha_1 - \beta_1 - \gamma_{12} + \epsilon_{12} \\
+y_{21} &= \mu - \alpha_1 + \beta_1 - \gamma_{21} + \epsilon_{21} \\
+y_{22} &= \mu - \alpha_1 - \beta_1 + \gamma_{22} + \epsilon_{22}
+\end{align}
+$$
+
+E a matriz $\mathbf{X}$ do modelo fica:
+
+$$
+\mathbf{X} =
+ \begin{bmatrix}
+    1 & 1  & 1 & 1 \\
+    1 & 1 & -1 & -1 \\
+    1 & -1 & 1 & -1 \\
+    1 & -1 & -1 & 1
+  \end{bmatrix}
+$$
+
+Considerando o vetor de respostas na ordem padrão
+
+$$
+\mathbf{y} =
+\begin{bmatrix}
+y_{11} \\
+y_{12} \\
+y_{21} \\
+y_{22}
+\end{bmatrix}
+$$
+
+Podemos mostrar que a solução de mínimos quadrados dada por
+
+$$
+\boldsymbol{\hat\beta} = \mathbf{(X'X)^{-1} X'y}
+$$
+
+resulta em:
+
+$$
+\boldsymbol{\hat\beta} =
+\frac{1}{4}
+\begin{bmatrix}
+y_{11} + y_{12} + y_{21} + y_{22} \\
+(y_{11} + y_{12}) - (y_{21} + y_{22}) \\
+(y_{11} + y_{21}) - (y_{12} + y_{22}) \\
+(y_{11} + y_{22}) - (y_{12} + y_{21}) \\
+\end{bmatrix}
+$$
+
+Note que, seguindo as linhas dessa matriz:
+
+$$
+\begin{align}
+\frac{1}{4} (y_{11} + y_{12} + y_{21} + y_{22}) &= \bar{y} \\
+\frac{1}{2} \left[ \frac{(y_{11} + y_{12})}{2} +
+ \frac{(y_{21} + y_{22})}{2} \right] &=
+ \frac{1}{2} (\bar{y}_{1j} - \bar{y}_{2j}) \\
+\frac{1}{2} \left[ \frac{(y_{11} + y_{21})}{2} +
+ \frac{(y_{12} + y_{22})}{2} \right] &=
+ \frac{1}{2} (\bar{y}_{i1} - \bar{y}_{i2}) \\
+\frac{1}{2} \left[ \frac{(y_{11} + y_{22})}{2} +
+ \frac{(y_{12} + y_{21})}{2} \right] &=
+ \frac{1}{2} (\bar{y}_{ii} - \bar{y}_{ij})
+\end{align}
+$$
+
+Portanto, pode-se notar que:
+
+- O primeiro coeficiente é a média geral do experimento
+- Os efeitos dos fatores são calculados como as diferenças entre as
+  médias dos níveis de cada fator
+- O efeito da interação é a diferença entre as médias "cruzadas" de cada
+  fator
+
+## Usando esquema de sinais
+
+Uma outra forma de se chegar ao mesmo resultado é através do chamado
+**esquema de sinais**. Esse sistema é exatamente igual à restrição soma
+zero, mas tem a vantegam de poder ser representado geometricamente, o
+que pode facilitar a visualização e interpretação dos efeitos de
+experimentos fatorias mais complicados.
+
+**Nomenclatura**:
+
+- Fatores são representados por letras maiúsculas (A, B, C...)
+- Os níveis de um fator são chamados de ALTO e BAIXO
+- Um tratamento (combinação de fatores) é identificado por letras minúsculas
+- Quando uma letra minúscula está presente é porque o fator
+  correspondente ocorre no nível ALTO
+
+**Esquema de sinais**:
+
+- O sinal `+` é associado ao nível ALTO e `-` ao nível baixo
+- A combinação de tratamentos com ambos os niveis baixos é representado
+  por `(1)`
+- Os sinais das interações são obtidos pelo produto dos sinais dos
+  fatores envolvidos
+
+Dessa forma, para um fatorial $2^2$, o experimento pode ser representado
+geometricamente por:
+
+```
+[+]  b_________ab
+     |         |
+ B   |         |
+     |         |
+[-] (1)________a
+    [-]   A   [+]
+```
+
+E a chamada **tabela de sinais** é desenvolvida da seguinte forma:
+
+```
+----------------------------------------------------
+Nomenclatura      Sinais       	Descrição
+----------------------------------------------------
+	           A	B	AB
+(1)	    	   -	-	+	    A e B níveis baixos
+a		       +	-	-	    A alto e B baixo
+b		       -	+	-	    A baixo e B alto
+ab		       +	+	+	    A e B níveis altos
+----------------------------------------------------
+```
+
+Note que os sinais dos fatores na tabela de sinais é exatamente igual à
+restrição soma zero utilizada anteriormente. A ordem de entrada dos
+fatores e dos níveis nessa tabela é devido ao desenvolvimento de Frank
+Yates, e por isso, é chamada de **ordem de Yates**. A única diferença
+é que na ordem padrão da restrição soma zero, as observações no vetor
+$\mathbf{y}$ estavam dispostas como $\mathbf{y} = [y_{11}, y_{12},
+y_{21}, y_{22}]'$, indicando que o nível alto do fator A é a observação
+$y_{21}$ e o nível alto do fator B por $y_{12}$.
+
+Para manter as observações no ordem de Yates é necessário apenas
+inverter essas duas linhas, e assim ficamos com a equivalência:
+
+$$
+\mathbf{y} =
+\begin{bmatrix}
+y_{11} \\
+y_{21} \\
+y_{12} \\
+y_{22}
+\end{bmatrix}
+=
+\begin{bmatrix}
+(1) \\
+a \\
+b \\
+ab
+\end{bmatrix}
+$$
+
+Dessa forma, a matriz $\mathbf{X}$ fica:
+
+$$
+\mathbf{X} =
+ \begin{bmatrix}
+    1 & -1  & -1 & 1 \\
+    1 & 1 & -1 & -1 \\
+    1 & -1 & 1 & -1 \\
+    1 & 1 & 1 & 1
+  \end{bmatrix}
+$$
+
+E a solução de mínimos quadrados é dada por:
+
+$$
+\boldsymbol{\hat\beta} =
+\frac{1}{4}
+\begin{bmatrix}
+y_{11} + y_{12} + y_{21} + y_{22} \\
+(y_{21} + y_{22}) - (y_{11} + y_{12}) \\
+(y_{12} + y_{22}) - (y_{11} + y_{21}) \\
+(y_{11} + y_{22}) - (y_{12} + y_{21}) \\
+\end{bmatrix}
+$$
+
+Dessa forma, tem-se que
+
+$$
+\begin{align}
+\frac{1}{4} (y_{11} + y_{12} + y_{21} + y_{22}) &= \bar{y} \\
+\frac{1}{2} \left[ \frac{(y_{21} + y_{22})}{2} +
+ \frac{(y_{11} + y_{12})}{2} \right] &=
+ \frac{1}{2} (\bar{y}_{2j} - \bar{y}_{1j}) \\
+\frac{1}{2} \left[ \frac{(y_{12} + y_{22})}{2} +
+ \frac{(y_{11} + y_{21})}{2} \right] &=
+ \frac{1}{2} (\bar{y}_{i2} - \bar{y}_{i1}) \\
+\frac{1}{2} \left[ \frac{(y_{11} + y_{22})}{2} +
+ \frac{(y_{12} + y_{21})}{2} \right] &=
+ \frac{1}{2} (\bar{y}_{ii} - \bar{y}_{ij})
+\end{align}
+$$
+
+Ou seja, a interpretação é a mesma, apenas mudam as comparações que
+agora são entre a média do nível alto menos a média do nível
+baixo (i.e. muda apenas o sinal).
+
+Com o esquema de sinais, podemos escrever o vetor $\mathbf{y}$ como
+
+$$
+\mathbf{y} =
+\begin{bmatrix}
+(1) \\
+a \\
+b \\
+ab
+\end{bmatrix}
+$$
+
+e assim a solução de mínimos quadrados fica
+
+$$
+\boldsymbol{\hat\beta} =
+\frac{1}{4}
+\begin{bmatrix}
+a + b + ab + (1) \\
+(a + ab) - ((1) + b) \\
+(b + ab) - ((1) + a) \\
+((1) + ab) - (a + b) \\
+\end{bmatrix}
+$$
+
+Sendo que:
+
+$$
+\begin{align}
+\frac{1}{4} (a + b + ab + (1)) &= \bar{y} \\
+\frac{1}{2} \left[ \frac{(a + ab)}{2} +
+ \frac{((1) + b)}{2} \right] &=
+ \frac{1}{2} (\bar{y}_{A+} - \bar{y}_{A-}) \\
+\frac{1}{2} \left[ \frac{(b + ab)}{2} +
+ \frac{((1) + a)}{2} \right] &=
+ \frac{1}{2} (\bar{y}_{B+} - \bar{y}_{B-}) \\
+\frac{1}{2} \left[ \frac{((1) + ab)}{2} +
+ \frac{(a + b)}{2} \right] &=
+ \frac{1}{2} (\bar{y}_{AB+} - \bar{y}_{AB-})
+\end{align}
+$$
+
+Onde $\bar{y_{A+}}$ e $\bar{y_{A-}}$ são as médias dos níveis alto e
+baixo do fator A, respectivamente. Os demais são similares. Perceba
+então que os efeitos são sempre um **contraste**, ou seja, uma diferença
+entre as médias dos níveis alto e baixo de um mesmo fator.
+
+Note que essa diferença é sempre dividida por 2, ou seja, na verdade, é
+a metade da diferença entre as médias. Isso é consequência do fato de
+que estes coeficientes são calculados com base em um modelo linear, onde
+os parâmetros medem a alteração na variável resposta (\mathbf{Y})
+causada pela variação de uma unidade nas variáveis explicativas
+(\mathbf{X}). Por isso, os coeficientes estimados dessa forma são
+chamados de **semi-amplitude** dos efeitos.
+
+Como pode ser visto na representação geométrica do experimento, a
+diferença entre as médias dos níveis alto e baixo de um fator é dada
+pela variação de duas unidades (entre -1 e +1). Dessa forma, dizemos que
+a **amplitude** dos efeitos de um fator mede o efeito ao se passar do
+nível baixo (-1) para o nível alto (+1). Assim definimos o **efeito** de
+um fator como sendo duas vezes a estimativa dos coeficientes dos níveis
+de cada fator.
+
+Assim, temos:
+
+$$
+\begin{align}
+Ef_A = \bar{y}_{A+} - \bar{y}_{A-} = \frac{(a + ab) - ((1) + b)}{2} =
+ \frac{contr_A}{2} \\
+Ef_B = \bar{y}_{B+} - \bar{y}_{B-} = \frac{(b + ab) - ((1) + a)}{2} =
+ \frac{contr_B}{2} \\
+Ef_{AB} = \bar{y}_{AB+} - \bar{y}_{AB-} = \frac{((1) + ab) - (a + b)}{2} =
+ \frac{contr_{AB}}{2}
+ \end{align}
+$$
+
+As quantidades no numerador são chamadas de **contrastes**, que são
+então apenas as diferenças entre os níveis alto e baixo de um fator.
+
+Como existem $r2^{k-1}$ observações para cada combinação dos fatores,
+então, para **qualquer experimento** $2^k$, as estimativas dos efeitos
+podem ser calculadas de forma geral como:
+
+$$
+\begin{align}
+Ef_A &= \frac{contr_A}{r2^{k-1}} \\
+Ef_B &= \frac{contr_B}{r2^{k-1}} \\
+Ef_{AB} &= \frac{contr_{AB}}{r2^{k-1}}
+\end{align}
+$$
+
+
+
+# Exemplo
+
+Voltando ao exemplo de um fatorial $2^2$ utilizado nas [aulas
+anteriores](anova-geral.html#experimentos_fatoriais):
+
+Os dados apresentados a seguir referem-se às produções (kg/m$^2$) de
+soja quando cultivadas sob diferentes tratamentos (adubo e torta). O
+experimento foi instalado segundo o delineamento inteiramente
+casualizado (DIC), com 4 repetições. **Importante**: ambos os
+tratamentos são considerados como fixos.
+
+```{r}
+##----------------------------------------------------------------------
+## Definições prévias do experimento
+a <- 2
+b <- 2
+r <- 4
+n <- a * b * r
+##----------------------------------------------------------------------
+## Dados
+# T0 = sem torta; T1 = com torta
+# A0 = sem adubo; A1 = com adubo
+da.fat <- data.frame(parcela = factor(1:n),
+                     torta = rep(c("T0", "T1"), each = a*r),
+                     adubo = rep(c("A0", "A1"), each = r, times = b),
+                     tratamento = rep(c("Tr1", "Tr2", "Tr3", "Tr4"),
+                                      each = a*b),
+                     producao = c(28.2, 18.8, 19.6, 21.6,
+                                  30.8, 31.2, 28.8, 30.8,
+                                  29.8, 25.2, 24.8, 26,
+                                  29.4, 29.8, 28.6, 30.4))
+## Estrutura dos dados
+str(da.fat)
+##----------------------------------------------------------------------
+## Croqui do experimento
+## Sorteia aleatoriamente as variedades e dispõe em uma matriz 4x4
+set.seed(11)
+croqui.DIC.fat <- sample(paste(da.fat$adubo, da.fat$torta, sep = ":"),
+                         nrow(da.fat))
+croqui.DIC.fat <- matrix(croqui.DIC.fat, ncol = a*b,
+                         dimnames = list(1:(a*b), 1:(a*b)))
+croqui.DIC.fat
+##----------------------------------------------------------------------
+## Atribui nomes comuns para variável resposta, linhas e colunas
+var.resp <- da.fat$producao
+parcela <- da.fat$parcela
+tratamento <- da.fat$tratamento
+fatorA <- da.fat$adubo
+fatorB <- da.fat$torta
+##----------------------------------------------------------------------
+## Definições
+a <- length(unique(fatorA))
+b <- length(unique(fatorB))
+r <- unique(table(tratamento))
+n <- a * b * r
+##----------------------------------------------------------------------
+## Matrizes
+## Vetor de respostas
+(Y <- matrix(var.resp, ncol = 1))
+## Matriz geral do modelo
+(X <- model.matrix(~fatorA * fatorB,
+                  contrasts = list(fatorA = contr.sum,
+                                   fatorB = contr.sum)))
+## Matriz de médias
+(Xg <- X[, "(Intercept)", drop = FALSE])
+## Matriz de parcelas (identidade)
+(Xp <- diag(1, nrow = n))
+## Matriz do fator A
+(Xa <- X[, "fatorA1", drop = FALSE])
+## Matriz do fator B
+(Xb <- X[, "fatorB1", drop = FALSE])
+## Matriz da interação A:B
+(Xab <- X[, "fatorA1:fatorB1", drop = FALSE])
+##----------------------------------------------------------------------
+## Matrizes M
+## para média
+Mg <- Xg %*% solve(t(Xg) %*% Xg) %*% t(Xg)
+MASS::fractions(Mg)
+## para parcelas
+Mp <- Xp %*% solve(t(Xp) %*% Xp) %*% t(Xp)
+MASS::fractions(Mp)
+## para fator A
+Ma <- Xa %*% solve(t(Xa) %*% Xa) %*% t(Xa)
+MASS::fractions(Ma)
+## para fator B
+Mb <- Xb %*% solve(t(Xb) %*% Xb) %*% t(Xb)
+MASS::fractions(Mb)
+## para interação A:B
+Mab <- Xab %*% solve(t(Xab) %*% Xab) %*% t(Xab)
+MASS::fractions(Mab)
+## para resíduo
+Mres <- Mp - Ma - Mb - Mab - Mg
+MASS::fractions(Mres)
+##----------------------------------------------------------------------
+## Matrizes de projeção ortogonal
+## NOTE que quando assume-se os contrastes soma zero, os fatores ficam
+## ortogonais entre si, e não sequenciais (condicionais). Por isso, não
+## subtrai as matrizes marginais pois sendo ortogonais não existem
+## termos marginais uns aos outros. Dessa forma não se calculam as
+## matrizes Q, e utilizam-se as matrizes M como as matrizes núcleo das
+## formas quadráticas.
+## Qp <- Mp - Mg
+## MASS::fractions(Qp)
+## Qa <- Ma - Mg
+## MASS::fractions(Qa)
+## Qb <- Mb - Mg
+## MASS::fractions(Qb)
+## Qab <- Mab - Ma - Mb + Mg
+## MASS::fractions(Qab)
+## Qr <- Mp - Mab
+## MASS::fractions(Qr)
+##----------------------------------------------------------------------
+## Graus de liberdade
+## USANDO as matrizes M
+(GLp <- sum(diag(Mp))) # n - 1
+(GLa <- sum(diag(Ma))) # a - 1
+(GLb <- sum(diag(Mb))) # b - 1
+(GLab <- sum(diag(Mab))) # (a-1)(b-1)
+(GLr <- sum(diag(Mres))) # ab(r - 1)
+## Soma de quadrados
+(SQp <- t(Y) %*% Mp %*% Y)
+(SQa <- t(Y) %*% Ma %*% Y)
+(SQb <- t(Y) %*% Mb %*% Y)
+(SQab <- t(Y) %*% Mab %*% Y)
+(SQr <- t(Y) %*% Mres %*% Y)
+## Quadrado médio
+(QMa <- SQa/GLa)
+(QMb <- SQb/GLb)
+(QMab <- SQab/GLab)
+(QMr <- SQr/GLr)
+## F calculado
+(FcalcA <- QMa/QMr)
+(FcalcB <- QMb/QMr)
+(FcalcAB <- QMab/QMr)
+## p-valor
+(p.valorA <- pf(FcalcA, GLa, GLr, lower.tail = FALSE))
+(p.valorB <- pf(FcalcB, GLb, GLr, lower.tail = FALSE))
+(p.valorAB <- pf(FcalcAB, GLab, GLr, lower.tail = FALSE))
+## Tabela final
+tab.final <- data.frame("GL" = c(GLp, GLa, GLb, GLab, GLr),
+                        "SQ" = c(SQp, SQa, SQb, SQab, SQr),
+                        "QM" = c(NA, QMa, QMb, QMab, QMr),
+                        "F" = c(NA, FcalcA, FcalcB, FcalcAB, NA),
+                        "p-valor" = c(NA, p.valorA, p.valorB, p.valorAB, NA),
+                        row.names = c("Parcela", " A", " B",
+                                      " A#B", " Resíduo"))
+tab.final
+## Comparando os resultados com a função `aov()`:
+summary(aov(var.resp ~ fatorA + fatorB + fatorA:fatorB))
+## Usando a função Error() para identificar o confundimento
+summary(aov(var.resp ~ fatorA + fatorB + fatorA:fatorB +
+                Error(parcela)))
+## Tira duas observações
+da.fat2 <- da.fat
+da.fat2$producao[c(3, 5, 8, 9, 12)] <- NA
+da.fat2
+
+m1 <- lm(producao ~ adubo * torta, data = da.fat2,
+         contrasts = list(adubo = contr.treatment,
+                          torta = contr.treatment))
+anova(m1)
+m2 <- lm(producao ~ adubo * torta, data = da.fat2,
+         contrasts = list(adubo = contr.sum,
+                          torta = contr.sum))
+anova(m2)
+
+m11 <- lm(producao ~ torta * adubo, data = da.fat2,
+         contrasts = list(adubo = contr.treatment,
+                          torta = contr.treatment))
+anova(m11)
+m22 <- lm(producao ~ torta * adubo, data = da.fat2,
+         contrasts = list(adubo = contr.sum,
+                          torta = contr.sum))
+anova(m22)
+
+library(car)
+Anova(m1, type = "III")
+Anova(m2, type = "III")
+Anova(m11, type = "III")
+Anova(m22, type = "III")
+```
