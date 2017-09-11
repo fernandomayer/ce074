@@ -1,39 +1,70 @@
 ##======================================================================
-## Diferentes formas de contrastes para modelos lineares
+## Interpretação de efeitos estimados em modelos lineares
 ##======================================================================
 
 ##----------------------------------------------------------------------
 ## Exemplo do catalisador
 
-dados <- read.csv("../dados/temp_cat.csv")
+dados <- read.csv("dados/temp_cat.csv")
 str(dados)
 dados$Temperatura <- as.factor(dados$Temperatura)
 
+##----------------------------------------------------------------------
 ## Separa em um fator
 da <- aggregate(Rendimento ~ Temperatura + Catalisador,
                 data = dados, FUN = mean)
 da1 <- da[, -1]
 plot(Rendimento ~ as.numeric(Catalisador), data = da1)
 
-## Contraste treatment = zerar primeiro nivel
+## Contraste treatment = zerar primeiro nivel --------------------------
 m1 <- lm(Rendimento ~ Catalisador, data = da1,
          contrasts = list(Catalisador = contr.treatment))
 summary(m1)
 tapply(da1$Rendimento, da1$Catalisador, mean)
 diff(tapply(da1$Rendimento, da1$Catalisador, mean))
+## É a média do segundo nível menos a média do primeiro nível
+
+## Fazendo na mão
+mean(da1$Rendimento[da1$Catalisador == "A"])
+mean(da1$Rendimento[da1$Catalisador == "B"]) -
+    mean(da1$Rendimento[da1$Catalisador == "A"])
+mean(da1$Rendimento[da1$Catalisador == "A"]) + coef(m1)[2]
+## Portanto, aqui estima-se o \tau_2, pois assume-se que o \tau_1 é
+## zero.
 model.matrix(m1)
 
-## Contraste soma zero
-m3 <- lm(Rendimento ~ Catalisador, data = da1,
+## Contraste soma zero -------------------------------------------------
+m2 <- lm(Rendimento ~ Catalisador, data = da1,
          contrasts = list(Catalisador = contr.sum))
-summary(m3)
+summary(m2)
 tapply(da1$Rendimento, da1$Catalisador, mean)
 mean(da1$Rendimento) # media geral = intercepto
-mean(da1$Rendimento) + coef(m3)[2] # media do catalisador A
-mean(da1$Rendimento) - coef(m3)[2] # media do catalisador B
-model.matrix(m3)
+mean(da1$Rendimento) + coef(m2)[2] # média + tau1
+mean(da1$Rendimento) - coef(m2)[2] # média - tau1
+## É a media do primeiro menos a média geral, porque:
+## \mu_1 = \mu + \tau_1  =>  \tau_1 = \mu_1 - \mu
+mean(da1$Rendimento[da1$Catalisador == "A"]) - mean(da1$Rendimento)
+## Ou a média geral menos a média do segundo, porque:
+## \mu_2 = \mu - \tau_1  =>  \tau_1 = \mu - \mu_2
+mean(da1$Rendimento) - mean(da1$Rendimento[da1$Catalisador == "B"])
 
-# Na mao
+## Note que é de fato a diferença entre as médias sobre 2:
+## Ef_A = (1/2) (\bar{y_A+} - \bar{y_A-})
+diff(tapply(da1$Rendimento, da1$Catalisador, mean))/2
+
+## Portanto aqui estima-se o \tau_1 apenas, pois assume-se que o \tau_2
+## é o negativo do \tau_1
+with(da1, tapply(Rendimento, Catalisador, mean)) - mean(da1$Rendimento)
+model.matrix(m2)
+
+## ANOVA usando aov() para poder acessar alguns métodos específicos
+m2aov <- aov(Rendimento ~ Catalisador, data = da1)
+model.tables(m2aov, type = "means")
+model.tables(m2aov, type = "effects")
+dae::yates.effects(m2aov, data = da1) # é o tau2 do contr.treatment!!
+dae::yates.effects(m2aov, data = da1)/2
+
+## Na mão
 y <- da1$Rendimento
 X <- rbind(c(1, 1),
            c(1, 1),
@@ -42,55 +73,8 @@ X <- rbind(c(1, 1),
 (Xt <- t(X))
 Xt %*% X
 solve(Xt %*% X)
-Xt %*% y
-solve(Xt %*% X) %*% Xt %*% y
-
-sum(da1$Rendimento)/4 - mean(da1$Rendimento[da1$Catalisador == "B"])
-mean(da1$Rendimento[da1$Catalisador == "A"]) - sum(da1$Rendimento)/4
-
-##----------------------------------------------------------------------
-## Adicionando mais um nivel para o catalisador
-da2 <- data.frame(Catalisador = factor(rep(c("A", "B", "C"), each = 2)),
-                  Rendimento = c(da1$Rendimento, 55, 63))
-str(da2)
-plot(Rendimento ~ as.numeric(Catalisador), data = da2)
-## Contraste treatment
-m1 <- lm(Rendimento ~ Catalisador, data = da2,
-         contrasts = list(Catalisador = contr.treatment))
-summary(m1)
-tapply(da2$Rendimento, da2$Catalisador, mean)
-model.matrix(m1)
-
-## Contraste soma zero
-m3 <- lm(Rendimento ~ Catalisador, data = da2,
-         contrasts = list(Catalisador = contr.sum))
-summary(m3)
-tapply(da2$Rendimento, da2$Catalisador, mean)
-mean(da2$Rendimento) # media geral = intercepto
-mean(da2$Rendimento) + coef(m3)[2] # media do catalisador A
-mean(da2$Rendimento) + coef(m3)[3] # media do catalisador B
--coef(m3)[2] - coef(m3)[3] # tau_3
-mean(da2$Rendimento) - coef(m3)[2] - coef(m3)[3] # media do catalisador C
-model.matrix(m3)
-
-# Na mao
-y <- da2$Rendimento
-X <- rbind(c(1, 1, 0),
-           c(1, 1, 0),
-           c(1, 0, 1),
-           c(1, 0, 1),
-           c(1, -1, -1),
-           c(1, -1, -1))
-(Xt <- t(X))
-Xt %*% X
-solve(Xt %*% X)
 MASS::fractions(solve(Xt %*% X))
-Xt %*% y
 solve(Xt %*% X) %*% Xt %*% y
-
-sum(da2$Rendimento[da2$Catalisador == "A"])/3 -
-    sum(da2$Rendimento[da2$Catalisador == "B"])/6 -
-    sum(da2$Rendimento[da2$Catalisador == "C"])/6
 
 ##======================================================================
 ## Modelo com 2 fatores
@@ -99,43 +83,53 @@ sum(da2$Rendimento[da2$Catalisador == "A"])/3 -
 ## Agrega dados brutos
 da <- aggregate(Rendimento ~ Temperatura + Catalisador,
                 data = dados, FUN = mean)
-# Qual a matriz X?
 str(da)
-with(dados,
-     interaction.plot(Temperatura, Catalisador, Rendimento, mean))
-
 da$Temperatura <- as.factor(da$Temperatura)
 
-## Contraste treatment
-m1 <- lm(Rendimento ~ Temperatura * Catalisador, data = da,
+## Gráfico de interação
+with(da,
+     interaction.plot(Catalisador, Temperatura, Rendimento, mean))
+wireframe(Rendimento ~ Catalisador * Temperatura, data = da)
+levelplot(Rendimento ~ Catalisador * Temperatura, data = da)
+
+## Contraste treatment -------------------------------------------------
+m1 <- lm(Rendimento ~ Catalisador * Temperatura, data = da,
          contrasts = list(Temperatura = contr.treatment,
                           Catalisador = contr.treatment))
 summary(m1)
+## Aqui não existem médias, pois só há uma observação por combinação de
+## tratamento
 da
-model.matrix(m1)
-## Contraste treatment com dadps completos
-m1 <- lm(Rendimento ~ Temperatura * Catalisador, data = dados,
-         contrasts = list(Temperatura = contr.treatment,
-                          Catalisador = contr.treatment))
-summary(m1)
-da
-with(dados, tapply(Rendimento, list(Temperatura, Catalisador), mean))
+## Os efeitos são então:
+da$Rendimento[1] # média do primeiro nível dos dois fatores
+da$Rendimento[3] - da$Rendimento[1]
+da$Rendimento[2] - da$Rendimento[1]
+da$Rendimento[1] - da$Rendimento[2] - da$Rendimento[3] +
+    da$Rendimento[4]
+## Ver exercícios
 
-
-## Contraste soma zero
+## Contraste soma zero -------------------------------------------------
 m3 <- lm(Rendimento ~ Catalisador * Temperatura, data = da,
          contrasts = list(Temperatura = contr.sum,
                           Catalisador = contr.sum))
 summary(m3)
+da
+mean(da$Rendimento) # media geral = intercepto
+
+## Note que é de fato a diferença entre as médias sobre 2:
+## Ef_A = (1/2) (\bar{y_A+} - \bar{y_A-})
+diff(tapply(da$Rendimento, da$Catalisador, mean))/2
+diff(tapply(da$Rendimento, da$Temperatura, mean))/2
+
+## Porque os sinais são trocados?
+model.matrix(m3)
+
+## ANOVA usando aov() para poder acessar alguns métodos específicos
 m3aov <- aov(Rendimento ~ Catalisador * Temperatura, data = da)
-summary(m3aov)
+model.tables(m3aov, type = "means")
+model.tables(m3aov, type = "effects")
 dae::yates.effects(m3aov, data = da)
 dae::yates.effects(m3aov, data = da)/2
-
-## Media geral
-mean(da$Rendimento)
-model.tables(m3aov)
-model.matrix(m3)
 
 ## Catalisador
 (mean(da$Rendimento[da$Catalisador == "A"]) -
@@ -169,45 +163,17 @@ mean(c(da$Rendimento[da$Catalisador == "A" & da$Temperatura == "60"],
        da$Rendimento[da$Catalisador == "B" & da$Temperatura == "40"]))
 
 ##----------------------------------------------------------------------
-# Na mao
-y <- da$Rendimento
-X <- rbind(c(1, 1, 1, 1),
-           c(1, 1, -1, -1),
-           c(1, -1, 1, -1),
-           c(1, -1, -1, 1))
-(Xt <- t(X))
-Xt %*% X
-solve(Xt %*% X)
-MASS::fractions(solve(Xt %*% X))
-Xt %*% y
-## Soma total
-sum(da$Rendimento)
-## Soma catalisador
-sum(da$Rendimento[da$Catalisador == "A"]) -
-    sum(da$Rendimento[da$Catalisador == "B"])
-## Soma temperatura
-sum(da$Rendimento[da$Temperatura == "40"]) -
-    sum(da$Rendimento[da$Temperatura == "60"])
-## Soma interacao
-sum(da$Rendimento[da$Catalisador == "A" & da$Temperatura == "40"],
-    da$Rendimento[da$Catalisador == "B" & da$Temperatura == "60"]) -
-    sum(da$Rendimento[da$Catalisador == "A" & da$Temperatura == "60"],
-        da$Rendimento[da$Catalisador == "B" & da$Temperatura == "40"])
-solve(Xt %*% X) %*% Xt %*% y
+## Usando dados completos
+## Gráfico de interação
+with(dados,
+     interaction.plot(Catalisador, Temperatura, Rendimento, mean))
+wireframe(Rendimento ~ Catalisador * Temperatura, data = dados)
+levelplot(Rendimento ~ Catalisador * Temperatura, data = dados)
 
-## Media geral
-mean(da$Rendimento)
-## Media catalisador
-(mean(da$Rendimento[da$Catalisador == "A"]) -
-    mean(da$Rendimento[da$Catalisador == "B"]))/2
-## Media temperatura
-(mean(da$Rendimento[da$Temperatura == "40"]) -
-    mean(da$Rendimento[da$Temperatura == "60"]))/2
-## Media interacao
-((mean(c(da$Rendimento[da$Temperatura == "40" & da$Catalisador == "A"],
-         da$Rendimento[da$Temperatura == "60" & da$Catalisador == "B"]))) -
-    (mean(c(da$Rendimento[da$Temperatura == "60" & da$Catalisador == "A"],
-            da$Rendimento[da$Temperatura == "40" & da$Catalisador == "B"]))))/2
-
-dae::yates.effects(m3aov, data = da)
-dae::yates.effects(m3aov, data = da)/2
+## Contraste soma zero -------------------------------------------------
+m4 <- lm(Rendimento ~ Catalisador * Temperatura, data = dados,
+         contrasts = list(Temperatura = contr.sum,
+                          Catalisador = contr.sum))
+summary(m4)
+m4aov <- aov(Rendimento ~ Catalisador * Temperatura, data = dados)
+summary(m4aov)
