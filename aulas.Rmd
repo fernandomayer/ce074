@@ -50,11 +50,14 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
   [material](anova-geral.html). **Trazer para a próxima aula** o
   diagrama de Hasse com a tabela de ANOVA completa para um experimento
   fatorial em um delineamento em blocos completos (DBC).
-- **04/09**: Fatoriais $2^k$. Tipos de restrições para modelos com dois
-  fatores.
-  <!-- Aula no quadro. Ver material escrito -->
+- **04/09**: Experimentos fatoriais $2^k$. Tipos de restrições para
+  modelos com dois fatores. Esquema de sinais. Ver
+  [material](fatorial_2k.html). <!-- Aula no quadro. Ver material
+  escrito -->
 - **07/09**: Feriado.
-- **11/09**:
+- **11/09**: Experimentos fatoriais $2^k$. Estimativas de efeitos
+  usando restrição soma zero e esquema de sinais. Ver
+  [material](fatorial_2k.html) e [script](scripts/script_catalisador.R).
 - **14/09**:
 - **18/09**:
 - **21/09**:
