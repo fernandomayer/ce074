@@ -35,10 +35,14 @@ navbar:
         href: modelos-lineares.html
       - text: "ANOVA por meio de Diagramas de Hasse"
         href: anova-geral.html
+      - text: "Experimentos fatorias 2^k"
+        href: fatorial_2k.html
       - text: "----------"
       - text: "Scripts"
       - text: "Tipos de contrastes em modelos lineares [R]"
         href: scripts/script_racoes_pimentel.R
+      - text: "Interpretação de efeitos estimados em modelos lineares [R]"
+        href: scripts/script_catalisador.R
       - text: "----------"
       - text: "Exercícios"
       - text: "Revisão de conhecimento [PDF]"
