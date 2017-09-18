@@ -27,6 +27,7 @@ opts_chunk$set(size = "small",
    geral) em modelos de análise de variância? Por que isso é necessário?
 1. Por que é mais comum utilizar a restrição do tipo soma zero na
    análise de experimentos fatoriais?
+1. O que é o pricípio da marginalidade e porque ele é importante?
 1. Considere o seguinte modelo para um experimento com apenas um
    fator
 $$
