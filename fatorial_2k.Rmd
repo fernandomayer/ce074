@@ -324,13 +324,13 @@ Note que, seguindo as linhas dessa matriz:
 $$
 \begin{align}
 \frac{1}{4} (y_{11} + y_{12} + y_{21} + y_{22}) &= \bar{y} \\
-\frac{1}{2} \left[ \frac{(y_{11} + y_{12})}{2} +
+\frac{1}{2} \left[ \frac{(y_{11} + y_{12})}{2} -
  \frac{(y_{21} + y_{22})}{2} \right] &=
  \frac{1}{2} (\bar{y}_{1j} - \bar{y}_{2j}) \\
-\frac{1}{2} \left[ \frac{(y_{11} + y_{21})}{2} +
+\frac{1}{2} \left[ \frac{(y_{11} + y_{21})}{2} -
  \frac{(y_{12} + y_{22})}{2} \right] &=
  \frac{1}{2} (\bar{y}_{i1} - \bar{y}_{i2}) \\
-\frac{1}{2} \left[ \frac{(y_{11} + y_{22})}{2} +
+\frac{1}{2} \left[ \frac{(y_{11} + y_{22})}{2} -
  \frac{(y_{12} + y_{21})}{2} \right] &=
  \frac{1}{2} (\bar{y}_{ii} - \bar{y}_{ij})
 \end{align}
@@ -453,13 +453,13 @@ Dessa forma, tem-se que
 $$
 \begin{align}
 \frac{1}{4} (y_{11} + y_{12} + y_{21} + y_{22}) &= \bar{y} \\
-\frac{1}{2} \left[ \frac{(y_{21} + y_{22})}{2} +
+\frac{1}{2} \left[ \frac{(y_{21} + y_{22})}{2} -
  \frac{(y_{11} + y_{12})}{2} \right] &=
  \frac{1}{2} (\bar{y}_{2j} - \bar{y}_{1j}) \\
-\frac{1}{2} \left[ \frac{(y_{12} + y_{22})}{2} +
+\frac{1}{2} \left[ \frac{(y_{12} + y_{22})}{2} -
  \frac{(y_{11} + y_{21})}{2} \right] &=
  \frac{1}{2} (\bar{y}_{i2} - \bar{y}_{i1}) \\
-\frac{1}{2} \left[ \frac{(y_{11} + y_{22})}{2} +
+\frac{1}{2} \left[ \frac{(y_{11} + y_{22})}{2} -
  \frac{(y_{12} + y_{21})}{2} \right] &=
  \frac{1}{2} (\bar{y}_{ii} - \bar{y}_{ij})
 \end{align}
@@ -499,13 +499,13 @@ Sendo que:
 $$
 \begin{align}
 \frac{1}{4} (a + b + ab + (1)) &= \bar{y} \\
-\frac{1}{2} \left[ \frac{(a + ab)}{2} +
+\frac{1}{2} \left[ \frac{(a + ab)}{2} -
  \frac{((1) + b)}{2} \right] &=
  \frac{1}{2} (\bar{y}_{A+} - \bar{y}_{A-}) \\
-\frac{1}{2} \left[ \frac{(b + ab)}{2} +
+\frac{1}{2} \left[ \frac{(b + ab)}{2} -
  \frac{((1) + a)}{2} \right] &=
  \frac{1}{2} (\bar{y}_{B+} - \bar{y}_{B-}) \\
-\frac{1}{2} \left[ \frac{((1) + ab)}{2} +
+\frac{1}{2} \left[ \frac{((1) + ab)}{2} -
  \frac{(a + b)}{2} \right] &=
  \frac{1}{2} (\bar{y}_{AB+} - \bar{y}_{AB-})
 \end{align}
@@ -519,9 +519,9 @@ entre as médias dos níveis alto e baixo de um mesmo fator.
 Note que essa diferença é sempre dividida por 2, ou seja, na verdade, é
 a metade da diferença entre as médias. Isso é consequência do fato de
 que estes coeficientes são calculados com base em um modelo linear, onde
-os parâmetros medem a alteração na variável resposta (\mathbf{Y})
+os parâmetros medem a alteração na variável resposta ($\mathbf{Y}$)
 causada pela variação de uma unidade nas variáveis explicativas
-(\mathbf{X}). Por isso, os coeficientes estimados dessa forma são
+($\mathbf{X}$). Por isso, os coeficientes estimados dessa forma são
 chamados de **semi-amplitude** dos efeitos.
 
 Como pode ser visto na representação geométrica do experimento, a
