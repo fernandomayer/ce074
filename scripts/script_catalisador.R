@@ -217,7 +217,7 @@ dados.new <- data.frame(
 ## Ajusta o modelo
 m4.new <- lm(Rendimento ~ Catalisador * Temperatura, data = dados.new)
 summary(m4.new) # Exatamente igual, mas com os sinais trocados
-## Predição e gráficos
+## Predição e gráfico
 pred <- expand.grid(Catalisador = seq(-1, 1, length = 20),
                     Temperatura = seq(-1, 1, length = 20))
 pred$y <- predict(m4.new, newdata = pred)
