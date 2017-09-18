@@ -166,12 +166,15 @@ mean(c(da$Rendimento[da$Catalisador == "A" & da$Temperatura == "60"],
 
 ##----------------------------------------------------------------------
 ## Predição
+## Cria novo data frame com codificação -1 e 1
 da.new <- data.frame(
     Temperatura = ifelse(da$Temperatura == "40", -1, 1),
     Catalisador = ifelse(da$Catalisador == "A", -1, 1),
     Rendimento = da$Rendimento)
+## Ajusta o modelo
 m3.new <- lm(Rendimento ~ Catalisador * Temperatura, data = da.new)
 summary(m3.new) # Exatamente igual, mas com os sinais trocados
+## Predição e gráficos
 pred <- expand.grid(Catalisador = seq(-1, 1, length = 20),
                     Temperatura = seq(-1, 1, length = 20))
 pred$y <- predict(m3.new, newdata = pred)
@@ -206,12 +209,15 @@ dae::yates.effects(m3aov, data = da)/2
 
 ##----------------------------------------------------------------------
 ## Predição
+## Cria novo data frame com codificação -1 e 1
 dados.new <- data.frame(
     Temperatura = ifelse(dados$Temperatura == "40", -1, 1),
     Catalisador = ifelse(dados$Catalisador == "A", -1, 1),
     Rendimento = dados$Rendimento)
+## Ajusta o modelo
 m4.new <- lm(Rendimento ~ Catalisador * Temperatura, data = dados.new)
 summary(m4.new) # Exatamente igual, mas com os sinais trocados
+## Predição e gráficos
 pred <- expand.grid(Catalisador = seq(-1, 1, length = 20),
                     Temperatura = seq(-1, 1, length = 20))
 pred$y <- predict(m4.new, newdata = pred)
