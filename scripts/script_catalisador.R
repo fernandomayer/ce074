@@ -118,7 +118,9 @@ mean(da$Rendimento) # media geral = intercepto
 
 ## Note que é de fato a diferença entre as médias sobre 2:
 ## Ef_A = (1/2) (\bar{y_A+} - \bar{y_A-})
+diff(tapply(da$Rendimento, da$Catalisador, mean))
 diff(tapply(da$Rendimento, da$Catalisador, mean))/2
+diff(tapply(da$Rendimento, da$Temperatura, mean))
 diff(tapply(da$Rendimento, da$Temperatura, mean))/2
 
 ## Porque os sinais são trocados?
@@ -163,7 +165,27 @@ mean(c(da$Rendimento[da$Catalisador == "A" & da$Temperatura == "60"],
        da$Rendimento[da$Catalisador == "B" & da$Temperatura == "40"]))
 
 ##----------------------------------------------------------------------
+## Predição
+da.new <- data.frame(
+    Temperatura = ifelse(da$Temperatura == "40", -1, 1),
+    Catalisador = ifelse(da$Catalisador == "A", -1, 1),
+    Rendimento = da$Rendimento)
+m3.new <- lm(Rendimento ~ Catalisador * Temperatura, data = da.new)
+summary(m3.new) # Exatamente igual, mas com os sinais trocados
+pred <- expand.grid(Catalisador = seq(-1, 1, length = 20),
+                    Temperatura = seq(-1, 1, length = 20))
+pred$y <- predict(m3.new, newdata = pred)
+wireframe(y ~ Catalisador + Temperatura, data = pred)
+wireframe(y ~ Catalisador + Temperatura, data = pred, drape = TRUE)
+levelplot(y ~ Catalisador + Temperatura, data = pred)
+levelplot(y ~ Catalisador + Temperatura, data = pred, cuts = 90)
+levelplot(y ~ Catalisador + Temperatura, data = pred, cuts = 90,
+          col.regions = heat.colors)
+
+##======================================================================
 ## Usando dados completos
+
+##----------------------------------------------------------------------
 ## Gráfico de interação
 with(dados,
      interaction.plot(Catalisador, Temperatura, Rendimento, mean))
@@ -177,3 +199,25 @@ m4 <- lm(Rendimento ~ Catalisador * Temperatura, data = dados,
 summary(m4)
 m4aov <- aov(Rendimento ~ Catalisador * Temperatura, data = dados)
 summary(m4aov)
+model.tables(m3aov, type = "means")
+model.tables(m3aov, type = "effects")
+dae::yates.effects(m3aov, data = da)
+dae::yates.effects(m3aov, data = da)/2
+
+##----------------------------------------------------------------------
+## Predição
+dados.new <- data.frame(
+    Temperatura = ifelse(dados$Temperatura == "40", -1, 1),
+    Catalisador = ifelse(dados$Catalisador == "A", -1, 1),
+    Rendimento = dados$Rendimento)
+m4.new <- lm(Rendimento ~ Catalisador * Temperatura, data = dados.new)
+summary(m4.new) # Exatamente igual, mas com os sinais trocados
+pred <- expand.grid(Catalisador = seq(-1, 1, length = 20),
+                    Temperatura = seq(-1, 1, length = 20))
+pred$y <- predict(m4.new, newdata = pred)
+wireframe(y ~ Catalisador + Temperatura, data = pred)
+wireframe(y ~ Catalisador + Temperatura, data = pred, drape = TRUE)
+levelplot(y ~ Catalisador + Temperatura, data = pred)
+levelplot(y ~ Catalisador + Temperatura, data = pred, cuts = 90)
+levelplot(y ~ Catalisador + Temperatura, data = pred, cuts = 90,
+          col.regions = heat.colors)
