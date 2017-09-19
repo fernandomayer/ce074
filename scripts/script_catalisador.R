@@ -5,7 +5,8 @@
 ##----------------------------------------------------------------------
 ## Exemplo do catalisador
 
-dados <- read.csv("dados/temp_cat.csv")
+url <- "http://leg.ufpr.br/~fernandomayer/data/temp_cat.csv"
+dados <- read.csv(url)
 str(dados)
 dados$Temperatura <- as.factor(dados$Temperatura)
 
