@@ -14,8 +14,8 @@ library(dae)
 
 ##----------------------------------------------------------------------
 ## Importação e conferência
-desq <- read.table("dados/avioes_esquerda.csv", header = TRUE,
-                   sep = ",", dec = ".")
+url <- "http://leg.ufpr.br/~fernandomayer/aulas/ce074/dados/avioes_esquerda.csv"
+desq <- read.table(url, header = TRUE, sep = ",", dec = ".")
 str(desq)
 desq$BLOCO <- as.factor(desq$BLOCO)
 str(desq)

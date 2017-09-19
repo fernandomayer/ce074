@@ -14,8 +14,8 @@ library(dae)
 
 ##----------------------------------------------------------------------
 ## Importação e conferência
-ddir <- read.table("dados/avioes_direita.csv", header = TRUE,
-                   sep = ";", dec = ",")
+url <- "http://leg.ufpr.br/~fernandomayer/aulas/ce074/dados/avioes_direita.csv"
+ddir <- read.table(url, header = TRUE, sep = ";", dec = ",")
 str(ddir)
 names(ddir) <- toupper(names(ddir))
 ## Converte distancia para centimetros (por compatibilidade com outro
