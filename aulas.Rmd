@@ -94,6 +94,7 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
 - Revisão de conhecimento. [PDF](exercicios/ex_revisao.pdf) |
 [Gabarito](exercicios/ex_revisao_GABARITO.pdf) |
 [Script](exercicios/ex_revisao_GABARITO.R)
+- Experimentos fatoriais. [PDF](exercicios/ex_fatorial.pdf)
 
 ## Notas
 
