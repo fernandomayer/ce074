@@ -33,6 +33,7 @@ navbar:
         href: catalizando-conhecimento.html
       - text: "Modelos lineares e reparametrizações"
         href: modelos-lineares.html
+      - text: "Experimentos fatoriais"
       - text: "ANOVA por meio de Diagramas de Hasse"
         href: anova-geral.html
       - text: "Experimentos fatorias 2^k"
@@ -47,6 +48,8 @@ navbar:
       - text: "Exercícios"
       - text: "Revisão de conhecimento [PDF]"
         href: exercicios/ex_revisao.pdf
+      - text: "Experimentos fatoriais [PDF]"
+        href: exercicios/ex_fatorial.pdf
   right:
     - text: GitHub
       icon: fa-github fa-lg
