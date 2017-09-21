@@ -64,12 +64,14 @@ model.matrix(m0)
 ## SQ = contraste^2/[r 2^k]
 ## Sabemos que a SQ total pode ser decomposta em
 ## SQTOT = SQTrat + SQRES
-## SQTot = SQA + SQB + SQAB + SQRES
-## onde SQTOT é a diferença
+## SQTOT = SQA + SQB + SQAB + SQRES
+## onde SQTOT é a soma de quadrados total:
 ## SQTOT = \sum\sum\sum y_{ijk}^2 - [(\sum y_{ijk})^2/n]
-## E SQRES é obtida por diferença. Os graus de liberdade associados a
-## soma de quadrados, podem ser decompostos em
-## SQTot = SQA + SQB + SQAB + SQRES
+## E SQRES é obtida por diferença:
+## SQRES = SQTOT - SQA - SQB - SQAB
+## Os graus de liberdade associados a soma de quadrados, podem ser
+## decompostos em:
+## SQTOT = SQA + SQB + SQAB + SQRES
 ## abr - 1 = (a - 1) + (b - 1) + (a - 1)(b - 1) + ab(r - 1)
 
 ## Assim, podemos calcular os componentes da ANOVA:
@@ -152,7 +154,7 @@ c(efA, efB, efAB)
 ## Que são os efeitos de Yates como calculados anteriormente
 dae::yates.effects(m0aov, data = dados)
 
-## Coeficientes deos efeitos -------------------------------------------
+## Coeficientes dos efeitos --------------------------------------------
 ## Ja vimos que a relacão entre os efeitos e os coefiecientes dos
 ## efeitos é dada por
 ## coef.ef = ef/2
@@ -171,19 +173,74 @@ model.tables(m0aov, type = "effects")
 ## sinais trocados)
 coef(m0)
 
-## Estimativa de sigma = MQRes
-(sigma <- sqrt(mqRES))
-
-## Erro padrao de A
+## Erro Padrão dos coeficientes dos efeitos ----------------------------
+## Sabemos que, de maneira geral, a variância das estimativas dos
+## parâmetros de um modelo linear é dada por
+## VAR[\hat{\beta}] = \hat{\sigma^2} (X'X)^-1
+## onde \hat{\sigma^2} é obtido pelo QMRes, ou seja,
+## \hat{\sigma^2} = QMRes
+(sigma2 <- mqRES)
+(sigma <- sqrt(sigma2))
+## Pode-se mostrar que, para experimentos fatorias 2^k, todos os efeitos
+## possuem a mesma precisão, que é dada por
+## VAR[\hat{\beta}] = \hat{\sigma^2} (1/r2^k)
+## Como o erro-padrão (EP) é a raíz quadrada da variância, então
+## EP[\hat{\beta}] = \hat{\sigma} \sqrt{(1/r2^k)}
+## Assim, podemos calcular os EPs como
 (epA <- sigma * sqrt((1/(r * 2^k))))
+(epB <- sigma * sqrt((1/(r * 2^k))))
+(epAB <- sigma * sqrt((1/(r * 2^k))))
+## Portanto
+c(epA, epB, epAB)
+## É identico a
+summary(m0)$coefficients[, "Std. Error"]
+
+## Note que, nesse caso, os EPs estão associados aos coeficientes dos
+## efeitos, que medem a variação entre 0 e 1. Como os efeitos são duas
+## vezes os coeficientes, então o EP dos efeitos é obtido pela
+## multiplicação dos EPs dos coeficientes por 2:
+c(epA, epB, epAB)*2
+## Os EPs dos efeitos também podem ser calculados com a função
+## se.contrast() aplicada a objetos da classe `aov`:
 se.contrast(m0aov, list(Catalisador == "A", Catalisador == "B"),
-            data = dados)
-se.contrast(m0aov, list(Catalisador == "A", Catalisador == "B"),
-            data = dados)/2
-se.contrast(m0aov, list(Catalisador == "B", Catalisador == "A"),
             data = dados)
 se.contrast(m0aov, list(Temperatura == "40", Temperatura == "60"),
             data = dados)
+se.contrast(m0aov, list((Catalisador == "A" & Temperatura == "40") |
+                        (Catalisador == "B" & Temperatura == "60"),
+                        (Catalisador == "A" & Temperatura == "60") |
+                        (Catalisador == "B" & Temperatura == "40")),
+            data = dados)
+
+## Teste t para os coeficientes ----------------------------------------
+## Um coeficiente relaciona o fator à resposta, e o interesse está em
+## saber se a estimatia do coeficiente é ou ão diferente de zero. Um
+## teste t pode ser usado para se avaliar a significância de um
+## efeito.
+## A estatística t para testar \beta = 0 em um experimento 2^k é então,
+## t = \hat\beta / EP(coef)
+## com graus de liberdade iguais aos da média quadrática dos erros
+## (MQRES).
+## Assim, os valores t e os p-valores associados podem ser calculados:
+(tA <- coefA/epA)
+(pA <- pt(abs(tA), df = glRES, lower.tail = FALSE) * 2)
+(tB <- coefB/epB)
+(pB <- pt(abs(tB), df = glRES, lower.tail = FALSE) * 2)
+(tAB <- coefAB/epAB)
+(pAB <- pt(abs(tAB), df = glRES, lower.tail = FALSE) * 2)
+
+## Assim, podemos construir a tabela com o resumo do cálculo dos
+## coeficientes e respectivos testes de hipótese:
+tab.coef <- data.frame(Coeficientes = c(coefA, coefB, coefAB),
+                       EP = c(epA, epB, epAB),
+                       t = c(tA, tB, tAB),
+                       "p-valor" = c(pA, pB, pAB),
+                       row.names = c("Catalisador", "Temperatura",
+                                     "Catalisador:Temperatura"))
+tab.coef
+## Que é o mesmo que (com sinais trocados)
+summary(m0)$coefficients
+
 ## Por isso tudo indica que o EP de um contraste (entre -1 e +1) é
 ## simplesmente o EP de um coeficiente vezes 2
 proj(m0aov)
@@ -193,14 +250,6 @@ TukeyHSD(m0aov)
 par(mfrow = c(1, 3))
 plot(TukeyHSD(m0aov))
 par(mfrow = c(1, 1))
-
-## Valor t de A
-(tA <- coefA/epA)
-## Valor p de A
-pt(abs(tA), glRES, lower.tail = FALSE) * 2 # pois a hipotese eh bilateral
-qt(0.05/2, glRES, lower.tail = FALSE) # t_{0.05;gl}
-model.tables(m0aov, type = "effects", se = TRUE)
-
 
 stop
 ##----------------------------------------------------------------------
