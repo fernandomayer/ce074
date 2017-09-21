@@ -241,34 +241,104 @@ tab.coef
 ## Que é o mesmo que (com sinais trocados)
 summary(m0)$coefficients
 
-## Por isso tudo indica que o EP de um contraste (entre -1 e +1) é
-## simplesmente o EP de um coeficiente vezes 2
-proj(m0aov)
-proj(m0)
-## É sensacional!
-TukeyHSD(m0aov)
-par(mfrow = c(1, 3))
-plot(TukeyHSD(m0aov))
-par(mfrow = c(1, 1))
+##======================================================================
+## Análise dos resíduos
 
-stop
-##----------------------------------------------------------------------
+## A análise dos resíduos permite verificar se as suposições:
+## a) homegeneidade de variâncias
+## b) normalidade da variável resposta
+## foram atendidas.
+## A análise padrão é através dos gráficos:
+par(mfrow = c(2, 2))
+plot(m0)
+par(mfrow = c(1, 1))
+## Nesse caso os resultados parecem indicar que nenhuma das suposições
+## foram atendidas.
+## NOTA: com apenas 8 observações será sempre difícil atender às
+## suposições.
+
+## Os resultados indicam que pode ser necessária alguma transformação da
+## variável resposta para que as variâncias se tornem homogêneas e a
+## distribuição dos dados mais próxima da normal. A transformação de
+## Box-Cox pode indicar qual a melhor transformação para os dados
+MASS::boxcox(m0)
+## Nesse caso, com \lambda próximo de zero, a transformação adequada
+## seria com o log. (Não será abordado aqui).
+
+##======================================================================
 ## Predição
-## Cria novo data frame com codificação -1 e 1
+
+## A predição para experimentos fatoriais nada mais é do que o cálculo
+## das médias para cada nível de cada tratamento, ou das médias das
+## combinações dos tratamentos no caso das interações.
+
+## Predição das médias para Catalisador
+mean(dados$Rendimento) + coefA * -1
+mean(dados$Rendimento) + coefA * 1
+with(dados, tapply(Rendimento, Catalisador, mean))
+## Predição das médias para Temperatura
+mean(dados$Rendimento) + coefB * -1
+mean(dados$Rendimento) + coefB * 1
+with(dados, tapply(Rendimento, Temperatura, mean))
+## Predição das médias para todas as combinações
+mean(dados$Rendimento) + coefA * -1 + coefB * -1 + coefAB * 1
+mean(dados$Rendimento) + coefA * -1 + coefB * 1 + coefAB * -1
+mean(dados$Rendimento) + coefA * 1 + coefB * -1 + coefAB * -1
+mean(dados$Rendimento) + coefA * 1 + coefB * 1 + coefAB * 1
+with(dados, tapply(Rendimento, Catalisador:Temperatura, mean))
+
+## Também é possível observar a PROJEÇÃO dos dados em termos de seus
+## efeitos. Essa projeção é dada por uma tabela, com o mesmo número de
+## linhas dos dados, onde cada linha é uma combinação linear da média
+## geral com os efeitos estimados. No R usamos a função proj():
+proj(m0)
+## Para ficar mais claro, podemos combinar as informações dessa matriz
+## com os dados observados:
+proj.m0 <- cbind(proj(m0),
+                 Rendimento = dados$Rendimento,
+                 Média = apply(proj(m0)[, -5], 1, sum))
+row.names(proj.m0) <- paste(dados$Catalisador, dados$Temperatura,
+                             sep = ":")
+proj.m0
+
+## Como estamos codificando os níveis dos fatores como -1 e 1, então
+## podemos teoricamente fazer a predição para qualquer valor nesse
+## intervalo. podemos criar uma "malha" de valores entre -1 e 1, e fazer
+## a predição para essa malha, da mesma forma como mostrado acima. No
+## entanto, para tornar o cálculo mais eficiente podemos seguir a
+## abordagem abaixo:
+## Cria novo data frame com codificação -1 (baixo) e 1 (alto)
 dados.new <- data.frame(
     Temperatura = ifelse(dados$Temperatura == "40", -1, 1),
     Catalisador = ifelse(dados$Catalisador == "A", -1, 1),
     Rendimento = dados$Rendimento)
-## Ajusta o modelo
-m4.new <- lm(Rendimento ~ Catalisador * Temperatura, data = dados.new)
-summary(m4.new) # Exatamente igual, mas com os sinais trocados
-## Predição e gráfico
+## Ajusta o modelo com essa codificação, que é exatamente igual a
+## declarar os contrastes soma zero (`contr.sum`)
+m0.new <- lm(Rendimento ~ Catalisador * Temperatura, data = dados.new)
+summary(m0.new) # Exatamente igual, mas com os sinais trocados
+## Cria um grid regular com valores equiespaçados entre -1 e 1
 pred <- expand.grid(Catalisador = seq(-1, 1, length = 20),
                     Temperatura = seq(-1, 1, length = 20))
-pred$y <- predict(m4.new, newdata = pred)
+## Faz o cálculo das predições para esse grid
+pred$y <- predict(m0.new, newdata = pred)
+## E existem várias formas de visualizar as predições
 wireframe(y ~ Catalisador + Temperatura, data = pred)
 wireframe(y ~ Catalisador + Temperatura, data = pred, drape = TRUE)
 levelplot(y ~ Catalisador + Temperatura, data = pred)
 levelplot(y ~ Catalisador + Temperatura, data = pred, cuts = 90)
 levelplot(y ~ Catalisador + Temperatura, data = pred, cuts = 90,
           col.regions = heat.colors)
+
+##======================================================================
+## Testes de Tukey para os efeitos
+
+## Assim como para experimentos com um único tratamento, o teste de
+## Tukey para as diferenças entre médias pode ser aplicado também para
+## experimentos fatorias.
+TukeyHSD(m0aov)
+## Note que as diferenças entre médias são os efeitos como já calculamos
+model.tables(m0aov, type = "means")
+## O resultado também pode ser visto graficamente
+par(mfrow = c(1, 3))
+plot(TukeyHSD(m0aov))
+par(mfrow = c(1, 1))
