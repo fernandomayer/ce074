@@ -214,7 +214,7 @@ se.contrast(m0aov, list((Catalisador == "A" & Temperatura == "40") |
 
 ## Teste t para os coeficientes ----------------------------------------
 ## Um coeficiente relaciona o fator à resposta, e o interesse está em
-## saber se a estimatia do coeficiente é ou ão diferente de zero. Um
+## saber se a estimatia do coeficiente é ou não diferente de zero. Um
 ## teste t pode ser usado para se avaliar a significância de um
 ## efeito.
 ## A estatística t para testar \beta = 0 em um experimento 2^k é então,
@@ -300,6 +300,9 @@ proj.m0 <- cbind(proj(m0),
 row.names(proj.m0) <- paste(dados$Catalisador, dados$Temperatura,
                              sep = ":")
 proj.m0
+## Removendo as linhas duplicadas
+proj.m0[duplicated(row.names(proj.m0)),] # 1a repetição
+proj.m0[!duplicated(row.names(proj.m0)),] # 2a repetição
 
 ## Como estamos codificando os níveis dos fatores como -1 e 1, então
 ## podemos teoricamente fazer a predição para qualquer valor nesse
@@ -336,9 +339,60 @@ levelplot(y ~ Catalisador + Temperatura, data = pred, cuts = 90,
 ## Tukey para as diferenças entre médias pode ser aplicado também para
 ## experimentos fatorias.
 TukeyHSD(m0aov)
-## Note que as diferenças entre médias são os efeitos como já calculamos
+## Note que as diferenças entre médias dos efeitos principais são os
+## efeitos como já calculamos
+dae::yates.effects(m0aov, data = dados)
+## E as diferenças individuais são as diferenças entre cada combinação
+## de tratamentos
 model.tables(m0aov, type = "means")
+
+## Como a interação foi significativa (pela ANOVA), devemos olhar a
+## comparação entre as médias das combinações de tratamentos. Para
+## entender como funciona vamos analisar as comparaçoes dos efeitos
+## principais primeiro. Lembre que a estatística de teste de Tukey é
+## calculada como:
+## W(\alpha %) = q_{t,v,alpha} * EP(diff)
+## onde q_{t,v,alpha} é a amplitude estudentizada com t = número de
+## médias sendo comparadas, v = graus de liberdade residual e alpha é o
+## nível de significância. O EP(diff) é o Erro-padrão da diferença entre
+## as médias, que no nosso caso é 2 vezes o EP calculado para os
+## coeficientes dos efeitos. Portanto:
+
+## Teste de Tukey para Catalisador:
+## Diferenças entre médias
+with(dados, tapply(Rendimento, Catalisador, mean))
+dist(with(dados, tapply(Rendimento, Catalisador, mean)))
+## Estatística de Tukey
+qtukey(p = 0.95, nmeans = 2, df = glRES) * (epA * 2)
+
+## Teste de Tukey para Temperatura:
+## Diferenças entre médias
+with(dados, tapply(Rendimento, Temperatura, mean))
+dist(with(dados, tapply(Rendimento, Temperatura, mean)))
+## Estatística de Tukey
+qtukey(p = 0.95, nmeans = 2, df = glRES) * (epB * 2)
+
+## Teste de Tukey para Catalisador:Temperatura:
+## Diferenças entre médias
+with(dados, tapply(Rendimento, Catalisador:Temperatura, mean))
+dist(with(dados, tapply(Rendimento, Catalisador:Temperatura, mean)))
+## Estatística de Tukey
+qtukey(p = 0.95, nmeans = 4, df = glRES) * (epA * 2)
+
 ## O resultado também pode ser visto graficamente
 par(mfrow = c(1, 3))
 plot(TukeyHSD(m0aov))
+par(mfrow = c(1, 1))
+
+## Podemos então fazer um gráfico com as médias
+layout(matrix(c(1, 2, 3, 3), 2, 2, byrow = TRUE))
+with(dados, barplot(tapply(Rendimento, Catalisador, mean),
+                    ylim = c(0, 90),
+                    main = "Catalisador"))
+with(dados, barplot(tapply(Rendimento, Temperatura, mean),
+                    ylim = c(0, 90),
+                    main = "Temperatura"))
+with(dados, barplot(tapply(Rendimento, Catalisador:Temperatura, mean),
+                    ylim = c(0, 90),
+                    main = "Catalisador:Temperatura"))
 par(mfrow = c(1, 1))
