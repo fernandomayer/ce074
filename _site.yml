@@ -44,6 +44,8 @@ navbar:
         href: scripts/script_racoes_pimentel.R
       - text: "Interpretação de efeitos estimados em modelos lineares [R]"
         href: scripts/script_catalisador.R
+      - text: "Análise completa de um fatorial 2^2 [R]"
+        href: scripts/script_fatorial_2-2.R
       - text: "----------"
       - text: "Exercícios"
       - text: "Revisão de conhecimento [PDF]"
