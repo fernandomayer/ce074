@@ -351,7 +351,7 @@ model.tables(m0aov, type = "means")
 ## entender como funciona vamos analisar as comparaçoes dos efeitos
 ## principais primeiro. Lembre que a estatística de teste de Tukey é
 ## calculada como:
-## W(\alpha %) = q_{t,v,alpha} * EP(diff)
+## W(\alpha %) = q_{t,v,alpha} * 2EP(diff)
 ## onde q_{t,v,alpha} é a amplitude estudentizada com t = número de
 ## médias sendo comparadas, v = graus de liberdade residual e alpha é o
 ## nível de significância. O EP(diff) é o Erro-padrão da diferença entre
