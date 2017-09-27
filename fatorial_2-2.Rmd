@@ -1,5 +1,5 @@
 ---
-title: "Experimentos fatoriais $2^k$"
+title: "Experimentos fatoriais $2^2$"
 output:
   html_document:
     code_folding: show
