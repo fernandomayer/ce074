@@ -1,0 +1,317 @@
+---
+title: "Experimentos fatoriais $2^3$"
+output:
+  html_document:
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+library(knitr, quietly = TRUE)
+opts_chunk$set(
+               cache = TRUE,
+               tidy = FALSE,
+               comment = "#",
+               collapse = TRUE,
+               fig.align = "center",
+               fig.path = "figures/",
+               cache.path = "cache/"
+           )
+```
+
+# Introdução
+
+Já vimos que em geral, os experimentos fatoriais $2^k$ são compostos por
+$k$ tratamentos, cada um com apenas dois níveis (que chamamos de alto e
+baixo). A representação geométrica e as formas de estimação para todos
+os componentes de um experimento fatorial $2^2$ já foram vistas
+[aqui](fatorial_2-2.Rmd).
+
+Nesta seção veremos as adatações necessárias para se obter todos os
+componentes de um experimento fatorial com 3 fatores, cada um com dois
+níveis. O modelo estatístico geral para um experimento fatorial $2^3$
+pode ser escrito como
+
+$$
+y_{ijkl} = \mu + \alpha_i + \beta_j + \gamma_k + (\alpha\beta)_{ij} +
+         (\alpha\gamma)_{ik} + (\beta\gamma)_{jk} +
+         (\alpha\beta\gamma)_{ijk} + \epsilon_{ijkl}
+$$
+
+Com $i = 1, \ldots, a$ niveis do fator A $j = 1, \ldots, b$ niveis do
+fator B, $k = 1, \ldots, c$ niveis do fator C, e $l = 1, \ldots, r$
+repetições. De maneira simpllificada podemos também escrever esse modelo
+como
+
+$$
+y = A + B + C + AB + AC + BC + ABC + \epsilon
+$$
+
+Portanto, esse planejamento permite estimar 3 efeitos principais, 3
+efeitos de interações de segunda ordem, e 1 interação de terceira ordem.
+
+Usando a representação geométrica (que já vimos ser equivalente à
+restrição do tipo soma zero em modelos lineares gerais), temos agora um
+cubo, onde cada dimensão representa um fator:
+
+```
+        bc ------- abc
+        .|        .|
+ [+]  c__|______ac |
+      |  |      |  |
+  C   |  b -----|- ab [+]
+      | .       | .   B
+ [-] (1)________a  [-]
+     [-]   A   [+]
+```
+
+Dessa forma, obtemos também a seguinte tabela de sinais para os afeitos
+principais, seguindo a ordem de Yates:
+
+```
+   nom A B C
+ 1   1 - - -
+ 2   a + - -
+ 3   b - + -
+ 4  ab + + -
+ 5   c - - +
+ 6  ac + - +
+ 7  bc - + +
+ 8 abc + + +
+```
+
+As colunas das interações são obtidas multiplicando-se as colunas dos
+respectivos fatores. Nota-se que em um experimento fatorial $2^3$ temos
+então 8 combinações possíveis para os 3 tratamentos.
+
+# Análise através de um exemplo
+
+No capítulo 5 de [Box, Hunter e Hunter
+(2005)](http://statisticsforexperimenters.net) é apresentado um
+experimento que avalia o rendimento de um processo na presença de 3
+fatores: temperatura (**T**) e concentração (**C**), ambos
+quantitativos, e tipo de catalisador (**K**), qualitativo. Em um
+primeiro momento foi considerado como resposta a média de rendimento de
+duas repetições do experimento. Os dados estão disponíveis
+[aqui](http://leg.ufpr.br/~fernandomayer/data/BHH2/tab0502.dat) e podem
+ser vistos abaixo:
+
+```{r}
+url <- "http://leg.ufpr.br/~fernandomayer/data/BHH2/tab0502.dat"
+da <- read.table(url, header = TRUE)
+str(da)
+kable(da)
+```
+
+Os níveis -1 (baixo) e 1 (alto) de cada fator são os seguintes:
+
+|   |  **(-)** |  **(+)** |
+|:-:|:---:|:---:|
+| **T**  | 160 | 180 |
+| **C** |  20 |  40 |
+| **K** |  A  |  B  |
+
+A representação geométrica desse experimento é então:
+
+```{r, echo=FALSE, out.width='80%'}
+include_graphics("img/bhh2_fig5-3_1.png")
+```
+
+E as definições são
+
+```{r}
+## Número de fatores
+k <- 3
+## Número de níveis
+a <- b <- c <- 2
+## Número de repetições
+r <- 1
+```
+
+## Contrastes
+
+Já vimos que um contraste é, por definição, a diferença entre as
+observações do nível alto e baixo de um fator. No caso de um experimento
+fatorial $2^2$ essa dedução é simplificada pois a representação
+geométrica é um quadrado. Naquele caso bastava olhar para a diferença
+entra as médias das arestas paralelas do quadrado.
+
+No caso de um experimento fatorial $2^3$ onde a representação geométrica
+se dá em um cubo, a dedução é a mesma, mas agora as diferenças serão
+realizadas entre **planos** do cubo. Por exemplo, o contraste para o
+fator A (temperatura) pode ser calculado como:
+
+$$
+contr_A = (a + ab + ac + abc) - (b + c + bc + (1))
+$$
+
+Note que todos os elementos da primeira soma contém a letra $a$ que
+representa o nível alto do fator A. De maneira análoga, podemos deduzir
+os contrastes para os fatores B e C:
+
+$$
+\begin{align}
+contr_B = (b + ab + bc + abc) - (a + c + ac + (1)) \\
+contr_C = (c + ac + bc + abc) - (a + b + ab + (1))
+\end{align}
+$$
+
+Os contrastes para as interações podem ser obtido de maeira similar.
+Considere por exemplo a interação $TK$. Quando a concentração ($C$) está
+no nível baixo, então
+
+$$
+contr_{TK(C-)} = ((1) + ab) - (a + b)
+$$
+
+E quando a concentração está no nível alto, então
+
+$$
+contr_{TK(C+)} = (c + abc) - (ac + bc)
+$$
+
+Portanto, a interação $TK$ é simplesmente a soma das interações para
+cada nível de $C$. Portanto, de maneira geral, o contraste da
+interação $AB$ é
+
+$$
+contr_{AB} = (ab + (1) + abc + c) - (a + b + ac + bc)
+$$
+
+De maneira similar, os contrastes para as outras duas interações duplas
+são:
+
+$$
+\begin{align}
+contr_{AC} = (ac + (1) + abc + b) - (a + c + ab + bc) \\
+contr_{BC} = (bc + (1) + abc + a) - (b + c + ab + ac)
+\end{align}
+$$
+
+O efeito da interação de terceira ordem ($TCK$) é obtida quando se
+considera a interação $TC$ nos níveis alto e baixo de $K$, mas com os
+sinais trocados. De maneira geral, a interação ABC é obtida a partir da
+interação de AB em cada nível de C, ou seja,
+
+$$
+contr_{ABC} = (a + b + c + abc) - ((1) + ab + ac + bc)
+$$
+
+Geometricamente os contrastes acima podem ser visualizados na figura
+abaixo.
+
+```{r, echo=FALSE, out.width='80%'}
+include_graphics("img/bhh2_fig5-4.png")
+```
+
+### Tabela de contrastes
+
+Note que a partir do momento que o número de fatores $k$ for aumentando,
+a dedução geometrica ficará cada vez mais difícil. Por isso, podemos
+utilizar a **tabela de contrastes** para auxiliar no cálculo dos
+contrastes de qualquer ordem.
+
+Para qualquer experimento fatorial $2^k$ definimos a tabela de
+contrastes como sendo a tabela de sinais para cada fator, adicionada das
+colunas de média geral (que chamaremos de $I$) e das colunas com todas
+as interações possíveis.
+
+Dessa forma, a partir da tabela de sinais do experimento
+
+```{r}
+da[, c("T", "C", "K")]
+```
+
+obtemos a tabela completa de contrastes da seguinte forma:
+
+```{r}
+tab.sinais <- cbind(I = 1, da[, c("T", "C", "K")])
+tab.sinais <- transform(tab.sinais,
+                        TC = T*C,
+                        TK = T*K,
+                        CK = C*K,
+                        TCK = T*C*K)
+row.names(tab.sinais) <- c("(1)", "a", "b", "ab", "c", "ac", "bc", "abc")
+tab.sinais
+```
+
+Note agora que cada coluna da tabela de sinais representa a própria
+definição de contraste para cada efeito principal ou interação, conforme
+foi deduzido anteriormente.
+
+Dessa forma, os contrastes podem ser facilmente calculados apenas
+multiplindo-se cada coluna pelo vetor de observações:
+
+```{r}
+(contr <- t(tab.sinais[, -1]) %*% da$y)
+```
+
+Note que a tabela de sinais completa para qualquer experimento fatorial
+$2^k$ pode ser obtida dessa mesma forma. Essa tabela possui algumas
+propriedades extremamente interessantes:
+
+1. Exceto pela coluna identidade $I$, cada coluna tem um número igual de
+   sinais mais ou menos.
+2. A soma dos produtos dos sinais de quaisquer duas colunas é zero. Isto
+   é, o **produto interno** de qualquer par de colunas será zero, o que
+   define que os contrastes são **ortogonais**, garantindo que cada
+   estimativa de efeito não é alterada pela magnitude dos efeitos e
+   sinais das outras.
+3. A multiplicação de qualquer coluna pela couna $I$ deixa a coluna
+   inalterada, ou seja, $I$ é um **elemento identidade**.
+4. O produto de quaisquer duas colunas resulta em uma coluna da tabela.
+   Por exemplo: $A \times B = AB$ e $AB \times ABC = A^2B^2C = C$, uma
+   vez que cada coluna multiplicada por si mesma é a identidade.
+
+## Somas de quadrados e ANOVA
+
+Já foi demonstrado também que a soma de quadrados de qualquer fator pode
+ser calculada como
+
+$$
+SQ = \frac{[contr]^2}{r2^k}
+$$
+
+onde os contrastes são específicos para cada fator e $r2^k$ é o total de
+observações do experimento.
+
+Para esse exemplo específico temos então
+
+```{r}
+(SQ <- contr^2/(r * 2^k))
+```
+
+Para calcular os quadrados médios precisamos dos graus de liberdade.
+Para um experimento fatorial $2^k$ as somas de quadrados e os graus de
+liberdade podem ser decompostos em:
+
+$$
+\begin{align}
+SQTot &= SQA + SQB + SQC + SQAB + SQAC + SQBC + SQABC + SQRes \\
+abcr - 1 &= (a-1) + (b-1) + (c-1) + (a-1)(b-1) + (a-1)(c-1) +
+(b-1)(c-1) + (a-1)(b-1)(c-1) + abc(r-1)
+\end{align}
+$$
+
+(Obtenha essas quantidades pelo diagrama de Hasse). A $SQTot$ é
+calculada da maneira usual, e a $SQRes$ obtida por diferença:
+
+Assim, os graus de liberdade são:
+
+```{r}
+(glA <- a - 1)
+(glB <- b - 1)
+(glC <- c - 1)
+(glAB <- (a-1)*(b-1))
+(glAC <- (a-1)*(c-1))
+(glBC <- (b-1)*(c-1))
+(glABC <- (a-1)*(b-1)*(c-1))
+(glRES <- a*b*c*(r-1))
+```
+
+E os quadrados médios são, portanto,
+
+```{r}
+(MQ <- SQ/c(glA, glB, glC, glAB, glAC, glBC, glABC))
+```
+
+Para obter uma estimativa da variância
