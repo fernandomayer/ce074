@@ -29,15 +29,17 @@ navbar:
     - text: "Materiais"
       menu:
       - text: "Introdução e revisão"
-      - text: "Catalizando a geração de conhecimento"
+      - text: "Catalizando a geração de conhecimento [HTML]"
         href: catalizando-conhecimento.html
-      - text: "Modelos lineares e reparametrizações"
+      - text: "Modelos lineares e reparametrizações [HTML]"
         href: modelos-lineares.html
       - text: "Experimentos fatoriais"
-      - text: "ANOVA por meio de Diagramas de Hasse"
+      - text: "ANOVA por meio de Diagramas de Hasse [HTML]"
         href: anova-geral.html
-      - text: "Experimentos fatorias 2^2"
+      - text: "Experimentos fatorias 2^2 [HTML]"
         href: fatorial_2-2.html
+      - text: "Experimentos fatorias 2^3 [HTML]"
+        href: fatorial_2-3.html
       - text: "----------"
       - text: "Scripts"
       - text: "Tipos de contrastes em modelos lineares [R]"
