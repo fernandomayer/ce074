@@ -63,6 +63,8 @@ linha.
 
 # Exemplo de um experimento $2^4$
 
+## Representação geométrica
+
 Para um experimento $2^4$, a representação geométrica fica:
 
 ```
@@ -143,6 +145,8 @@ a <- b <- c <- d <- 2
 r <- 1
 ```
 
+## Análise exploratória
+
 Uma possível forma de visualizar se existe interação nesse experimento é
 através do sguinte gráfico:
 
@@ -160,6 +164,8 @@ Note que várias outras combinações são possíveis, assim como outras
 formas de visualização. No entanto note que à medida que o número de
 fatores ($k$) aumentar, este tipo de visualização ficará cada vez mais
 difícil de ser interpretada.
+
+## Contrastes, efeitos e avaliação do modelo
 
 Como vimos anteriormente, podemos calcular os efeitos diretamente
 através da tabela de contrastes. Agora, ao invés de calcularmos essa
@@ -340,6 +346,8 @@ caso é preciso lembrar que as podem haver interações entre estes novos
 fatores e aqueles que foram descartados no primeiro experimento, e isto
 não está sendo considerado neste caso.
 
+## Análise dos resíduos
+
 Para avaliar a suposição de normalidade podemos fazer um gráfico de quantis
 normais para os resíduos:
 
@@ -367,6 +375,8 @@ with(dados, {
 })
 par(mfrow = c(1, 1))
 ```
+
+## Predição
 
 Como já vimos, as predições para experimentos fatoriais nada mais são do
 que as estimativas das médias para cada combinação dos fatores,
@@ -415,3 +425,5 @@ levelplot(y ~ x2 + x4, data = pred, cuts = 90,
 ```
 
 # Análise de um experimento $2^6$
+
+Ver script.
