@@ -20,7 +20,7 @@ opts_chunk$set(
 
 # Introdução
 
-Á medida que o número de fatores cresce em um experimento fatorial,
+A medida que o número de fatores cresce em um experimento fatorial,
 o número de efeitos que podem ser estimados também cresce. Com isso,
 fazer o experimento com replicação acaba sendo praticamente inviável.
 Por exemplo:
@@ -102,7 +102,7 @@ O que gera a seguinte tabela de sinais, seguindo a ordem de Yates:
 
 No capítulo 5 de [Box, Hunter e Hunter
 (2005)](http://statisticsforexperimenters.net) é apresentado um
-experimento que avalia a taxa de conversão de um processo, conforma a
+experimento que avalia a taxa de conversão de um processo, conforme a
 combinação de 4 fatores: carga de catalisador (`x1`), temperatura
 (`x2`), pressão (`x3`), e concentração de um reagente (`x4`). O
 experimento foi realizado sem repetições, e pode ser visualizado abaixo
@@ -150,10 +150,10 @@ através do sguinte gráfico:
 library(lattice)
 ## Interação de x2 com x3, para cada nível de x4, fixando x1
 xyplot(conversion ~ factor(x1) | x2 + x3, groups = x4,
-       data = dados,  type = c("p", "l"), auto.key = TRUE)
+       data = dados,  type = c("p", "a"), auto.key = TRUE)
 ## Interação de x2 com x4, para cada nível de x3, fixando x1
 xyplot(conversion ~ factor(x1) | x2 + x4, groups = x3,
-       data = dados,  type = c("p", "l"), auto.key = TRUE)
+       data = dados,  type = c("p", "a"), auto.key = TRUE)
 ```
 
 Note que várias outras combinações são possíveis, assim como outras
@@ -193,15 +193,15 @@ anova(lm(conversion ~ (x1 * x2 * x3 * x4), data = dados))
 ```
 
 Uma forma de verificar quais efeitos são importantes é através de um
-gráfico de probabilidade normal para a estimativa dos efeitos. Lembre-se
-que, sob a hipótses nula, todos os parâmetros do modelo são iguais a
-zero, e pela definição do termo de erro do modelo, se os parâmetros são
-iguais a zero, então sobra apenas o erro que possui média 0 e variância
-constante $\sigma^2$. Dessa forma, se a hipótese nula for verdadeira,
-esperamos que os efeitos tenham também média 0, e fiquem em cima da
-linha em um gráfico de probabilidade normal. Os efeitos que se afastarem
-muito da linha são aqueles que possuem média diferente de zero, e
-portanto, são aqueles que temos interesse.
+**gráfico de probabilidade normal** para a estimativa dos efeitos.
+Lembre-se que, sob a hipótses nula, todos os parâmetros do modelo são
+iguais a zero, e pela definição do termo de erro do modelo, se os
+parâmetros são iguais a zero, então sobra apenas o erro que possui média
+0 e variância constante $\sigma^2$. Dessa forma, se a hipótese nula for
+verdadeira, esperamos que os efeitos tenham também média 0, e fiquem em
+cima da linha em um gráfico de probabilidade normal. Os efeitos que se
+afastarem muito da linha são aqueles que possuem média diferente de
+zero, e portanto, são aqueles que temos interesse.
 
 ```{r, fig.show='hold'}
 ## Gráfico de probabilidade normal dos efeitos estimados
@@ -221,11 +221,11 @@ m0 <- lm(conversion ~ (x1 + x2 + x3 + x4)^2, data = dados)
 anova(m0)
 ```
 
-Note que a variabilidade das interações não consideradas foi integrada
+Note que a variabilidade das interações não consideradas foi encorporada
 na soma de quadrado dos resíduos, e assim podemos agora ter uma
 estimativa para $\sigma^2$.
 
-Com esse resultado, confirmamos a hipótese leventada no gráfico de
+Com esse resultado, confirmamos a hipótese levantada no gráfico de
 probabilidades normais de que apenas 3 fatores principais e uma
 interação são importantes. A interação `x2:x3` apareceu também como
 marginalmente significativa. Por isso, podemos agora atualizar o modelo
@@ -311,18 +311,20 @@ Como resultado, podemos dizer então:
    produz algum efeito na conversão. Na prática isso significa que o
    nível de pressão não interfere na resposta, e assim pode ser
    escolhido aquele nível que otimize alguma outra resposta, como por
-   exemplo o custo ou o tempode operação.
-4. Ver figura abaixo (mas acho que não vai ajudar).
-
+   exemplo o custo ou o tempo de operação.
 
 ```{r}
 with(dados, interaction.plot(x4, x2, conversion))
 ```
 
+Uma vez que o fator pressão (`x3`) não interfere no processo, podemos
+tentar olhar o que acontece com a interação dos fatores que permaneceram
+como influentes.
+
 ```{r}
 ## Tentativa de visualização
-xyplot(conversion ~ factor(x1) | x3, groups = interaction(x2,x4),
-       data = dados,  type = c("p", "l"), auto.key = TRUE)
+xyplot(conversion ~ factor(x2) + factor(x4) | x1,
+       data = dados,  type = c("p", "a"), auto.key = TRUE)
 ```
 
 Com esses resultados, vemos então que o experimento incial $2^4$, pode
@@ -330,15 +332,15 @@ agora ser reduzido para um experimento fatorial $2^3$, processo
 denominado de **projeção de um experimento fatorial**. A partir desse
 ponto, o experimentador possui duas opções:
 
-1. Fazer um novo experimento, agora com apenas estes dois fatores e com
-um número maior de repetições: projeção
-2. Fazer um novo experimento com estes dois fatores e, se desejado,
+1. Fazer um novo experimento, agora com apenas estes três fatores e com
+um número maior de repetições: **projeção**
+2. Fazer um novo experimento com estes três fatores e, se desejado,
 outros fatores que não foram considerados no primeiro experimento. Nesse
 caso é preciso lembrar que as podem haver interações entre estes novos
 fatores e aqueles que foram descartados no primeiro experimento, e isto
 não está sendo considerado neste caso.
 
-Para avaliar as suposições do modelo podemos fazer um gráfico de quantis
+Para avaliar a suposição de normalidade podemos fazer um gráfico de quantis
 normais para os resíduos:
 
 ```{r}
@@ -366,22 +368,50 @@ with(dados, {
 par(mfrow = c(1, 1))
 ```
 
-Como já vimos, as predições para experimentos fatorias nada mais são do
-que as estimativas das médias para cada combinação dos fatores.
+Como já vimos, as predições para experimentos fatoriais nada mais são do
+que as estimativas das médias para cada combinação dos fatores,
+incluindo a interação quando houver. Note que quando existe interação, o
+modelo não é mais aditivo, e portanto, as médias simples, calculadas
+apenas com fatores principais não serão estimativas corretas para o
+experimento. Portanto, as médias estimadas só levam em consideração a
+mudança nos níveis dos fatores importantes para o processo, independente
+dos níveis dos outros fatores.
 
 ```{r}
 ## Predição para as combinações únicas dos fatores
 pred <- data.frame(x1 = dados$x1,
                    x2 = dados$x2,
-                   x4 = dados$x4,
-                   x2x4 = dados$x2 * dados$x4)
+                   x4 = dados$x4)
 pred$y <- predict(m2, newdata = pred)
 pred
-## Verificar essas contas e combinar com proj()
+```
+
+Note que a **projeção** do experimento, conforme vimos usando a função
+`proj()` é exatamente a mesma coisa que a predição do modelo final para
+cada nível dos fatores:
+
+```{r}
+## Projeção do experimento com proj()
 proj(m2)
-apply(proj(m2)[,-6], 1, sum)
-cbind(pred, apply(proj(m2)[,-6], 1, sum))
-## É isso mesmo!
+cbind(pred, yproj = apply(proj(m2)[,-6], 1, sum))
+```
+
+Como os fatores são quantitativos, podemos também fazer a predição para
+um **grid** de valores entre os níveis baixo e alto. Os gráficos gerados
+a partir destas predições são chamados de gráficos de **superfície de
+resposta de primeira ordem**.
+
+```{r}
+## Predição para um intervalo de valores entre os níveis baixo e alto
+## dos fatores
+pred <- expand.grid(x1 = seq(-1, 1, length.out = 30),
+                    x2 = seq(-1, 1 ,length.out = 30),
+                    x4 = seq(-1, 1 ,length.out = 30))
+pred$y <- predict(m2, newdata = pred)
+## Vários formas de visualizar
+wireframe(y ~ x2 + x4, data = pred, drape = TRUE)
+levelplot(y ~ x2 + x4, data = pred, cuts = 90,
+          col.regions = heat.colors)
 ```
 
 # Análise de um experimento $2^6$
