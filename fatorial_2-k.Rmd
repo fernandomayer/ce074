@@ -18,6 +18,10 @@ opts_chunk$set(
            )
 ```
 
+```{r external-code, cache=FALSE, include=FALSE}
+knitr::read_chunk("scripts/fatorial_2-k_respostas.R")
+```
+
 # Introdução
 
 A medida que o número de fatores cresce em um experimento fatorial,
@@ -427,3 +431,28 @@ levelplot(y ~ x2 + x4, data = pred, cuts = 90,
 # Análise de um experimento $2^6$
 
 Ver [script](scripts/script_fatorial_2-6.R).
+
+# Exercícios
+
+Exercícios de [Box, Hunter e Hunter
+(2005)](http://statisticsforexperimenters.net), capitulo 5:
+
+1. Adicione qualquer constante aos níveis altos (+1) da resposta de
+   qualquer fator do exemplo inicial de fatorial $2^4$ (dados
+   [aqui]("http://leg.ufpr.br/~fernandomayer/data/BHH2/tab0510a.dat")).
+   Verifique que somente aquele único contraste será afetado. Da mesma
+   forma, verifique que se uma constante for adicionada à todas as
+   observações, somente a média geral será alterada.
+```{r ex1, eval=FALSE, include=FALSE}
+```
+2. Para os dados disponíveis
+   [aqui](http://leg.ufpr.br/~fernandomayer/data/BHH2/exe0503.dat),
+   calcule os efeitos principais, interações e erro-padrão.
+```{r ex2, eval=FALSE, include=FALSE}
+```
+3. Com os mesmos dados do exercício anterior, considere que cada
+   repetição é na verdade um bloco. Dessa forma, o experimento passa a
+   ser um fatorial $2^3$ em blocos completos. Calcule novamente os
+   efeitos e o erro-padrão e verifique as diferenças obtidas.
+```{r ex3, eval=FALSE, include=FALSE}
+```
