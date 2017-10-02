@@ -314,7 +314,6 @@ Como resultado, podemos dizer então:
    Veja também que o efeito calculado de 4.5 é obtido através dos
    contrastes destes dois fatores, calculados como se fosse um
    experimento $2^2$: [(65.25 + 83.75) - (55.25 + 84.75)]/4 = 4.5.
-   (INSERIR MEDIAS NO GRAFICO).
 3. O fator pressão (`x3`) é essencialmente **inerte**, ou sem
    significância (pelo menos para este experimento), uma vez que nem seu
    efeito principal, nem nenhuma interação com qualquer outro fator
@@ -323,8 +322,13 @@ Como resultado, podemos dizer então:
    escolhido aquele nível que otimize alguma outra resposta, como por
    exemplo o custo ou o tempo de operação.
 
-```{r}
+```{r, fig.show='hold'}
 with(dados, interaction.plot(x4, x2, conversion))
+meds <- with(dados, tapply(conversion, factor(x2):factor(x4), mean))
+text(1, meds[1], labels = meds[1], pos = 3)
+text(2, meds[2], labels = meds[2], pos = 3)
+text(1, meds[3], labels = meds[3], pos = 1)
+text(2, meds[4], labels = meds[4], pos = 1)
 ```
 
 Uma vez que o fator pressão (`x3`) não interfere no processo, podemos
