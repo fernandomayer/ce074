@@ -76,7 +76,8 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
 - **28/09**: Experimentos fatorias $2^3$. Representação geométrica e
   tabela de contrastes. Avaliação do modelo, análise dos resíduos e
   predição. Ver [material](fatorial_2-3.html).
-- **02/10**:
+- **02/10**: Experimentos fatorias $2^k$, $k > 3$. Ver
+  [material](fatorial_2-k.html).
 - **05/10**:
 - **09/10**: **Prova 1**.
 - **12/10**: Feriado.
