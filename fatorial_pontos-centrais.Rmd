@@ -89,7 +89,7 @@ um grau de liberdade, então $SQ_{curv} = MQ_{curv}$) para testar a
 curvatura. Note que quando a equação (@sqcurv) acima for dividida por
 $\hat{\sigma}^2 = MQ_{Res}$, o resultado será similar ao quadrado da
 estatística $t$ usada para comparar duas médias, o que equivale a um
-teste $F$.
+teste F.
 
 Mais especificamente, quando pontos centrais são adicionados à um
 experimento $2^k$, então o teste para curvatura (usando a equação acima)
@@ -117,7 +117,8 @@ modelo de primeira ordem (@1ord) que estima efeitos principais e
 interações apenas, é adequado para descrever o fenômeno. Por outro lado,
 a existência de falta de ajuste indica que para pelo menos um dos $k$
 fatores existe uma relação não linear e que este fator está perto da sua
-região experimental ótima.
+região experimental ótima (isso será melhor explorado na metodologia de
+superfície de resposta).
 
 Quando isso acontecer, os próximos experimentos devem ser planejados de
 forma a pertimitir estimação de termos quadráticos para capturar essa
@@ -268,24 +269,28 @@ $$
 que, sob $H_0$, possui distribuição $F$ com $1$, e $n_C - 1$ graus de
 liberdade.
 
-## Exemplos
+# Exemplos
+
+## Fatorial $2^2$ + 5 pontos centrais
 
 ```{r mont146}
+##----------------------------------------------------------------------
+## Importação e definições
 url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-6.csv"
 dados <- read.csv(url)
 str(dados)
-
 ## Definições
 k <- 2
 a <- b <- 2
 r <- 1
 n <- r*2^k
 
+##----------------------------------------------------------------------
+## Análise exploratória
 with(subset(dados, Tempo != 0),
      interaction.plot(Tempo, Temperatura, Rendimento))
 with(subset(dados, Tempo == 0),
             points(x = 1.5, y = mean(Rendimento), pch = 16, col = 2))
-
 wireframe(Rendimento ~ Tempo + Temperatura, data = dados, drape = TRUE)
 
 ##----------------------------------------------------------------------
@@ -294,13 +299,19 @@ tab <- model.matrix(~ Tempo * Temperatura, data = dados)
 tab
 
 ##----------------------------------------------------------------------
-## Cálculo dos contrastes
-y <- dados$Rendimento
+## Cálculo dos contrastes e efeitos
 ## Contrastes
-(contr <- t(tab[, -1]) %*% y)
+(contr <- t(tab[, -1]) %*% dados$Rendimento)
+## Efeitos
+(ef <- contr/(r*2^(k-1)))
+```
 
-##----------------------------------------------------------------------
-## Teste manual para a falta de ajuste
+Note que os pontos centrais, por serem definidos no ponto (0,0) não são
+considerados efeitos, e por isso não são estimados.
+
+O teste manual para falta de ajuste pode ser feito da seguinte forma:
+
+```{r}
 ## Separa os pontos fatoriais dos centrais e calcula tamanho das
 ## amostras
 yf <- dados$Rendimento[dados$Tempo != 0] # y dos pontos fatoriais
@@ -310,79 +321,126 @@ yc <- dados$Rendimento[dados$Tempo == 0] # y do ponto central (0,0)
 ## Médias
 c(mean(yf), mean(yc))
 diff(c(mean(yf), mean(yc)))
+```
 
-## A SQ do erro puro mede a distância das observações do ponto central
-## em relação à sua média
+A SQ do erro puro mede a distância das observações do ponto central em
+relação à sua média
+
+```{r}
 (SQpuro <- sum((yc - mean(yc))^2))
-## Como só existe uma média, então essa SQ está associada à n_c - 1
-## graus de liberdade. Dessa forma, podemos obter uma estimativa do
-## "erro puro", ou seja, independente do modelo adotado
-(MQpuro <- SQpuro/(nc-1))
+```
 
-## Agora podemos calcular a SQ devido à curvatura, ou à falta de ajuste,
-## conforme mostrado anteriormente
+Como só existe uma média, então essa SQ está associada à $n_c - 1$ graus
+de liberdade. Dessa forma, podemos obter uma estimativa do "erro puro",
+ou seja, independente do modelo adotado
+
+```{r}
+(MQpuro <- SQpuro/(nc-1))
+```
+
+Agora podemos calcular a SQ devido à curvatura, ou à falta de ajuste,
+conforme mostrado anteriormente
+
+```{r}
 ## lof = lack of fit
 (SQlof <- (nf * nc * (mean(yc) - mean(yf))^2)/(nf + nc))
-## que possui apneas um grau de liberdade (portanto SQlof = MQlof).
-## Como vimos, o teste F para a falta de ajuste vem da razão entre MQlof
-## e MQpuro
+```
+
+que possui apneas um grau de liberdade (portanto SQlof = MQlof).
+Como vimos, o teste F para a falta de ajuste vem da razão entre MQlof
+e MQpuro
+
+```{r}
 (Flof <- SQlof/MQpuro)
 ## Calculando o p-valor associado, temos
 pf(Flof, 1, nc - 1, lower.tail = FALSE)
-## Ou seja, não rejeitamos a hipótese de que o modelo linear é adequado
-## (ou de que não existe falta de ajuste)
+```
 
+Ou seja, não rejeitamos a hipótese de que o modelo linear é adequado (ou
+de que não existe falta de ajuste).
 
+Fazendo através das funções do R, podemos adotar a seguinte abordagem:
 
-##----------------------------------------------------------------------
-## Ajustes dos modelos
+```{r}
 ## Modelo desconsiderando os pontos centrais
 m0 <- lm(Rendimento ~ Tempo * Temperatura, data = dados,
          subset = Tempo != 0)
 anova(m0)
-## Note que dessa forma não temos uma estimativa do erro
+```
+
+Note que dessa forma não temos uma estimativa do erro.
+
+```{r}
 ## Modelo considerando os pontos centrais
 m1 <- lm(Rendimento ~ Tempo * Temperatura, data = dados)
 anova(m1)
-## Mesmo sem repetição dos fatores, obtemos uma estimativa do erro
-## devido às repetições do ponto central. Mas note que essa estimativa
-## pode ser viesada pois não consideramos um termo quadrático no modelo
-## para incorporar a falta de ajuste. Caso não exista falta de ajuste,
-## ou seja o modelo linear é adequado, então esta estimativa está
-## correta (não viesada). Mas se o modelo linear não for adequado a
-## estimativa será viesada. Para incluir um termo que define a falta de
-## ajuste podemos criar uma nova variável indicadora para os pontos
-## fatoriais e os pontos centrais. Obtemos esse termo elevendo qualquer
-## coluna de fator ao quadrado:
+```
+
+Mesmo sem repetição dos fatores, obtemos uma estimativa do erro devido
+às repetições do ponto central. Mas note que essa estimativa pode ser
+viesada pois não consideramos um termo quadrático no modelo para
+incorporar a falta de ajuste. Caso não exista falta de ajuste, ou seja o
+modelo linear é adequado, então esta estimativa está correta (não
+viesada). Mas se o modelo linear não for adequado a estimativa será
+viesada. Para incluir um termo que define a falta de ajuste podemos
+criar uma nova variável indicadora para os pontos fatoriais e os pontos
+centrais. Obtemos esse termo elevendo qualquer coluna de fator ao
+quadrado:
+
+```{r}
 dados$lof <- dados$Tempo^2
-## lof aqui significa "lack of fit". Note que essa coluna somente indica
-## quais observações são dos eixos fatoriais e quais são do ponto
-## central
+```
+lof aqui significa "lack of fit". Note que essa coluna somente indica
+ quais observações são dos eixos fatoriais e quais são do ponto
+ central
+
+```{r}
 dados
-## Isso irá fazer com que a média do plano fatorial (\bar{y}_f) seja
-## contrastada com a média do plano dos pontos centrais (\bar{y}_c).
-## Agora podemos ajustar um novo modelo com esse termo
+```
+
+Isso irá fazer com que a média do plano fatorial (\bar{y}_f) seja
+contrastada com a média do plano dos pontos centrais (\bar{y}_c).
+Agora podemos ajustar um novo modelo com esse termo
+
+```{r}
 m2 <- lm(Rendimento ~ Tempo * Temperatura + lof, data = dados)
 anova(m2)
-## O ideal é que a SQlof seja a última linha do quadro de ANOVA, porém,
-## como nesses modelos existe ortogonalidade entre os efeitos, isso deixa
-## de ter importância. Note que o teste F para SQlof está de fato
-## testando se esse termo é importante, ou em outras palavras, se a
-## diferença entre as médias dos eixos dos fatores é significativa. Um
-## TRV entre os modelos com e sem lof mostra o mesmo resultado.
+```
+
+O ideal é que a SQlof seja a última linha do quadro de ANOVA, porém,
+como nesses modelos existe ortogonalidade entre os efeitos, isso deixa
+de ter importância. Note que o teste F para SQlof está de fato testando
+se esse termo é importante, ou em outras palavras, se a diferença entre
+as médias dos eixos dos fatores é significativa. Um TRV entre os modelos
+com e sem lof mostra o mesmo resultado.
+
+```{r}
 anova(m2, m1)
-## Nesse caso, não rejeitamos a hipótese de que essas médias são iguas
-## e concluimos que não há falta de ajuste, e que o modelo linear é
-## adequado. Assim, podemos redefinir o modelo sem esse termo
+```
+
+Nesse caso, não rejeitamos a hipótese de que essas médias são iguas e
+concluimos que não há falta de ajuste, e que o modelo linear é adequado.
+Assim, podemos redefinir o modelo sem esse termo
+
+```{r}
 mf <- update(m2, . ~ . -lof)
 anova(mf)
-## Como a interação também é não significativa, então também a retiramos
-## do modelo
+```
+
+Como a interação também é não significativa, então também a retiramos do
+modelo
+
+```{r}
 mf <- update(mf, . ~ . -Tempo:Temperatura)
 anova(mf)
-## Dessa forma temos uma estimativa de erro não viesada e um modelo
-## parcimonioso para descrever o processo.
+```
 
+Dessa forma temos uma estimativa de erro não viesada e um modelo
+parcimonioso para descrever o processo.
+
+Podemos então avaliar os resíduos e fazer as predições:
+
+```{r}
 ##----------------------------------------------------------------------
 ## Residuos do modelo
 res <- residuals(mf)
@@ -421,98 +479,99 @@ levelplot(y ~ Tempo + Temperatura, data = pred, cuts = 90,
           col.regions = heat.colors)
 ```
 
-```{r, eval=FALSE, echo=FALSE, include=FALSE}
-##======================================================================
-## Exercício 14-17, pg 354, Montgomery, Estatística aplicada e
-## probabilidade para Engenheiros, 4 ed.  Um experimento foi realizado
-## em uma planta de fabricação de semicondutores, como um esforço para
-## aumentar o rendimento. Cinco fatores, cada um com dois níveis, foram
-## estudados. Os fatores (e níveis) foram A = abertura (peq, grande), B
-## = tempo de exposição (20% abaixo, 20% acima do valor nominal), C =
-## tempo de desenvolvimento (30, 40 s), D = dimensão da máscara (peq,
-## grande), e E = tempo de ataque químico (14.5, 15.5 min). Foi
-## realizado um planejamento 2^5+5 pontos centrais. Os dados estão
-## disponíveis abaixo.  a) construa um gráfico de probabilidade normal
-## dos efeitos estimados. Que efeitos parecem ser grandes; b) conduza a
-## análise de variância para confirmar suas descobertas do item (a); c)
-## estime o erro experimental usando os pontos centrais e conduza a
-## análise de variância para testar a falta de ajuste; d) avalie os
-## pressupostos por meio de análise gráfica dos resíduos; e) projete o
-## planejamento 2^5 deste problema em um planejamento 2^k, k<5, nos
-## fatores importantes.
+## Fatorial $2^5$ + 5 pontos centrais
 
+Um experimento foi realizado em uma planta de fabricação de
+semicondutores, como um esforço para aumentar o rendimento. Cinco
+fatores, cada um com dois níveis, foram estudados. Os fatores (e níveis)
+foram A = abertura (peq, grande), B = tempo de exposição (20% abaixo,
+20% acima do valor nominal), C = tempo de desenvolvimento (30, 40 s), D
+= dimensão da máscara (peq, grande), e E = tempo de ataque químico
+(14.5, 15.5 min). Foi realizado um planejamento 2^5 + 5 pontos centrais.
+Com isso:
+
+a. Construa um gráfico de probabilidade normal dos efeitos estimados.
+Que efeitos parecem ser grandes?
+b. Conduza a análise de variância para confirmar suas descobertas do
+item (a).
+c. Estime o erro experimental usando os pontos centrais e conduza a
+análise de variância para testar a falta de ajuste.
+d. Avalie os pressupostos por meio de análise gráfica dos resíduos.
+e. Projete o planejamento $2^5$ deste problema em um planejamento $2^k$,
+$k<5$, nos fatores importantes.
+
+
+```{r mont1417}
+##----------------------------------------------------------------------
+## Dados e definições
 url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-17.txt"
 da <- read.csv(url, sep = "\t")
 str(da)
 r <- 1
 k <- 5
 
-#------------------------------------------------------------------------------------------
-# a) gráfico q-q dos efeitos
+##----------------------------------------------------------------------
+## a) Gráfico q-q dos efeitos
+tab <- model.matrix(~ A * B * C * D * E, data = da)
+contr <- t(tab[, -1]) %*% da$Y
+(ef <- contr/(r * 2^(k-1)))
+aux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
+text(aux$x, aux$y, rownames(aux$y), cex = 0.8, pos = 3)
 
-X <- model.matrix(~A*B*C*D*E, data=da)
-
-contr <- t(X[,-1])%*%da$Y
-contr
-
-ef <- contr/(r * 2^(k-1))
-
-aux <- qqnorm(ef, col=2, pch=19); qqline(ef)
-text(aux$x, aux$y, rownames(aux$y), cex=0.8, pos=3)
-
-# Destaque para termos até segunda ordem. Ajustar modelo compatível com essa impressão.
-
-#------------------------------------------------------------------------------------------
-# b) análise de variância para confirmar impressões de (a)
-
-m0 <- lm(Y~(A+B+C+D+E)^2, data=da)
+##----------------------------------------------------------------------
+## b) Análise de variância para confirmar impressões de (a)
+m0 <- lm(Y ~ (A + B + C + D + E)^2, data = da)
 anova(m0)
 
-#------------------------------------------------------------------------------------------
-# c) avaliar se existe falta de ajuste
+##----------------------------------------------------------------------
+## c) Avaliar se existe falta de ajuste
 
-da$lof <- da$A^2 # cria coluna que permite avaliar a falta de ajuste
+## Separa os pontos fatoriais dos centrais e calcula tamanho das
+## amostras
+yf <- da$Y[da$A != 0] # y dos pontos fatoriais
+yc <- da$Y[da$A == 0] # y do ponto central (0,0)
+(nf <- length(yf))
+(nc <- length(yc))
+## Médias
+c(mean(yf), mean(yc))
+diff(c(mean(yf), mean(yc)))
+## Erro experimental usando pontos centrais
+(SQpuro <- sum((yc - mean(yc))^2))
+(MQpuro <- SQpuro/(nc-1))
 
-m1 <- lm(Y~(A+B+C+D+E)^2+lof, data=da)
+## Teste para falta de ajuste
+da$lof <- da$A^2
+m1 <- lm(Y ~ (A + B + C + D + E)^2 + lof, data = da)
 anova(m1)
-
 anova(m0, m1)
 
-da$lof2 <- ifelse(da$A==0, 1, 0)
+##----------------------------------------------------------------------
+## d) Avaliação dos pressupostos
+## Para o modelo sem lof
+res.m0 <- residuals(m0)
+qqnorm(res.m0); qqline(res.m0)
 
-m2 <- lm(Y~(A+B+C+D+E)^2+lof2, data=da)
-anova(m1)
-anova(m2)
+## Para o modelo com lof
+res.m1 <- residuals(m1)
+qqnorm(res.m1); qqline(res.m1)
 
-anova(m1, m2)
-
-coef(m1)
-coef(m2) # soh muda o sinal da lof, mas faz mais sentido
-
-#------------------------------------------------------------------------------------------
-# d) avaliação dos pressupostos
-
-par(mfrow=c(2,2))
-plot(m0)          # observações dos pontos centrais se destacam indicando falta de ajuste
-layout(1)
-
-par(mfrow=c(2,2))
-plot(m1)          # ok
-layout(1)
-
-#------------------------------------------------------------------------------------------
-# e) projete um experimento 2^k, k<5.
+##----------------------------------------------------------------------
+## e) Projeção do experimento
 ## Os fatores D e E podem ser desconsiderados nos próximos ensaios. Então reduz-se o estudo
-## à 3 fatores. Devido a existência de falta de ajuste, o planejamento dos próximos
-## experimentos deve permitir estimar efeitos quadráticos. Pode-se usar, por exemplo,
-## experimentos fatoriais com pontos centrais e axiais.
-
-
+## à 3 fatores.
+## Modelo final, mantendo apenas fatores importantes
+mf <- lm(Y ~ A + B + C + A:B + lof, data = da)
+anova(mf)
+## Note que o experimento foi reduzido para um fatorial 2^k. Devido a
+## existência de falta de ajuste, o planejamento dos próximos
+## experimentos deve permitir estimar efeitos quadráticos. Pode-se usar,
+## por exemplo, experimentos fatoriais com pontos centrais e axiais
+## (metodologia de superfície de resposta).
 ```
 
 # Exercícios
 
-```{r}
+```{r, eval=FALSE, include=FALSE}
 ##======================================================================
 ## Exercício 14-23, pg 356, Montgomery, Estatística aplicada e
 ## probabilidade para Engenheiros, 4 ed.  Considere um experimento
@@ -548,4 +607,42 @@ Ff <- SQf/(SQpura/(nc-1))
 pf(Ff, 1, nc-1, lower=FALSE)
 
 anova(lm(y ~ A*B, data = da))
+```
+
+```{r, eval=FALSE, include=FALSE}
+url <- "http://leg.ufpr.br/~fernandomayer/data/montgomery_ICEQ_ex_13.9.csv"
+dados <- read.csv(url)
+str(dados)
+
+## Definições
+k <- 4
+a <- b <- c <- d <- 2
+r <- 1
+n <- (r*2^k)
+
+##----------------------------------------------------------------------
+## Montando a tabela de sinais
+tab <- model.matrix(~ A * B * C * D, data = dados)
+tab
+
+##----------------------------------------------------------------------
+## Cálculo dos contrastes e efeitos
+## Contrastes
+(contr <- t(tab[, -1]) %*% dados$y)
+## Efeitos
+(ef <- contr/(r*2^(k-1)))
+
+aux <- qqnorm(ef, col=2, pch=19); qqline(ef)
+text(aux$x, aux$y, rownames(aux$y), cex=0.8, pos=3)
+
+
+m0 <- lm(y ~ (A + B + C + D)^2, data = dados)
+anova(m0)
+
+## Avalia se existe falta de ajuste
+dados$lof <- dados$A^2
+m1 <- lm(y ~ (A + B + C + D)^2 + lof, data = dados)
+anova(m1)
+
+## Nao tem lof, fazer a seleção e predição
 ```
