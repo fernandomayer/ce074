@@ -40,6 +40,8 @@ navbar:
         href: fatorial_2-2.html
       - text: "Experimentos fatorias 2^3 [HTML]"
         href: fatorial_2-3.html
+      - text: "Experimentos fatorias 2^k, k > 3 [HTML]"
+        href: fatorial_2-k.html
       - text: "----------"
       - text: "Scripts"
       - text: "Tipos de contrastes em modelos lineares [R]"
@@ -48,6 +50,8 @@ navbar:
         href: scripts/script_catalisador.R
       - text: "Análise completa de um fatorial 2^2 [R]"
         href: scripts/script_fatorial_2-2.R
+      - text: "Análise completa de um fatorial 2^6 [R]"
+        href: scripts/script_fatorial_2-6.R
       - text: "----------"
       - text: "Exercícios"
       - text: "Revisão de conhecimento [PDF]"
