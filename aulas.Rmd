@@ -78,7 +78,8 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
   predição. Ver [material](fatorial_2-3.html).
 - **02/10**: Experimentos fatorias $2^k$, $k > 3$. Ver
   [material](fatorial_2-k.html).
-- **05/10**:
+- **05/10**: Adição de pontos centrais em fatoriais $2^k$. Ver
+  [material](fatorial_pontos-centrais.html).
 - **09/10**: **Prova 1**.
 - **12/10**: Feriado.
 - **16/10**:
