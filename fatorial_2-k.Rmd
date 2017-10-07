@@ -460,3 +460,6 @@ Exercícios de [Box, Hunter e Hunter
    efeitos e o erro-padrão e verifique as diferenças obtidas.
 ```{r ex3, eval=FALSE, include=FALSE}
 ```
+
+As respostas podem ser consultadas neste
+[script](scripts/fatorial_2-k_respostas.R).
