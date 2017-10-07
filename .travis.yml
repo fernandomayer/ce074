@@ -19,6 +19,7 @@ install:
   - pandoc --version
   - sudo apt-get install r-base
   - sudo apt-get install tree
+  - sudo apt-get install libnlopt-dev
   - "[ ! -d ~/R ] && mkdir ~/R"
   - R --version
   - Rscript -e '.libPaths(); sessionInfo()'
