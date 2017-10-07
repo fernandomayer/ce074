@@ -42,6 +42,8 @@ navbar:
         href: fatorial_2-3.html
       - text: "Experimentos fatorias 2^k, k > 3 [HTML]"
         href: fatorial_2-k.html
+      - text: "Adição de pontos centrais em planejamentos 2^k [HTML]"
+        href: fatorial_pontos-centrais.html
       - text: "----------"
       - text: "Scripts"
       - text: "Tipos de contrastes em modelos lineares [R]"
