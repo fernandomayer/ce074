@@ -102,27 +102,3 @@ summary(m1)
 ## O erro-padrão dos efeitos se altera pois o QM do resíduo foi alterado
 ## com a inclusão do bloco. OS EPs ficaram menores quando se
 ## consideraram blocos.
-
-##======================================================================
-## Como obter a variância usando variâncias ponderadas?
-myvar <- function(x){
-    n <- length(x)
-    mv <- var(x) * ((n-1)/n)
-    return(mv)
-}
-
-sum(8*apply(db[, 8:10], 2, myvar))/24
-sum(8*apply(db[, 8:10], 2, var))/24
-
-## Exe 5.2
-## Os dados nao sao esses
-url <- "http://leg.ufpr.br/~fernandomayer/data/BHH2/exe0502.dat"
-db <- read.table(url, header = TRUE)
-str(db)
-## Definições
-k <- 3
-r <- 1
-## Calcula os contrastes e efeitos para poder comparar depois
-tab <- model.matrix(~ temp * conc * catalyst, data = db)
-contr <- t(tab[, -1]) %*% db$yield
-ef <- contr/(r * 2^(k-1))
