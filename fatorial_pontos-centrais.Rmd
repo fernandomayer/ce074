@@ -18,6 +18,11 @@ opts_chunk$set(
            )
 ```
 
+
+```{r external-code, cache=FALSE, include=FALSE}
+knitr::read_chunk("scripts/fatorial_pontos-centrais_respostas.R")
+```
+
 # Introdução
 
 Nos experimentos $2^k$, pelo fato de usarmos apenas 2 níveis de cada
@@ -562,87 +567,43 @@ qqnorm(res.m1); qqline(res.m1)
 ## Modelo final, mantendo apenas fatores importantes
 mf <- lm(Y ~ A + B + C + A:B + lof, data = da)
 anova(mf)
-## Note que o experimento foi reduzido para um fatorial 2^k. Devido a
-## existência de falta de ajuste, o planejamento dos próximos
-## experimentos deve permitir estimar efeitos quadráticos. Pode-se usar,
-## por exemplo, experimentos fatoriais com pontos centrais e axiais
-## (metodologia de superfície de resposta).
 ```
+
+Note que o experimento foi reduzido para um fatorial $2^3$. Devido a
+existência de falta de ajuste, o planejamento dos próximos experimentos
+deve permitir estimar efeitos quadráticos. Pode-se usar, por exemplo,
+experimentos fatoriais com pontos centrais e axiais (metodologia de
+superfície de resposta).
+
+Note também que a inclusão da coluna `lof` não significa que estamos
+ajustando um modelo com termos quadráticos (de segunda ordem). Essa
+coluna serve apenas para indicar um contraste entre duas médias (dos
+pontos fatoriais e centrais) e testar se existe falta de ajuste. Caso a
+falta de ajuste exista, então devemos **planejar** o próximo experimento
+de forma que seja possível estimar termos quadráticos.
 
 # Exercícios
 
-```{r, eval=FALSE, include=FALSE}
-##======================================================================
-## Exercício 14-23, pg 356, Montgomery, Estatística aplicada e
-## probabilidade para Engenheiros, 4 ed.  Considere um experimento
-## fatorial 2² com 4 pontos centrais. Os dados são (1)=21, a=125, b=154,
-## ab=352 e as respostas no ponto central são 92, 130, 98, 152. Calcule
-## uma ANOVA com a soma de quadrados para a curvatura (lof) e faça o
-## teste F, use alpha=0.05.
-da <- data.frame(A = c(-1,1,-1,1,0,0,0,0),
-                 B = c(-1,-1,1,1,0,0,0,0),
-                 y = c(21,125,154,352,92,130,98,152))
-
-## Tabela de sinais
-X <- model.matrix(~A*B, data=da)
-X
-
-nr <- 1; k <- 2           # nº de repetições e fatores
-contr <- t(X[,-1])%*%da$y # contrastes
-SQf <- contr^2/(n * 2^k)     # soma de quadrado dos fatores
-SQf
-
-yf <- da$y[da$A!=0] # y dos pontos fatoriais
-yc <- da$y[da$A==0] # y do ponto central (0,0)
-nf <- length(yf)
-nc <- length(yc)
-
-SQlof <- nf*nc*(mean(yc)-mean(yf))^2/(nf+nc) # soma de quadrado devido à lof
-SQpura <- sum((yc-mean(yc))^2) # soma de quadrados do erro puro
-
-Flof <- SQlof/(SQpura/(nc-1))
-pf(Flof, 1, nc-1, lower=FALSE) # não significativo
-
-Ff <- SQf/(SQpura/(nc-1))
-pf(Ff, 1, nc-1, lower=FALSE)
-
-anova(lm(y ~ A*B, data = da))
+1. (Montgomery, EAPE, ex. 14-23) Considere um experimento
+fatorial $2^2$ com 4 pontos centrais. Os dados estão disponíveis
+[aqui](http://leg.ufpr.br/~fernandomayer/data/montgomery_ex_14-23.txt).
+Calcule uma ANOVA com a soma de quadrados para a curvatura, faça a
+seleção do modelo e verifique se existe falta de ajuste.
+```{r ex1, eval=FALSE, include=FALSE}
+```
+2. (Montgomery, ICEQ, exemplo 13.9) Um artigo em *Solid State
+   Technology* descreve a aplicação de planejamentos fatoriais no
+   desenvolvimento de um processo de gravação por nitreto em um gravador
+   de plasma de placa única. O processo usa $C_2F_6$ como o gás
+   reagente. Os autores usaram uma única replicação de um planejamento
+   $2^4$ para estudar esse processo. Os fatores testados foram:
+   espaçamento (A-: 0.8, A+: 1.2), pressão (B-: 450, B+: 550), fluxo de
+   $C_2F_6 (C-: 125, C+: 200)$, potência (D-: 275, D+: 325). Foram
+   também adicionados 4 pontos centrais. Os dados estão disponíveis
+   [aqui](http://leg.ufpr.br/~fernandomayer/data/montgomery_ICEQ_ex_13.9.csv).
+   Faça a ANOVA, avalie o modelo e verifique se existe falta de ajuste.
+```{r ex2, eval=FALSE, include=FALSE}
 ```
 
-```{r, eval=FALSE, include=FALSE}
-url <- "http://leg.ufpr.br/~fernandomayer/data/montgomery_ICEQ_ex_13.9.csv"
-dados <- read.csv(url)
-str(dados)
-
-## Definições
-k <- 4
-a <- b <- c <- d <- 2
-r <- 1
-n <- (r*2^k)
-
-##----------------------------------------------------------------------
-## Montando a tabela de sinais
-tab <- model.matrix(~ A * B * C * D, data = dados)
-tab
-
-##----------------------------------------------------------------------
-## Cálculo dos contrastes e efeitos
-## Contrastes
-(contr <- t(tab[, -1]) %*% dados$y)
-## Efeitos
-(ef <- contr/(r*2^(k-1)))
-
-aux <- qqnorm(ef, col=2, pch=19); qqline(ef)
-text(aux$x, aux$y, rownames(aux$y), cex=0.8, pos=3)
-
-
-m0 <- lm(y ~ (A + B + C + D)^2, data = dados)
-anova(m0)
-
-## Avalia se existe falta de ajuste
-dados$lof <- dados$A^2
-m1 <- lm(y ~ (A + B + C + D)^2 + lof, data = dados)
-anova(m1)
-
-## Nao tem lof, fazer a seleção e predição
-```
+As respostas podem ser consultadas neste
+[script](scripts/fatorial_pontos-centrais_respostas.R).
