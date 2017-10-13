@@ -88,7 +88,7 @@ experimento.
 
 ## Exemplos
 
-### Experimento $2^2$ em blocos completos
+##### Experimento $2^2$ em blocos completos
 
 Um processo químico é investigado em relação à dois fatores e o
 experimento é conduzido em 3 blocos completos. Os resultados estão
@@ -123,7 +123,7 @@ m1 <- update(m0, . ~ . - A:B)
 anova(m1)
 ```
 
-### Experimento $2^3$ em blocos completos
+##### Experimento $2^3$ em blocos completos
 
 Uma planejamento fatorial $2^3$ foi corrido em um processo químico. Os
 fatores do planejamento são A = tempo, B = concentração, C =
@@ -154,7 +154,7 @@ m1 <- update(m0, . ~ bloco + A * C)
 anova(m1)
 ```
 
-### Comparando $2^3$ com e sem blocos
+##### Comparando $2^3$ com e sem blocos
 
 Considere os dados de um experimento descrito em [Box, Hunter e Hunter
 (2005)](http://leg.ufpr.br/~fernandomayer/data/BHH2/exe0503.dat),
@@ -269,10 +269,10 @@ sigma * sqrt(1/(12)) # porque? é a metade das observações
 A idéia central é dividir as $2^k$ UEs igualmente em dois blocos de forma
 que uma interação de ordem que não tenha interesse seja confundida com o
 efeito dos blocos. É usual usar a interação de maior ordem para fazer a
-divisão, que é simples: aquelas UEs com sinal (-) serão de um bloco e as
-de sinal (+) serão do outro. Pode-se fazer essa separação obtendo a
-coluna de sinais da interação mais alta ou usando o contraste de
-definição.
+divisão, que é relativamente simples: aquelas UEs com sinal (-) serão de
+um bloco e as de sinal (+) serão do outro. Pode-se fazer essa separação
+obtendo a **coluna de sinais** da interação mais alta ou usando o
+**contraste de definição**.
 
 ## Blocagem de um fatorial $2^2$ em dois blocos
 
@@ -305,8 +305,8 @@ estimar os efeitos dos fatores A e B são
 
 $$
 \begin{align}
-contr_A = ab + a - b - (1) \\
-contr_B = ab + b - a - (1)
+contr_A = (ab + a) - (b + (1)) \\
+contr_B = (ab + b) - (a + (1))
 \end{align}
 $$
 
@@ -318,13 +318,13 @@ e o bloco II será cancelada.
 O contraste para a interação é
 
 $$
-contr_{AB} = ab + (1) - a - b
+contr_{AB} = (ab + (1)) - (a + b)
 $$
 
 Já que as duas combinações de tratamento com sinal mais (`ab` e `(1)`)
 estão no bloco I, e as duas com sinal menos estão no bloco II (`a` e
-`b`), o efeito do bloco e da interação AB é o mesmo. Ou seja, a
-interação AB está **confundida** com os blocos.
+`b`), o efeito do bloco e da interação AB é o mesmo. Ou seja, **a
+interação AB está confundida com os blocos**.
 
 A razão para isso está clara quando analisamos a tabela de sinais para o
 planejamento $2^2$
@@ -341,8 +341,8 @@ Dessa tabela, vemos que todas as combinações de tratamentos que possuem
 sinal mais em AB são atribuídas ao bloco I, enquanto que os tratamentos
 com sinal menos em AB são atribuídas ao bloco II.
 
-Essa abordagem pode ser usada para confundir qualquer efeito (A, B, ou
-AB) com blocos. Por exemplo, se `a` e `ab` estivessem no bloco I, e
+Essa abordagem **pode ser usada para confundir qualquer efeito** (A, B,
+ou AB) com blocos. Por exemplo, se `a` e `ab` estivessem no bloco I, e
 `(1)` e `b` no bloco II, então seria o efeito A que estaria confundido
 com blocos. **A prática usual é confundir a interação de ordem mais alta
 com blocos**, já que geralmente essa interação não tem interpretação
@@ -407,22 +407,22 @@ L = \alpha_1  x_1 + \alpha_2  x_2 + \cdots + \alpha_k  x_k
 $$
 
 onde $x_i$ é o nível do $i$-ésimo fator aparecendo em uma combinação de
-tratamentos, e $\alpha_i$ é o expoente aparecendo no $i$-ésimo fator no
-efeito que deve ser confundido. Por exemplo, se o efeito a ser
-confundido for ABCD, então os valores de $\alpha_i$ serão todos iguais a
-1, pois $ABCD = A^1B^1C^1D^1$. Se o efeito a ser confundido for ACD,
-então os valores serão $\alpha_1 = \alpha_3 = \alpha_4 = 1$, e $\alpha_2
-= 0$, pois $ACD = A^1B^0C^1D^1$.
+tratamentos (codificado como 0 e 1, para baixo e alto, respectivamente),
+e $\alpha_i$ é o expoente aparecendo no $i$-ésimo fator no efeito que
+deve ser confundido. Por exemplo, se o efeito a ser confundido for ABCD,
+então os valores de $\alpha_i$ serão todos iguais a 1, pois $ABCD =
+A^1B^1C^1D^1$. Se o efeito a ser confundido for ACD, então os valores
+serão $\alpha_1 = \alpha_3 = \alpha_4 = 1$, e $\alpha_2 = 0$, pois $ACD
+= A^1B^0C^1D^1$.
 
-Dessa forma, para o sistema $2^k$, temos tanto
-$\alpha_i = 0$ ou $1$, e $x_i = 0$ (nível baixo) ou $1$ (nível
-alto). Combinações de tratamentos que produzam o mesmo valor de $L \mod
-2$ serão colocados no mesmo bloco. Como os únicos valores possíveis de
-$L \mod 2$ são 0 e 1, isso atribuirá as $2^k$ combinações de tratamentos
-à extamente dois blocos.
+Dessa forma, para o sistema $2^k$, temos tanto $\alpha_i = 0$ ou $1$, e
+$x_i = 0$ (nível baixo) ou $1$ (nível alto). Combinações de tratamentos
+que produzam o mesmo valor de $L \mod 2$ serão colocados no mesmo bloco.
+Como os únicos valores possíveis de $L \mod 2$ são 0 e 1, isso atribuirá
+as $2^k$ combinações de tratamentos à extamente dois blocos.
 
 > NOTA: a função $x \mod 2$ retorna o resto da divisão de x pelo
-> número 2. $\text{mod}$ é a função *módulo*, e no R é reprsentada por
+> número 2. $\text{mod}$ é a função *módulo*, e no R é representada por
 > `%%`.
 
 Como exemplo, considere um planejamento $2^3$, com a interação ABC (a de
@@ -454,30 +454,32 @@ abc:& \quad L = 1(1) + 1(1) + 1(1) = 3 \mod 2 = 1
 $$
 
 > NOTE que na notação $(0,1)$, a combinação `(1)` é representada por
-> 000, `a` por 100, e assim por diante.
+> 000, `a` por 100, `b` por 010, e assim por diante.
 
 Dessa forma, as combinações `(1)`, `ab`, `ac`, e `bc` são corridas no
 bloco I, enquanto que `a`, `b`, `c`, e `abc` são corridas no
 bloco 2. Veja que esta atribuição é idêntica àquela realizada ao se
-utilizar a coluna ABC da tabela de sinais. O contraste de definição é
-apenas uma generalização daquele método.
+utilizar a coluna ABC da tabela de sinais. **O contraste de definição é
+apenas uma generalização** daquele método.
 
 ## Exemplos
 
+Fatorial $2^3$ com a notação (0,1):
+
 ```{r}
-##======================================================================
-## Fatorial 2^3 com a notação (0,1)
 da <- expand.grid(A = c(0, 1),
                   B = c(0, 1),
                   C = c(0, 1))
 row.names(da) <- c("(1)", "a", "b", "ab", "c", "ac", "bc", "abc")
 da
+```
 
-## Montando o contraste de definição, considerando a interação ABC
-## confundida com bloco
+Montando o contraste de definição, considerando a interação ABC
+confundida com bloco
+
+```{r}
 ## alpha = 1,1,1 pois A, B e C estão presentes nesse efeito
 alpha <- c(1, 1, 1)
-
 ## Cálculo dos contrastes para cada combinação de tratamento, já
 ## considerando mod 2
 ## (1)
@@ -487,73 +489,101 @@ sum(alpha * da[2, ]) %% 2
 ## E assim por diante... Para facilitar podemos usar apply
 apply(da, 1, function(x) sum(alpha * x) %% 2)
 ## E criar uma função para calcular L mod 2
-contr.def <- function(alpha, x) sum(alpha * x) %% 2
+contr.def <- function(alpha, x){
+    sum(alpha * x) %% 2
+}
+## Assim podemos atribuir os blocos diretamente usando essa função
 da$bloco <- apply(da, 1, contr.def, alpha = alpha)
 da
+## Ordenando
+da[order(da$bloco), ]
 ```
 
+Dividindo um fatorial $2^4$ em dois blocos, pela tabela de sinais:
+
 ```{r}
-##======================================================================
-## Dividindo um fatorial 2^4 em dois blocos, pela tabela de sinais
 da <- do.call(expand.grid, replicate(4, list(c(-1, 1))))
 names(da) <- LETTERS[1:ncol(da)]
 row.names(da) <- apply(da, 1,
                        function(i) paste(letters[1:4][i==1], collapse = ""))
 row.names(da)[1] <- "(1)"
 da
+```
 
-## Usando a interação de ordem mais alta, ABCD, para confundir com blocos
+Usando a interação de ordem mais alta, ABCD, para confundir com blocos:
+
+```{r}
 da$ABCD <- with(da, A * B * C * D)
 da
-da <- da[order(da$ABCD),]
+da <- da[order(da$ABCD), ]
 da
+## Croqui do experimento
+matrix(row.names(da), ncol = 2,
+       dimnames = list(1:8, paste("Bloco", 1:2)))
+```
 
-##======================================================================
-## Dividindo um fatorial 2^4 em dois blocos, usando o contraste de
-## definição
+Dividindo um fatorial $2^4$ em dois blocos, usando o contraste de
+definição
+
+```{r}
+## Cria as colunas dos fatores com a notação (0,1)
 db <- do.call(expand.grid, replicate(4, list(c(0, 1))))
 names(db) <- LETTERS[1:ncol(db)]
 row.names(db) <- apply(db, 1,
                        function(i) paste(letters[1:4][i==1], collapse = ""))
 row.names(db)[1] <- "(1)"
 db
+```
 
-## Usando a interação de ordem mais alta, ABCD, para confundir com
-## blocos. Dessa forma temos
+Usando a interação de ordem mais alta, ABCD, para confundir com
+blocos:
+
+```{r}
+## Dessa forma temos:
 ## L = x_1 + x_2 + x_3 + x_4
 ## com alpha_i = 1
 alpha <- c(1, 1, 1, 1)
 db$bloco <- apply(db, 1, contr.def, alpha = alpha)
+db <- db[order(db$bloco), ]
 db
-db[order(db$bloco), ]
-
-## Para variar, vamos escolhar e interação tripla ACD para definir o
-## contraste de forma a separar as corridas em 2 blocos. Nossa função de
-## definição fica
-## L = x_1 + x_3 + x_4
-## Note que todos os coeficientes alpha são 1, com excessão de alpha_2
-## que é igual a zero, pois é o expoente de B na interação
-## ACD = A¹B°C¹D¹
-## porque o efeito usado, ACD, não contém B. Portanto o vetor alpha fica
-alpha <- c(1, 0, 1, 1)
-db$bloco2 <- apply(db[, 1:4], 1, contr.def, alpha = alpha)
-db
-db[order(db$bloco2), ]
+## Croqui do experimento
+matrix(row.names(db), ncol = 2,
+       dimnames = list(1:8, paste("Bloco", 1:2)))
 ```
 
-### Exemplo
+Para variar, vamos escolhar e interação tripla ACD para definir o
+contraste de forma a separar as corridas em 2 blocos. Nossa função de
+definição fica
 
-Exemplo 14-7, pg 357, Montgomery, Estatística aplicada e probabilidade
-para Engenheiros. Um experimento é realizado para investigar o efeito de
-quatro fatores sobre o desvio, em relação ao alvo, no disparo de um
-míssil. Os quatro fatores são: A = tipo de alvo, B = tipo de rastreador,
-C = altitude do alvo, D = distância do alvo. Cada fator pode ser
-convenientemente testado em 2 níveis e o sistema ótimo de rastreamento
-permitirá medir o desvio no disparo com a precisão de um pé. Dois
-atiradores diferentes são usados no teste de vôo e, já que há diferença
-entre operadores, os engenheiros de teste decidiram conduzir o
-planejamento $2^4$ em 2 blocos com ABCD confundido. Faça a análise
-estatística dos dados.
+$$
+L = x_1 + x_3 + x_4
+$$
+
+Note que todos os coeficientes $\alpha$ são 1, com excessão de $\alpha_2$
+que é igual a zero, pois é o expoente de B na interação
+$ACD=A^1B^0C^1D^1$, porque o efeito usado, ACD, não contém B.
+
+```{r}
+## Portanto, o vetor alpha fica
+alpha <- c(1, 0, 1, 1)
+## E usando essa definição podemos definir os blocos
+db$bloco2 <- apply(db[, 1:4], 1, contr.def, alpha = alpha)
+db <- db[order(db$bloco2), ]
+## Croqui do experimento
+matrix(row.names(db), ncol = 2,
+       dimnames = list(1:8, paste("Bloco", 1:2)))
+```
+
+Exemplo 14-7, Montgomery, EAPE. Um experimento é realizado para
+investigar o efeito de quatro fatores sobre o desvio, em relação ao
+alvo, no disparo de um míssil. Os quatro fatores são: A = tipo de alvo,
+B = tipo de rastreador, C = altitude do alvo, D = distância do alvo.
+Cada fator pode ser convenientemente testado em 2 níveis e o sistema
+ótimo de rastreamento permitirá medir o desvio no disparo com a precisão
+de um pé. Dois atiradores diferentes são usados no teste de vôo e, já
+que há diferença entre operadores, os engenheiros de teste decidiram
+conduzir o planejamento $2^4$ em 2 blocos com ABCD confundido. Faça a
+análise estatística dos dados obtidos.
 
 ```{r}
 ##----------------------------------------------------------------------
@@ -567,10 +597,10 @@ da$y <- c(3, 7, 5, 7, 6, 6, 8, 6, 4, 10, 4, 12, 8, 9, 7, 9)
 da
 
 ##----------------------------------------------------------------------
-## Definido os blocos
+## Definindo os blocos
 
 ## Pela tabela de sinais
-da$bloco <- with(da, A*B*C*D)
+da$bloco <- with(da, A * B * C * D)
 
 ## Pelo contraste de definição
 ## Antes é necessário transformar a codificação para (0,1)
@@ -583,25 +613,29 @@ db$bloco <- apply(db[, 1:4], 1, contr.def, alpha = alpha)
 ## Apenas para ilustração e verificação:
 all.equal(row.names(da[order(da$bloco), ]),
           row.names(db[order(db$bloco, decreasing = TRUE), ]))
+
 ## Note que por qualquer um dos métodos a determinação de blocos fica a
 ## mesma. Daqui pra frente tanto faz usar um ou outro. O importante é
 ## identificar que a coluna de blocos deve ser um fator para poder
 ## entrar como um termo no modelo
 da$bloco <- as.factor(da$bloco)
 
+##----------------------------------------------------------------------
+## Análise do experimento
+
 ## Aqui procedemos da mesma forma. A diferença é que como estamos
 ## colocando bloco explicitamente no modelo, e bloco está confundido com
 ## a interação ABCD, então esta última interação não é especificada, e
 ## por isso, especificamos o modelo com todas as interações até terceira
 ## ordem apenas
-X <- model.matrix(~ bloco + (A + B + C + D)^3, data = da)
-colnames(X)
+tab <- model.matrix(~ bloco + (A + B + C + D)^3, data = da)
+colnames(tab)
 
-## Calcula os contrastes, excluindo a interação e o bloco
-contr <- t(X[, -(1:2)]) %*% da$y
+## Calcula os contrastes, excluindo o intercepto e o bloco
+contr <- t(tab[, -(1:2)]) %*% da$y
 
-## Efeitos = contraste/(n2^{k-1})
-n <- 1 # sem repetições
+## Efeitos = contraste/(r2^{k-1})
+r <- 1 # sem repetições
 k <- 4
 ef <- contr/(n * 2^(k - 1))
 
@@ -617,8 +651,7 @@ anova(m0)
 m1 <- update(m0, . ~ bloco + A + C + D + A:C + A:D)
 anova(m1)
 
-## Análise dos resíduos
-par(mfrow=c(2,2)); plot(m1); layout(1)
+## Daqui em diante, a análise segue conforme visto anteriormente.
 ```
 
 # Confundimento do fatorial $2^k$ em quatro blocos
@@ -628,11 +661,12 @@ $2^{k-2}$ observações em cada. Estes experimentos são particularmente
 úteis quando o número de fatores é moderadamente alto ($k \geq 4$), e o
 tamanho dos blocos é relativamente pequeno.
 
-Como exemplo considere um experimento $2^5$. Se cada bloco deve conter 8
-corridas, então são necessários 4 blocos. Para selecionar as combinações
-de tratamento em cada bloco, devemos selecionar **dois** efeitos a serem
+Como exemplo considere um experimento $2^5$ com 32 corridas. Se cada
+bloco deve conter $2^{5-2} = 8$ corridas, então são necessários 4 blocos
+($8 \times 4 = 32$ corridas). Para selecionar as combinações de
+tratamento em cada bloco, devemos selecionar **dois** efeitos a serem
 confundidos com blocos, por exemplo, ADE e BCE. Estes efeitos possuem os
-contrastes de definição
+contrastes de definição dados por:
 
 $$
 \begin{align}
@@ -641,7 +675,7 @@ L_2 = x_2 + x_3 + x_5
 \end{align}
 $$
 
-associados à eles. Com isso, cada combinação de tratamento irá gerar um
+Com isso, cada combinação de tratamento irá gerar um
 particular par de valores de $L_1 \mod 2$ e $L_2 \mod 2$, ou seja,
 $(L_1, L_2) = (0,0), (0,1), (1,0), (1,1)$. Combinações de tratamentos
 que resultem no mesmo par de valores $(L_1, L_2)$ serão designadas para
@@ -663,8 +697,6 @@ $$
 Estas combinações de tratamentos serão atribuídas para cada um dos
 quatro blocos.
 
-<!-- figura aqui -->
-
 Devemos notar também que outra interação, além de ADE e BCE, deve estar
 confundida com bloco. Como existem 4 blocos e 3 graus de liberdade entre
 eles, e como ADE e BCE possuem 1 grau de liberdade cada, deve haver um
@@ -677,23 +709,25 @@ das propriedades da tabela de sinais) também está confundida com blocos.
 O procedimento geral para construir um experimento fatorial $2^k$ em
 quatro blocos, é escolher dois efeitos para gerar os blocos, e
 automaticamente confundir um terceiro efeito que é a interação
-generalizada dos dois efeitos iniciais. Então o experimeno é construído
+generalizada dos dois efeitos iniciais. Então o experimento é construído
 utilizando-se os dois contrastes de definição $(L_1, L_2)$ para designar
 as combinações de tratamentos aos blocos.
 
 Ao selecionar os efeitos a serem confudidos, devemos tomar cuidado para
 não escolher efeitos que sejam de interesse. Por exemplo, em um fatorial
-$2^5$, podemos escolher confundir ABCDE e ABD, que automaticamente
-também confunde CE [$(ABCDE)(ABD) = A^2B^2CD^2E = CE$], um efeito que
+$2^5$, podemos escolher confundir $ABCDE$ e $ABD$, que automaticamente
+também confunde $CE$ [$(ABCDE)(ABD) = A^2B^2CD^2E = CE$], um efeito que
 provavelmente possa ser de interesse. Uma escolha melhor é confundir ADE
 com BCE, que automaticamente confunde ABCD. É preferível sacrificar
 informação de duas interações de terceira ordem, do que uma interação de
 segunda ordem.
 
+A seguir, vemos um exemplo prático da definição dos blocos para um
+fatorial $2^5$:
+
 ```{r}
-##======================================================================
-## Experimento fatorial 2^5 em quatro blocos
-da <- do.call(expand.grid, replicate(5, list(c(0,1))))
+## Monta os fatores do experimento com a notação (0,1)
+da <- do.call(expand.grid, replicate(5, list(c(0, 1))))
 names(da) <- LETTERS[1:ncol(da)]
 row.names(da) <- apply(da, 1,
                        function(i) paste(letters[1:5][i==1], collapse = ""))
@@ -718,10 +752,12 @@ da
 ## Croqui do experimento
 matrix(row.names(da), ncol = 4,
        dimnames = list(1:8, paste("Bloco", 1:4)))
+```
 
-##----------------------------------------------------------------------
-## Também é possível fazer pela tabela de sinais
-## Usando ADE e BCE cofundidos
+Também é possível fazer pela tabela de sinais (usando ADE e BCE confundidos):
+
+```{r}
+## Monta os fatores do experimento com a notação (-1, 1)
 db <- do.call(expand.grid, replicate(5, list(c(-1, 1))))
 names(db) <- LETTERS[1:ncol(db)]
 row.names(db) <- apply(db, 1,
@@ -729,7 +765,7 @@ row.names(db) <- apply(db, 1,
 row.names(db)[1] <- "(1)"
 db
 
-## Obtém as intreações de confundimento
+## Obtém as interações de confundimento
 db$ADE <- with(db, A*D*E)
 db$BCE <- with(db, B*C*E)
 
@@ -738,25 +774,28 @@ db$bloco <- with(db, interaction(ADE, BCE, sep = ""))
 db <- db[order(db$bloco), ]
 db
 
-## Veja que o resultado é o mesmo
+## Veja que o resultado é o mesmo se forem utilizados os contrastes de
+## definição
 cbind(row.names(da), row.names(db))
 ```
 
+A seguir, vemos um exemplo prático da definição dos blocos para um
+fatorial $2^4$:
+
 ```{r}
-##======================================================================
-## Experimento fatorial 2^4 em quatro blocos
+## MOnta as colunas dos fatores na notação (0,1)
 da <- do.call(expand.grid, replicate(4, list(c(0,1))))
 names(da) <- LETTERS[1:ncol(da)]
 row.names(da) <- apply(da, 1,
                        function(i) paste(letters[1:4][i==1], collapse = ""))
 row.names(da)[1] <- "(1)"
 da
+```
 
-##----------------------------------------------------------------------
-## Usando o contraste de definição, com ABC e ACD confundidos, por
-## consequência, a interação generalizada é
-## (ABC)(ACD) = A²BC²D = BD
+Usando o contraste de definição, com $ABC$ e $ACD$ confundidos. Por
+consequência, a interação generalizada é $(ABC)(ACD) = A^2BC^2D = BD$.
 
+```{r}
 ## L_1 = x1 + x_2 + x3
 alpha1 <- c(1, 1, 1, 0)
 L1 <- apply(da, 1, contr.def, alpha = alpha1)
@@ -774,127 +813,265 @@ matrix(row.names(da), ncol = 4,
        dimnames = list(1:4, paste("Bloco", 1:4)))
 ```
 
-### Exemplos
+## Exemplos
 
-```{r, echo=FALSE, eval=FALSE, include=FALSE}
-## Montgomery, Design and analysis of experiments, 5 ed., ex. 7-5, com
-## dados do ex. 6-7
+Exercício 6.7, Montgomery, DAE. Um experimento foi conduzido para
+aumentar o rendimento de um processo químico. Quatro fatores foram
+selecionados e um experimento completamente casualizado foi rodado com
+duas rpetições. Os dados estão disponíveis
+[aqui](http://www.leg.ufpr.br/~fernandomayer/data/montgomery_6-7.txt).
+Com isso:
+
+a. Estime os efeitos dos fatores.
+b. Faça a ANOVA para selecionar os fatores importantes.
+c. Verifique os resíduos do modelo.
+d. Usando o modelo adequado, faça a predição para cada combinação única
+dos níveis dos fatores.
+
+```{r}
+##----------------------------------------------------------------------
+## Dados
 url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_6-7.txt"
 dados <- read.table(url, header = TRUE)
-
-##======================================================================
-## Analisando os dados originais
-
-## a) estime os efeitos
-tab <- model.matrix(~ A*B*C*D, data = dados)
-contr <- t(tab[, -1]) %*% dados$y
-n <- 2 # duas replicas
-k <- 4
-ef <- contr/(n * 2^(k-1))
-
-## b) ANOVA
-m0 <- lm(y ~ A*B*C*D, data = dados)
-anova(m0)
-
-## c) Modelo para predição
-m1 <- update(m0, . ~ A + B + C + D + A:B + A:D + A:B:C + A:B:D + A:B:C:D)
-anova(m1)
-
-## d) Grafico de residuo vs predito
-par(mfrow = c(1, 2))
-plot(predict(m1), residuals(m1)); abline(h = 0, lty = 2, col = 2)
-qqnorm(residuals(m1)); qqline(residuals(m1))
-par(mfrow = c(1, 1))
-
-##======================================================================
-## Para gerar blocos, ex. 7-5
-## Considere os dados da primeira réplica
-da <- dados[!duplicated(dados[, 1:4]), ]
-row.names(da) <- apply(da, 1,
-                       function(i) paste(letters[1:4][i==1], collapse = ""))
-row.names(da)[1] <- "(1)"
-
-## Construa um experimento com 2 blocos com 8 observações cada, e com a
-## interação ABCD confundida com blocos.
-
-## Usando a tabela de sinais
-da$bloco <- with(da, A*B*C*D)
-da <- da[order(da$bloco), ]
-matrix(row.names(da), ncol = 2,
-       dimnames = list(1:8, paste("Bloco", 1:2)))
-
-## Analise os dados
-tab <- model.matrix(~ bloco + (A+B+C+D)^3, data = da)
-contr <- t(tab[, -(1:2)]) %*% da$y
-n <- 1
-k <- 4
-ef <- contr/(n * 2^(k-1))
-aux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
-text(aux$x, aux$y, rownames(aux$y), cex = 0.8, pos = 3)
-## Ajustando o modelo com todas as interações de segunda ordem, (menos
-## C:D), e ABC e ABD
-m0 <- lm(y ~ bloco + (A+B+C+D)^2 - C:D + A:B:C + A:B:D, data = da)
-anova(m0)
-
-##======================================================================
-## Ex. 7-6
-## Repita o mesmo experimento, mas considerando 4 blocos, confundindo
-## ABD e ABC (consequentemente CD) com blocos
-db <- dados[!duplicated(dados[, 1:4]), ]
-row.names(db) <- apply(db, 1,
-                       function(i) paste(letters[1:4][i==1], collapse = ""))
-row.names(db)[1] <- "(1)"
+str(dados)
 
 ##----------------------------------------------------------------------
+## a. Estime os efeitos dos fatores.
+tab <- model.matrix(~ A * B * C * D, data = dados)
+contr <- t(tab[, -1]) %*% dados$y
+r <- 2 # duas repetições
+k <- 4
+ef <- contr/(r * 2^(k-1))
+aux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
+text(aux$x, aux$y, rownames(aux$y), cex = 0.8, pos = 3)
+
+##----------------------------------------------------------------------
+## b. Faça a ANOVA para selecionar os fatores importantes.
+m0a <- lm(y ~ A * B * C * D, data = dados)
+anova(m0a)
+## Mantém fatores importantes
+m1a <- update(m0a, . ~ A + B + C + D + A:B + A:D + A:B:C + A:B:D + A:B:C:D)
+anova(m1a)
+## TRV
+anova(m0a, m1a)
+
+##----------------------------------------------------------------------
+## c. Verifique os resíduos do modelo.
+qqnorm(residuals(m1a)); qqline(residuals(m1a))
+
+##----------------------------------------------------------------------
+## d. Usando o modelo adequado, faça a predição para cada combinação única
+## dos níveis dos fatores.
+pred <- unique(dados[ 1:4])
+pred$y <- predict(m1a, newdata = pred)
+pred
+## Como são muitos fatores e interações de ordem alta são importantes,
+## uma forma simplificada de visualização seria
+xyplot(y ~ interaction(A, B, C, D, sep = ""), data = pred,
+       scales = list(x = list(rot = 90)),
+       xlab = "Tratamentos", ylab = "Rendimento",
+       panel = function(x, y, ...){
+    panel.xyplot(x, y, ...)
+    panel.abline(h = mean(y), lty = 2, col = 2)
+})
+```
+
+Exercício 7.5, Montgomery, DAE. Considerando apenas as observações da
+primeira réplica dos dados acima, analise o mesmo experimento, mas
+considerando dois blocos com 8 observações cada, com $ABCD$ confundido.
+
+```{r}
+##----------------------------------------------------------------------
+## Considerando os dados da primeira réplica
+dados2 <- dados[!duplicated(dados[, 1:4]), ]
+row.names(dados2) <- apply(dados2, 1,
+                       function(i) paste(letters[1:4][i==1], collapse = ""))
+row.names(dados2)[1] <- "(1)"
+
+##----------------------------------------------------------------------
+## Criando os blocos
+
+## Usando a tabela de sinais
+dados2$bloco <- with(dados2, A*B*C*D)
+dados2 <- dados2[order(dados2$bloco), ]
+dados2
+
 ## Usando contrastes de definição
-## Antes, é necessário converter a base de dados da codificação (-1,1)
-## para a codificação (0,1)
-db[, 1:4] <- ifelse(db[, 1:4] == -1, 0, 1)
+dados3 <- dados2
+## Muda codificação para (0,1)
+dados3[, 1:4] <- ifelse(dados3[, 1:4] == -1, 0, 1)
+## L = ABCD = x_1 + x_2 + x_3 + x_4
+alpha <- c(1, 1, 1, 1)
+dados3$bloco2 <- apply(dados3[, 1:4], 1, contr.def, alpha = alpha)
+dados3
+## O resultado é o mesmo. Mas para analisar é melhor usar dados2, com a
+## codificação (-1, 1).
+
+##----------------------------------------------------------------------
+## Analisando os dados
+
+##----------------------------------------------------------------------
+## a. Estime os efeitos dos fatores.
+## Como ABCD está confundido com bloco, não podemos colocar os dois na
+## tabela de sinais, portanto declaramos o bloco e as interações de até
+## terceira ordem
+tab <- model.matrix(~ bloco + (A + B + C + D)^3, data = dados2)
+## Calcula os contrastes excluindo o intercepto e bloco
+contr <- t(tab[, -(1:2)]) %*% dados2$y
+r <- 1
+k <- 4
+ef <- contr/(r * 2^(k-1))
+aux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
+text(aux$x, aux$y, rownames(aux$y), cex = 0.8, pos = 3)
+
+##----------------------------------------------------------------------
+## b. Faça a ANOVA para selecionar os fatores importantes.
+## Existem termos de terceira ordem que são importantes e outros não. Se
+## declaramos o modelo com todas as interações de terceira ordem, o
+## modelo será saturado e não teremos estimativa de erro. Portanto,
+## vamos declarar o modelo com todas as interações de segunda ordem e as
+## de terceira ordem que se destacaram no gráfico de quantis normais.
+m0b <- lm(y ~ bloco + (A + B + C + D)^2 + A:B:C + A:B:D, data = dados2)
+anova(m0b)
+## Mantém apenas termos importantes
+m1b <- update(m0b, . ~ bloco + A + B + C + D + A:B + A:D + A:B:C + A:B:D)
+anova(m1b)
+## TRV
+anova(m0b, m1b)
+## Note que ficamos com essencialmente o mesmo modelo de antes, quando
+## mantivemos a interação ABCD. Aqui, como bloco está confundido com
+## essa interação, então basicamente temos o mesmo modelo.
+
+##----------------------------------------------------------------------
+## c. Verifique os resíduos do modelo.
+qqnorm(residuals(m1b)); qqline(residuals(m1b))
+
+##----------------------------------------------------------------------
+## d. Usando o modelo adequado, faça a predição para cada combinação única
+## dos níveis dos fatores.
+pred <- dados2[, -5]
+pred$y <- predict(m1b, newdata = pred)
+pred
+## Como são muitos fatores e interações de ordem alta são importantes,
+## uma forma simplificada de visualização seria
+xyplot(y ~ interaction(A, B, C, D, sep = ""), data = pred,
+       scales = list(x = list(rot = 90)),
+       xlab = "Tratamentos", ylab = "Rendimento",
+       panel = function(x, y, ...){
+    panel.xyplot(x, y, ...)
+    panel.abline(h = mean(y), lty = 2, col = 2)
+})
+```
+
+Exercício 7.6, Montgomery, DAE. Repita o mesmo exercícioo assumindo que
+quatro blocos são neessários. Use $ABD$ e $ABC$ para confundir os
+blocos. Qual é a interação generalizada?
+
+```{r}
+## Considerando os dados da primeira réplica
+dados3 <- dados[!duplicated(dados[, 1:4]), ]
+row.names(dados3) <- apply(dados3, 1,
+                       function(i) paste(letters[1:4][i==1], collapse = ""))
+row.names(dados3)[1] <- "(1)"
+
+##----------------------------------------------------------------------
+## Criando os blocos
+
+## Usando ABD e ABC para confundir a interação generalizada é:
+## (ABD)(ABC) = DC
+## Portanto, ABD, ABC e DC serão os efeitos confundidos com blocos
+
+## Usando a tabela de sinais
+dados3$ABC <- with(dados3, A*B*C)
+dados3$ABD <- with(dados3, A*B*D)
+dados3$bloco <- with(dados3, interaction(ABC, ABD, sep = ""))
+dados3 <- dados3[order(dados3$bloco), ]
+dados3
+## Croqui do experimento com 4 blocos
+matrix(row.names(dados3), ncol = 4,
+       dimnames = list(1:4, paste("Bloco", 1:4)))
+
+## Usando contrastes de definição
+dados4 <- dados3
+## Muda codificação para (0,1)
+dados4[, 1:4] <- ifelse(dados4[, 1:4] == -1, 0, 1)
 ## L_1 = ABC = x_1 + x_2 + x_3
 alpha1 <- c(1, 1, 1, 0)
-L1 <- apply(db[, 1:4], 1, contr.def, alpha = alpha1)
+L1 <- apply(dados4[, 1:4], 1, contr.def, alpha = alpha1)
 ## L_2 = ABD = x_1 + x_2 + x_4
 alpha2 <- c(1, 1, 0, 1)
-L2 <- apply(db[, 1:4], 1, contr.def, alpha = alpha2)
+L2 <- apply(dados4[, 1:4], 1, contr.def, alpha = alpha2)
 ## Cria os blocos
-db$bloco <- interaction(L1, L2, sep = "")
-db <- db[order(db$bloco), ]
-## Croqui do experimento com 4 blocos
-matrix(row.names(db), ncol = 4,
-       dimnames = list(1:4, paste("Bloco", 1:4)))
-
-## Analise do experimento
-## Note que para calcular os efeitos, é necessário voltar para a
-## codificação (-1,1) para montar a tebela de sinais
-db[, 1:4] <- ifelse(db[, 1:4] == 0, -1, 1)
-tab <- model.matrix(~ bloco + A*B*C*D - A:B:C - A:B:D - C:D,
-                    data = db)
-colnames(tab)
-contr <- t(tab[, -(1:4)]) %*% db$y
-n <- 1
-k <- 4
-ef <- contr/(n * 2^(k-1))
-aux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
-text(aux$x, aux$y, rownames(aux$y), cex = 0.8, pos = 3)
-## Ajustando os modelos com os fatores importantes: A, D, AB, AD, e
-## ABCD. Os efeitos principais B e C foram mantidos para preservar a
-## marginalidade do modelo
-m0 <- lm(y ~ bloco + A + B + C + D + A:B + A:D + A:B:C:D, data = db)
-anova(m0)
+dados4$bloco2 <- interaction(L1, L2, sep = "")
+dados4
+## O resultado é o mesmo. Mas para analisar é melhor usar dados3, com a
+## codificação (-1, 1).
 
 ##----------------------------------------------------------------------
-## Usando a tabela de sinais
-db$ABC <- with(db, A*B*C)
-db$ABD <- with(db, A*B*D)
-db$bloco2 <- interaction(db$ABC, db$ABD, sep = "")
-db <- db[order(db$bloco), ]
-## Croqui do experimento com 4 blocos
-matrix(row.names(db), ncol = 4,
-       dimnames = list(1:4, paste("Bloco", 1:4)))
+## Analisando os dados
 
-## A análise dos dados segue da mesma forma como foi feita acima com os
-## blocos criados através dos contrastes de definição
+##----------------------------------------------------------------------
+## a. Estime os efeitos dos fatores.
+## Como ABC, ABD, e CD estão confundidos com bloco, vamos declarar o
+## bloco e excluir estes três termos da tabela de sinais
+tab <- model.matrix(~ bloco + (A * B * C * D) - A:B:C - A:B:D - C:D,
+                    data = dados3)
+## Calcula os contrastes excluindo o intercepto e os blocos
+contr <- t(tab[, -(1:4)]) %*% dados3$y
+r <- 1
+k <- 4
+ef <- contr/(r * 2^(k-1))
+aux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
+text(aux$x, aux$y, rownames(aux$y), cex = 0.8, pos = 3)
+
+##----------------------------------------------------------------------
+## b. Faça a ANOVA para selecionar os fatores importantes.
+
+## Os termos importantes são A, D, AB, AD, e ABCD. Mas podem existir
+## dúvidas quanto aos termos de terceira ordem. Se declararmos o modelo
+## completo não teremos estimativa de erro. Por isso, vamos declarar um
+## modelo mais completo possível, deixando de fora os termos que
+## realmente não parecem importantes.
+m0c <- lm(y ~ bloco + A + B + C + D + A:B + A:C + A:D + A:C:D + A:B:C:D,
+          data = dados3)
+anova(m0c)
+## Mantém apenas termos importantes, considerando ainda o gráfico acima
+m1c <- update(m0c, . ~ bloco + A + B + C + D + A:B + A:D + A:B:C:D)
+anova(m1c)
+## TRV
+anova(m0c, m1c)
+## Note que esse modelo é essencialmente o mesmo modelo que o anterior.
+## A diferença é que no anterior as interações importantes ABC e ABD
+## apareciam explicitamente. Agora, por estarem confundidas com blocos,
+## elas não parecem, mas sabe-se que seus efeitos estão cnfundidos com o
+## de bloco. Dessa forma, a SQ de blocos aqui seria a SQ de ABC, ABD e
+## por consequência, também de CD.
+print(anova(m1b), signif.stars = FALSE)
+print(anova(m1c), signif.stars = FALSE)
+
+##----------------------------------------------------------------------
+## c. Verifique os resíduos do modelo.
+qqnorm(residuals(m1c)); qqline(residuals(m1c))
+
+##----------------------------------------------------------------------
+## d. Usando o modelo adequado, faça a predição para cada combinação única
+## dos níveis dos fatores.
+pred <- dados3[, -(5:7)]
+pred$y <- predict(m1c, newdata = pred)
+pred
+## Como são muitos fatores e interações de ordem alta são importantes,
+## uma forma simplificada de visualização seria
+xyplot(y ~ interaction(A, B, C, D, sep = ""), data = pred,
+       scales = list(x = list(rot = 90)),
+       xlab = "Tratamentos", ylab = "Rendimento",
+       panel = function(x, y, ...){
+    panel.xyplot(x, y, ...)
+    panel.abline(h = mean(y), lty = 2, col = 2)
+})
 ```
+
+- Comparar as 3 predições
+- Deixar o exemplo abaixo como exercício
 
 ```{r}
 ##======================================================================
