@@ -32,9 +32,9 @@ output: html_document
     experimento
 	- O efeito esperado (mesmo que seja qualitativo) que os valores
       propostos devem causar na variável resposta
-5. **Fatores fixos**
-	- Listar todos os fatores que serão considerados como fixos no
-    experimento
+5. **Fatores mantidos constante**
+	- Listar todos os fatores que serão considerados como fixos
+    (mantidos constante) no experimento
 	- Indicar o nível (médio) desejado de cada fator fixo, e a amplitude
     de variação permitida
 	- Indicar a faixa de valores que cada fator fixo pode ser medido (e
@@ -45,7 +45,7 @@ output: html_document
 6. **Fatores *nuisance* **
 	- Listar todos os possíveis fatores que podem interferir no
       experimento, mas que não serão controlados e nem considerados
-      fixos
+      constantes
 	- Indicar a estratégia que será utilizada para minimizar os efeitos
     destes fatores. Por exemplo: blocagem, randomização, etc.
 	- Indicar os possíveis efeitos destes fatores na variável resposta

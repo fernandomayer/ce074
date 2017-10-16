@@ -16,39 +16,52 @@ problemas e perguntas específicas que poderão ser respondidas pelo
 experimento. Existem muitos objetivos para se realizar um experimento,
 mas os principais são:
 
-- Confirmação (funciona como no passado?)
-- Descoberta (o que mais interfere?)
+- Caracterização (para processos novos)
+- Otimização (níveis ótimos de funcionamento)
+- Confirmação (se funciona como no passado ou alguma teoria)
+- Descoberta (novos materiais ou abordagens)
 - Estabilidade (em quais condições o sistema degrada?)
 
 Considerar ao invés de um grande experimento muito compreensivo, uma
 **abordagem sequencial**, ou seja, uma série de experimentos menores.
 
-## 2. Escolha de fatores, níveis e amplitude
+## 2. Escolha da variável resposta
 
-Fatores podem ser classificados como *fatores do desenho* e *fatores
-nuisance* (acessórios, secundários, de segunda ordem, ...). Os fatores
-do desenho são aqueles que o experimentador tem o interesse em variar.
+- Certificar que a variável resposta é de fato relevante para responder
+  as perguntas do problema.
+- Pode haver mais de uma.
+- Verificar de que forma, e com qual precisão ela será medida.
 
-Outra classificação poderia ser:
+## 3. Escolha de fatores, níveis e amplitude
 
-- Fatores do desenho
-- Fatores mantidos constantes
-- Fatores em que se permite variar
+Fatores podem ser classificados como **fatores do desenho** e **fatores
+nuisance** (acessórios, secundários, de segunda ordem, ...).
 
-Fatores *nuisance* podem ser:
+Os fatores do desenho são aqueles que o experimentador tem o interesse
+em variar. POdem ser classificados em:
 
-- Controláveis (entram no modelo)
-- Não controláveis (se puderem ser medidos)
+- Fatores do desenho: aqueles realmente de interesse e selecionados para
+  o experimento.
+- Fatores mantidos constantes: aqueles que podem influenciar na
+  resposta, mas que não há interesse para o experimento específico, e
+  será mantido à um nível específico.
+- Fatores em que se permite variar: pequenas variações de material, por
+  exemplo, podem ser permitidas. A casualização é fundamental para se
+  anular essas pequanas variações.
+
+Geralmente se assume que os fatores mantidos constantes e aqueles em que
+se permite variar possuem efeitos relativamente pequenos.
+
+Fatores *nuisance*, no entanto, podem ter efeitos grandes na resposta,
+mas também não se tem interesse neles no experimento atual. Podem ser:
+
+- Controláveis (entram no modelo, como blocos por exemplo)
+- Não controláveis (se puderem ser medidos podem entrar no modelo)
 - Ruídos (varia e não pode ser controlado)
 
-Após definir os fatores, é necessário selecionar o número de níveis e a
-amplitude de variação entre eles. Se o objetivo for caracterização, as
-aplitudes devem ser grandes.
-
-## 3. Escolha da variável resposta
-
-Certificar que a variável resposta é de fato relevante para responder as
-perguntas do problema.
+Após definir os fatores, é necessário selecionar o número de níveis
+(vamos usar 2) e a amplitude de variação entre eles. Se o objetivo for
+caracterização, por exemplo, as amplitudes devem ser grandes.
 
 ## 4. Escolha do desenho experimental
 
@@ -63,7 +76,9 @@ experimental, e se serão necessários ajustes no experimento.
 
 ## 6. Análise dos dados
 
-Apropriado ao seu planejamento.
+Se o planejamento e execução foram bem feitos, a análise já estará
+pré-determinada. Deve-se utilizar métodos gráficos, fazer a seleção de
+modelos, analisar resíduos e re-analisar se necessário.
 
 ## 7. Conclusões e recomendações
 
