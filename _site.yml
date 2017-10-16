@@ -55,6 +55,14 @@ navbar:
       - text: "Análise completa de um fatorial 2^6 [R]"
         href: scripts/script_fatorial_2-6.R
       - text: "----------"
+      - text: "Experimento"
+      - text: "Instruções para o planejamento de experimentos [HTML]"
+        href: instrucoes-planejamento.html
+      - text: "Guia para o planejamento de experimentos [HTML]"
+        href: misc/guia-planejamento.html
+      - text: "Guia para o planejamento de experimentos [Rmd]"
+        href: misc/guia-planejamento.Rmd
+      - text: "----------"
       - text: "Exercícios"
       - text: "Revisão de conhecimento [PDF]"
         href: exercicios/ex_revisao.pdf
