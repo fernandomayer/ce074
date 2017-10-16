@@ -82,20 +82,26 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
   [material](fatorial_pontos-centrais.html).
 - **09/10**: **Prova 1**.
 - **12/10**: Feriado.
-- **16/10**:
+- **16/10**: Entrega e correção da primeira prova. Orientações para o
+  experimento a ser realizado em grupo. Ver [instruções para o
+  planejamento de experimentos](instrucoes-planejamento.html).
 - **19/10**:
 - **23/10**:
 - **26/10**:
-- **30/10**:
+- **30/10**: Não haverá aula.
 - **02/11**: Feriado.
-- **06/11**:
+- **06/11**: Apresentação do planejamento do experimento e primeiros
+  resultados (se houver). Todos os grupos devem apresentar o
+  [guia](misc/guia-planejamento.html) para o planejamento de
+  experimentos preenchido. O código fonte do guia está
+  [aqui](misc/guia-planejamento.Rmd).
 - **09/11**:
 - **13/11**:
 - **16/11**:
 - **20/11**:
 - **23/11**:
-- **27/11**:
-- **30/11**:
+- **27/11**: Apresentações dos resultados dos experimentos realizados em grupo.
+- **30/11**: Apresentações dos resultados dos experimentos realizados em grupo.
 
 ## Exercícios
 
