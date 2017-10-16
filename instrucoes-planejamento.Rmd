@@ -1,0 +1,98 @@
+---
+title: "Instruções para o planejamento de experimentos"
+---
+
+```{r setup, include=FALSE}
+source("setup_knitr.R")
+```
+
+## 1. Reconhecimento e caracterização do problema
+
+Reconhecer algum processo que necessite de experimentação e desenvolver
+todas as ideias sobre os objetivos do problema. É importante usar todo o
+conhecimento já existente sobre o problema. Por esse motivo, uma
+**abordagem de grupo** deve ser adotada. É útil preparar uma lista com
+problemas e perguntas específicas que poderão ser respondidas pelo
+experimento. Existem muitos objetivos para se realizar um experimento,
+mas os principais são:
+
+- Confirmação (funciona como no passado?)
+- Descoberta (o que mais interfere?)
+- Estabilidade (em quais condições o sistema degrada?)
+
+Considerar ao invés de um grande experimento muito compreensivo, uma
+**abordagem sequencial**, ou seja, uma série de experimentos menores.
+
+## 2. Escolha de fatores, níveis e amplitude
+
+Fatores podem ser classificados como *fatores do desenho* e *fatores
+nuisance* (acessórios, secundários, de segunda ordem, ...). Os fatores
+do desenho são aqueles que o experimentador tem o interesse em variar.
+
+Outra classificação poderia ser:
+
+- Fatores do desenho
+- Fatores mantidos constantes
+- Fatores em que se permite variar
+
+Fatores *nuisance* podem ser:
+
+- Controláveis (entram no modelo)
+- Não controláveis (se puderem ser medidos)
+- Ruídos (varia e não pode ser controlado)
+
+Após definir os fatores, é necessário selecionar o número de níveis e a
+amplitude de variação entre eles. Se o objetivo for caracterização, as
+aplitudes devem ser grandes.
+
+## 3. Escolha da variável resposta
+
+Certificar que a variável resposta é de fato relevante para responder as
+perguntas do problema.
+
+## 4. Escolha do desenho experimental
+
+Escolha do tamanho da amostra (número de réplicas), a seleção da ordem
+de execução, e se haverá blocagem.
+
+## 5. Execução do experimento
+
+Controlar o processo como planejado. Geralmente é recomendado realizar
+algum (ou alguns) **experimentos piloto**, para se ter uma ideia do erro
+experimental, e se serão necessários ajustes no experimento.
+
+## 6. Análise dos dados
+
+Apropriado ao seu planejamento.
+
+## 7. Conclusões e recomendações
+
+Após o experimento, o experimentador deve descrever conclusões
+**práticas** baseadas nos resultados, e ainda recomendar estudos
+posteriores, com os ajustes que descobriu-se ser necessário.
+
+Note que todo esse processo é **iterativo**!
+
+Os passos 1-3 são chamados de **planejamento pré-experimental**, e são
+fundamentais para o bom desenvolvimento de um experimento. Por isso,
+vamos usar este guia para facilitar essa fase:
+
+1. Objetivos do experimento
+2. Conhecimento relevante sobre o problema
+3. Listar:
+     - variável resposta
+     - os níveis normais de operação dessa variável
+     - os níveis que podem ser de fato medidos
+4. Listar: fatores controláveis
+5. Listar: fatores que serão considerados fixos
+6. Listar: fatores *nuisance*
+7. Listar: possíveis interações
+8. Listar: restrições do experimento (aquisição de dados, material, etc)
+9. Desenho experimental inicial
+10. Propor a análise e técnicas de representação dos resultados e do
+    experimento
+11. Experimento piloto deverá ser conduzido? Sim/não. Por que?
+
+O guia completo está disponível em:
+[guia-planejamento.html](misc/guia-planejamento.html), e o código fonte
+está em [guia-planejamento.Rmd](misc/guia-planejamento.Rmd).
