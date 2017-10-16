@@ -30,7 +30,7 @@ notas.col <- grep("^P*[0-9]$", names(notas))
 
 ## Histograma e box plot geral
 
-```{r, fig.width=8, fig.height=6, echo=FALSE, eval=TRUE}
+```{r notashist, fig.width=8, fig.height=6, echo=FALSE, eval=TRUE}
 ## Grafico geral das notas
 breaks <- 0:10
 ## table(cut(notas$S1, breaks = breaks,
