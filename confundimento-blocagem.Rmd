@@ -24,7 +24,7 @@ options(show.signif.stars = TRUE)
 
 Existem certas situações em que é praticamente impossível fazer todas as
 corridas de um experimento em condições uniformes. Por exemplo, pode
-haver limitações da quatidade de matéria prima, ou matéria prima de
+haver limitações da quantidade de matéria prima, ou matéria prima de
 diversas origens. As condições de contorno podem mudar ao longo do
 ensaio (temperatura, ventilação, luz). Pode existir um número elevado de
 tratamentos difícil de acomodar em um curto espaço de tempo/espaço ou
@@ -34,9 +34,9 @@ resultados. A técnica experimental adotada nessas situações é a
 **blocagem**.
 
 A idéia central da blocagem é fazer com que as unidades experimentais
-(UEs) sejam homogêneas dentro dos blocos. Os blocos são completos quando
-em cada bloco existe pelo menos uma UE de cada tratamento, e incompleto
-caso contrário.
+(UEs) sejam homogêneas dentro dos blocos. Os blocos são **completos**
+quando em cada bloco existe pelo menos uma UE de cada tratamento, e
+**incompleto** caso contrário.
 
 Nos experimentos $2^k$ existe uma série de opções de blocagem. A
 primeira é repetir o experimento de forma que cada repetição completa
@@ -79,12 +79,12 @@ fatorial $2^k$ sem blocos, com a exceção de que haverá também uma soma
 de quadrados para bloco, dada por
 
 $$
-SQ_{Bloco} = \frac{\sum_{i=1}^n B_i^2}{2^k} - \frac{y_{...}^2}{n}
+SQ_{Bloco} = \frac{\sum_{i=1}^r B_i^2}{2^k} - \frac{(\sum_{i=1}^{n} y_i)^2}{n}
 $$
 
-onde $B_i$ é o total de cada bloco $i$, $y_{...}^2$ é o quadrado da soma
-total de todas as observações, e $n$ é o número total de corridas do
-experimento.
+onde $B_i$ é o total de cada bloco $i$, $(\sum_{i=1}^{n} y_i)^2/n$ é a
+chamada correção de somas de quadrados, e $n$ é o número total de
+corridas do experimento.
 
 ## Exemplos
 
@@ -98,7 +98,7 @@ abaixo. Faça a análise estatística dos resultados.
 bloco 1  b 2  b 3
 (1) = 28   25   27
   a = 36   32   32
-  b = 18   19   23
+  b = 16   19   23
  ab = 31   30   29
 ```
 
@@ -152,6 +152,23 @@ anova(m0)
 ## deve permanecer pois faz parte do delineamento
 m1 <- update(m0, . ~ bloco + A * C)
 anova(m1)
+```
+
+```{r, eval=FALSE, include=FALSE}
+## Para ver a diferença do EP de blocos
+da$bloco2 <- ifelse(da$bloco == "I", -1, 1)
+da
+m0 <- lm(y ~ bloco2 + A * B * C, data = da)
+anova(m0)
+X <- model.matrix(m0)
+t(X) %*% X
+solve(t(X) %*% X)
+m1 <- lm(y ~ A * B * C, data = da)
+anova(m1)
+coef(m0)
+coef(m1)
+summary(m0)
+summary(m1)
 ```
 
 ##### Comparando $2^3$ com e sem blocos
@@ -212,7 +229,8 @@ variância (que naturalmente deve ser menor devido à inclusão de bloco).
 Agora podemos analisar a diferença nas estimativas dos efeitos:
 
 ```{r}
-coef(m0); coef(m1)
+coef(m0)
+coef(m1)
 ```
 
 Os efeitos dos fatores não mudam, mas são também calculados os efeitos
@@ -234,7 +252,9 @@ coef(m2)
 Agora os coeficientes são:
 
 ```{r}
-coef(m0); coef(m1); coef(m2)
+coef(m0)
+coef(m1)
+coef(m2)
 ```
 
 Dessa forma, o intercepto volta a ser a média geral do experimento. Note
@@ -253,15 +273,37 @@ O erro-padrão dos efeitos se altera pois o QM do resíduo foi alterado
 com a inclusão do bloco. OS EPs ficam menores quando se consideraram
 blocos.
 
-Por que os EPs dos blocos são diferentes?
+<!-- Por que os EPs dos blocos são diferentes? -->
 
-```{r}
+```{r, eval=FALSE, include=FALSE}
 ## Estimativa de sigma
 sigma <- sqrt(anova(m2)[5, "Mean Sq"])
 ## EP para os efeitos
 sigma * sqrt(1/(3*2^3))
 ## EP para blocos
 sigma * sqrt(1/(12)) # porque? é a metade das observações
+
+## Muda bloco para (-1, 0, 1)
+db2$bloco <- -1
+db2$bloco[db2$variable == "rep2"] <- 0
+db2$bloco[db2$variable == "rep3"] <- 1
+db2
+m0 <- lm(value ~ bloco + depth + watering + type, data = db2)
+summary(m0)
+m1 <- lm(value ~ depth + watering + type, data = db2)
+summary(m1)
+
+X <- model.matrix(m0)
+t(X) %*% X
+solve(t(X) %*% X)
+sqrt(solve(t(X) %*% X))
+sigma <- sqrt(anova(m0)[5, "Mean Sq"])
+sigma * sqrt(solve(t(X) %*% X))
+
+## EP para efeitos
+sigma * sqrt(1/(3*2^3))
+## EP para blocos
+sigma * sqrt(1/(16)) # porque?
 ```
 
 # Confundimento do fatorial $2^k$ em dois blocos
@@ -327,7 +369,7 @@ estão no bloco I, e as duas com sinal menos estão no bloco II (`a` e
 interação AB está confundida com os blocos**.
 
 A razão para isso está clara quando analisamos a tabela de sinais para o
-planejamento $2^2$
+planejamento $2^2$:
 
 ```{r, echo=FALSE}
 da <- expand.grid(A = c(-1, 1),
@@ -419,7 +461,7 @@ Dessa forma, para o sistema $2^k$, temos tanto $\alpha_i = 0$ ou $1$, e
 $x_i = 0$ (nível baixo) ou $1$ (nível alto). Combinações de tratamentos
 que produzam o mesmo valor de $L \mod 2$ serão colocados no mesmo bloco.
 Como os únicos valores possíveis de $L \mod 2$ são 0 e 1, isso atribuirá
-as $2^k$ combinações de tratamentos à extamente dois blocos.
+as $2^k$ combinações de tratamentos à exatamente dois blocos.
 
 > NOTA: a função $x \mod 2$ retorna o resto da divisão de x pelo
 > número 2. $\text{mod}$ é a função *módulo*, e no R é representada por
