@@ -38,14 +38,14 @@ Fatores podem ser classificados como **fatores do desenho** e **fatores
 nuisance** (acessórios, secundários, de segunda ordem, ...).
 
 Os fatores do desenho são aqueles que o experimentador tem o interesse
-em variar. POdem ser classificados em:
+em variar. Podem ser classificados em:
 
-- Fatores do desenho: aqueles realmente de interesse e selecionados para
+- **Fatores do desenho**: aqueles realmente de interesse e selecionados para
   o experimento.
-- Fatores mantidos constantes: aqueles que podem influenciar na
+- **Fatores mantidos constantes**: aqueles que podem influenciar na
   resposta, mas que não há interesse para o experimento específico, e
   será mantido à um nível específico.
-- Fatores em que se permite variar: pequenas variações de material, por
+- **Fatores em que se permite variar**: pequenas variações de material, por
   exemplo, podem ser permitidas. A casualização é fundamental para se
   anular essas pequanas variações.
 
@@ -55,13 +55,14 @@ se permite variar possuem efeitos relativamente pequenos.
 Fatores *nuisance*, no entanto, podem ter efeitos grandes na resposta,
 mas também não se tem interesse neles no experimento atual. Podem ser:
 
-- Controláveis (entram no modelo, como blocos por exemplo)
-- Não controláveis (se puderem ser medidos podem entrar no modelo)
-- Ruídos (varia e não pode ser controlado)
+- **Controláveis** (entram no modelo, como blocos por exemplo)
+- **Não controláveis** (se puderem ser medidos podem entrar no modelo)
+- **Ruídos** (varia e não pode ser controlado)
 
 Após definir os fatores, é necessário selecionar o número de níveis
-(vamos usar 2) e a amplitude de variação entre eles. Se o objetivo for
-caracterização, por exemplo, as amplitudes devem ser grandes.
+(à princípio vamos usar 2) e a amplitude de variação entre eles. Se o
+objetivo for caracterização, por exemplo, as amplitudes devem ser
+grandes.
 
 ## 4. Escolha do desenho experimental
 
