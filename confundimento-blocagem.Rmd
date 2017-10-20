@@ -627,7 +627,7 @@ que há diferença entre operadores, os engenheiros de teste decidiram
 conduzir o planejamento $2^4$ em 2 blocos com ABCD confundido. Faça a
 análise estatística dos dados obtidos.
 
-```{r}
+```{r m14-7}
 ##----------------------------------------------------------------------
 ## Resultados do experimento
 da <- do.call(expand.grid, replicate(4, list(c(-1, 1))))
@@ -904,12 +904,12 @@ qqnorm(residuals(m1a)); qqline(residuals(m1a))
 ##----------------------------------------------------------------------
 ## d. Usando o modelo adequado, faça a predição para cada combinação única
 ## dos níveis dos fatores.
-pred <- unique(dados[ 1:4])
-pred$y <- predict(m1a, newdata = pred)
-pred
+pred.a <- unique(dados[, 1:4])
+pred.a$y <- predict(m1a, newdata = pred.a)
+pred.a
 ## Como são muitos fatores e interações de ordem alta são importantes,
 ## uma forma simplificada de visualização seria
-xyplot(y ~ interaction(A, B, C, D, sep = ""), data = pred,
+xyplot(y ~ interaction(A, B, C, D, sep = ""), data = pred.a,
        scales = list(x = list(rot = 90)),
        xlab = "Tratamentos", ylab = "Rendimento",
        panel = function(x, y, ...){
@@ -991,12 +991,12 @@ qqnorm(residuals(m1b)); qqline(residuals(m1b))
 ##----------------------------------------------------------------------
 ## d. Usando o modelo adequado, faça a predição para cada combinação única
 ## dos níveis dos fatores.
-pred <- dados2[, -5]
-pred$y <- predict(m1b, newdata = pred)
-pred
+pred.b <- dados2[, -5]
+pred.b$y <- predict(m1b, newdata = pred.b)
+pred.b
 ## Como são muitos fatores e interações de ordem alta são importantes,
 ## uma forma simplificada de visualização seria
-xyplot(y ~ interaction(A, B, C, D, sep = ""), data = pred,
+xyplot(y ~ interaction(A, B, C, D, sep = ""), data = pred.b,
        scales = list(x = list(rot = 90)),
        xlab = "Tratamentos", ylab = "Rendimento",
        panel = function(x, y, ...){
@@ -1098,12 +1098,12 @@ qqnorm(residuals(m1c)); qqline(residuals(m1c))
 ##----------------------------------------------------------------------
 ## d. Usando o modelo adequado, faça a predição para cada combinação única
 ## dos níveis dos fatores.
-pred <- dados3[, -(5:7)]
-pred$y <- predict(m1c, newdata = pred)
-pred
+pred.c <- dados3[, -(5:7)]
+pred.c$y <- predict(m1c, newdata = pred.c)
+pred.c
 ## Como são muitos fatores e interações de ordem alta são importantes,
 ## uma forma simplificada de visualização seria
-xyplot(y ~ interaction(A, B, C, D, sep = ""), data = pred,
+xyplot(y ~ interaction(A, B, C, D, sep = ""), data = pred.c,
        scales = list(x = list(rot = 90)),
        xlab = "Tratamentos", ylab = "Rendimento",
        panel = function(x, y, ...){
@@ -1113,6 +1113,26 @@ xyplot(y ~ interaction(A, B, C, D, sep = ""), data = pred,
 ```
 
 - Comparar as 3 predições
+
+```{r}
+pred.a <- pred.a[with(pred.a, order(D, C, B, A)), ]
+pred.b <- pred.b[with(pred.b, order(D, C, B, A)), ]
+pred.c <- pred.c[with(pred.c, order(D, C, B, A)), ]
+preds <- rbind(pred.a, pred.b[, -5], pred.c[, -5])
+preds$id <- c(rep("Sem bloco", 16),
+              rep("Com 2 blocos", 16),
+              rep("Com 4 blocos", 16))
+xyplot(y ~ interaction(A, B, C, D, sep = ""), groups = id,
+       data = preds,
+       scales = list(x = list(rot = 90)),
+       xlab = "Tratamentos", ylab = "Rendimento",
+       auto.key = list(columns = 3),
+       panel = function(x, y, ...){
+    panel.xyplot(x, y, ...)
+    panel.abline(h = mean(y), lty = 2, col = 2)
+})
+```
+
 - Deixar o exemplo abaixo como exercício
 
 ```{r}
