@@ -1112,16 +1112,17 @@ xyplot(y ~ interaction(A, B, C, D, sep = ""), data = pred.c,
 })
 ```
 
-- Comparar as 3 predições
+Comparando as três predições (sem blocos, com 2 blocos, e com 4 blocos),
+notamos que ocorrem pequenas diferenças devido aos fatores presentes nos
+modelos e ao confundimento entre blocos e interações.
 
 ```{r}
-pred.a <- pred.a[with(pred.a, order(D, C, B, A)), ]
-pred.b <- pred.b[with(pred.b, order(D, C, B, A)), ]
-pred.c <- pred.c[with(pred.c, order(D, C, B, A)), ]
+## Cria um data frame único com todas as predições
 preds <- rbind(pred.a, pred.b[, -5], pred.c[, -5])
-preds$id <- c(rep("Sem bloco", 16),
-              rep("Com 2 blocos", 16),
-              rep("Com 4 blocos", 16))
+preds$id <- c(rep("Sem bloco", nrow(pred.a)),
+              rep("Com 2 blocos", nrow(pred.b)),
+              rep("Com 4 blocos", nrow(pred.c)))
+## Gráfico com as três predições
 xyplot(y ~ interaction(A, B, C, D, sep = ""), groups = id,
        data = preds,
        scales = list(x = list(rot = 90)),
@@ -1133,13 +1134,100 @@ xyplot(y ~ interaction(A, B, C, D, sep = ""), groups = id,
 })
 ```
 
-- Deixar o exemplo abaixo como exercício
+# Confundindo um fatorial $2^k$ em $2^p$ blocos
 
-```{r}
+Os métodos descritos acima podem ser extendidos para a construção de
+fatoriais $2^k$ confundidos em $2^p$ blocos ($p<k$), onde cada bloco
+contém exatamente $2^{k-p}$ corridas.
+
+Começe selecionando $p$ efeitos a serem confundidos, com o cuidado de
+que nenhum afeito escolhida seja uma interação generalizada dos
+outros. Dessa forma, os blocos podem ser construídos a partir de $p$
+contrastes de definição $L_1, L_2, \ldots, L_p$ que estejam associados
+com estes efeitos. Em adição aos $p$ efeitos escolhidos para serem
+confundidos, exatamente $2^p - p - 1$ efeitos adicionais serão também
+confundidos com blocos. Estas são as interações generalizadas dos $p$
+efeitos originais escolhidos. eve-se tomar cuidado para não confundir
+efeitos que tenham interesse potencial.
+
+# Exercícios
+
+1. Considere os dados abaixo:
+```{r, echo=FALSE}
+url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-12.txt"
+ex1 <- read.table(url, header = TRUE)
+da <- expand.grid(A = c(-1, 1), B = c(-1, 1), C = c(-1, 1))
+ex1 <- data.frame(da, y = ex1$RepI,
+                  row.names = ex1$Tratamento)
+ex1
+```
+   a. Estabeleça um planejamento para correr essas observações em dois
+    blocos de quatro observações cada, com ABC confundido.
+   b. Analise os dados.
+2. Considere os dados abaixo:
+```{r, echo=FALSE}
+url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-13.txt"
+ex2 <- read.table(url, header = TRUE)
+da <- expand.grid(A = c(-1, 1), B = c(-1, 1), C = c(-1, 1), D = c(-1, 1))
+ex2 <- data.frame(da, y = ex2$RepI,
+                  row.names = ex2$Tratamento)
+ex2
+```
+   a. Construa um planejamento com dois blocos de oito observações cada,
+    com ABCD confundido.
+   b. Analise os dados.
+3. Considere os dados abaixo:
+```{r, echo=FALSE}
+url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-18.txt"
+ex3 <- read.table(url, header = TRUE)
+da <- expand.grid(A = c(-1, 1), B = c(-1, 1), C = c(-1, 1), D = c(-1, 1))
+ex3 <- data.frame(da, y = ex3$y,
+                  row.names = ex3$Tratamento)
+ex3
+```
+   a. Construa o planejamento que teria sido usado para correr esse
+   experimento em dois blocos de oito corridas cada.
+   b. Analise os dados.
+4. Construa um planejamento $2^5$ em dois blocos. Selecione a interação
+ABCDE para ser confundida com os blocos.
+5. Considere os mesmos dados do exercício 2 acima, e suponha que quatro
+blocos sejam necessários. Crie os blocos com ABD e ABC confundidos.
+   a. Qual a interação generalizada, que também está confundida neste
+   experimento?
+   b. Construa os blocos com as combinações de tratamento adequadas, e
+   analise os dados.
+6. Um estudo reportou um experimento para minimizar variações nos níveis
+de glicose no sangue. Os fatores foram: volume de suco ingerido antes de
+um exercício (`Suco`), tempo de exercíco em uma estação de esqui
+(`Exercicio`), intervalo de tempo entre tomar o suco e começar o
+exercício (`Intervalo`). O período do dia (`Periodo`) foi considerado
+como bloco. Os dados estão abaixo:
+```{r, echo=FALSE}
+url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-37.txt"
+ex6 <- read.table(url, header = TRUE)
+print(ex6, row.names = FALSE)
+```
+   a. Quais efeitos estão confundidos com os blocos?
+   b. Analise os dados e tire conclusões.
+7. (Montgomery, DAE, ex. 6.26) Um experimento foi conduzido em uma
+   fábrica de semicondutores com o objetivo de se aumentar o rendimento.
+   Os fatores e níveis foram: A = abertura (pequena, grande), B =
+   tempode exposição (20% abaixo do nominal, 20% acima do nominal), C =
+   tempode desenvolvimento (30 s., 45 s.), D = dimensão da máscara
+   (pequena, grande), E = tempo de gravação (14.5 min., 15.5 min.). Os
+   resultados deste fatorial $2^5$ sem réplicas está disponível
+   [aqui](http://leg.ufpr.br/~fernandomayer/data/montgomery_DAE_6-26.txt).
+   Com isso:
+     a. Estime os efeitos e faça o gráfico normal de probabilidade.
+     b. Faça a ANOVA para confirmar os resultados da letra (a).
+     c. Avalie os resíduos.
+     d. Interprete os resultados e faça a projeção do experimento se
+   necessário.
+```{r, eval=FALSE, include=FALSE}
 ##======================================================================
 ## Montgomery, Design and analysis of experiments, 5 ed., ex. 7-7, com
 ## dados do ex. 6-21
-url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_6-21.txt"
+url <- "http://leg.ufpr.br/~fernandomayer/data/montgomery_DAE_6-26.txt"
 dados <- read.table(url, header = TRUE)
 row.names(dados) <- apply(dados, 1,
                        function(i) paste(letters[1:5][i==1], collapse = ""))
@@ -1165,7 +1253,10 @@ anova(m0)
 
 ## Analise dos residuos
 qqnorm(residuals(m0)); qqline(residuals(m0))
-
+```
+8. Usando os mesmos dados do exercício 7, construa e analise o
+   experimento com 2 blocos, com ABCDE confundido com blocos.
+```{r, eval=FALSE, include=FALSE}
 ##======================================================================
 ## Ex. 7-7. Dividindo o experimento em 2 blocos, usando ABCD como
 ## confundimento
@@ -1204,7 +1295,10 @@ anova(m1)
 
 ## Analise dos residuos
 qqnorm(residuals(m1)); qqline(residuals(m1))
-
+```
+9. Repita o exercício 8, supondo que 4 blocos fossem necessários. Sugira
+   um esquema de confundimento.
+```{r, eval=FALSE, include=FALSE}
 ##======================================================================
 ## Ex. 7-8. Mesmo experimento dividido em 4 blocos. Use ABC e CDE
 ## (consequentemente ABDE) como confundimento
@@ -1249,7 +1343,10 @@ anova(m2)
 
 ## Analise dos residuos
 qqnorm(residuals(m2)); qqline(residuals(m2))
-
+```
+10. Repita novamente o exercício 8, considerando 4 blocos com ACDE e BCD
+(consequentemente ABE) confundidos com bloco.
+```{r, eval=FALSE, include=FALSE}
 ##======================================================================
 ## Ex. 7-9. Mesmo experimento dividido em 4 blocos. Use ACDE e BCD
 ## (consequentemente ABE) como confundimento
@@ -1295,92 +1392,3 @@ anova(m3)
 ## Analise dos residuos
 qqnorm(residuals(m3)); qqline(residuals(m3))
 ```
-
-# Confundindo um fatorial $2^k$ em $2^p$ blocos
-
-Os métodos descritos acima podem ser extendidos para a construção de
-fatoriais $2^k$ confundidos em $2^p$ blocos ($p<k$), onde cada bloco
-contém exatamente $2^{k-p}$ corridas.
-
-Começe selecionando $p$ efeitos a serem confundidos, com o cuidado de
-que nenhum afeito escolhida seja uma interação generalizada dos
-outros. Dessa forma, os blocos podem ser construídos a partir de $p$
-contrastes de definição $L_1, L_2, \ldots, L_p$ que estejam associados
-com estes efeitos. Em adição aos $p$ efeitos escolhidos para serem
-confundidos, exatamente $2^p - p - 1$ efeitos adicionais serão também
-confundidos com blocos. Estas são as interações generalizadas dos $p$
-efeitos originais escolhidos. eve-se tomar cuidado para não confundir
-efeitos que tenham interesse potencial.
-
-# Exercícios
-
-1. Considere os dados abaixo:
-
-```{r, echo=FALSE}
-url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-12.txt"
-ex1 <- read.table(url, header = TRUE)
-da <- expand.grid(A = c(-1, 1), B = c(-1, 1), C = c(-1, 1))
-ex1 <- data.frame(da, y = ex1$RepI,
-                  row.names = ex1$Tratamento)
-ex1
-```
-
-a. Estabeleça um planejamento para correr essas observações em dois
-blocos de quatro observações cada, com ABC confundido.
-b. Analise os dados.
-
-2. Considere os dados abaixo:
-
-```{r, echo=FALSE}
-url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-13.txt"
-ex2 <- read.table(url, header = TRUE)
-da <- expand.grid(A = c(-1, 1), B = c(-1, 1), C = c(-1, 1), D = c(-1, 1))
-ex2 <- data.frame(da, y = ex2$RepI,
-                  row.names = ex2$Tratamento)
-ex2
-```
-
-a. Construa um planejamento com dois blocos de oito observações cada,
-com ABCD confundido.
-b. Analise os dados.
-
-3. Considere os dados abaixo:
-
-```{r, echo=FALSE}
-url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-18.txt"
-ex3 <- read.table(url, header = TRUE)
-da <- expand.grid(A = c(-1, 1), B = c(-1, 1), C = c(-1, 1), D = c(-1, 1))
-ex3 <- data.frame(da, y = ex3$y,
-                  row.names = ex3$Tratamento)
-ex3
-```
-
-a. Construa o planejamento que teria sido usado para correr esse
-experimento em dois blocos de oito corridas cada.
-b. Analise os dados.
-
-4. Construa um planejamento $2^5$ em dois blocos. Selecione a interação
-ABCDE para ser confundida com os blocos.
-
-5. Considere os mesmos dados do exercício 2 acima, e suponha que quatro
-blocos sejam necessários. Crie os blocos com ABD e ABC confundidos.
-a. Qual a interação generalizada, que também está confundida neste
-experimento?
-b. Construa os blocos com as combinações de tratamento adequadas, e
-analise os dados.
-
-6. Um estudo reportou um experimento para minimizar variações nos níveis
-de glicose no sangue. Os fatores foram: volume de suco ingerido antes de
-um exercício (`Suco`), tempo de exercíco em uma estação de esqui
-(`Exercicio`), intervalo de tempo entre tomar o suco e começar o
-exercício (`Intervalo`). O período do dia (`Periodo`) foi considerado
-como bloco. Os dados estão abaixo:
-
-```{r, echo=FALSE}
-url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-37.txt"
-ex6 <- read.table(url, header = TRUE)
-print(ex6, row.names = FALSE)
-```
-
-a. Quais efeitos estão confundidos com os blocos?
-b. Analise os dados e tire conclusões.
