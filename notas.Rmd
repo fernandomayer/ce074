@@ -17,12 +17,17 @@ notas <- read.csv("misc/notas.csv")
 notas$Matrícula <- as.numeric(gsub("[A-Z]", "", notas$Matrícula))
 notas <- notas[order(notas$Matrícula), ]
 rownames(notas) <- 1:nrow(notas)
-## Nesse caso, existem duas notas P1P e P1D que precisam ser somadas. Se
-## houver 1 NA, soma sem o NA. Se houverem 2 NAs, mantém NA.
-notas$P1 <- apply(notas[, 2:3], 1, function(x){
-    count.na <- sum(is.na(x))
-    ifelse(count.na == 2, NA, sum(x, na.rm = TRUE))
+## Nesse caso, existem duas notas P1E e P1D que precisam ser somadas. Se
+## houver 1 NA, soma sem o NA. Se houverem 2 NAs, mantém NA. Essa soma é
+## multiplicada por 0.7 e o resultado é somado com P1P multiplicado por
+## 0.3.
+notas$P1 <- apply(notas[, 2:4], 1, function(x){
+    count.na <- sum(is.na(x[1:2]))
+    ifelse(count.na == 2, NA,
+           sum(sum(x[1:2], na.rm = TRUE)*0.7, x[3]*0.3, na.rm = TRUE))
 })
+## Arredonda para duas casas decimais
+notas$P1 <- round(notas$P1, 2)
 ## Seleciona apenas as colunas com as notas de provas, que nesse caso é
 ## só a nota final somada P1 (começa com P e termina com número)
 notas.col <- grep("^P*[0-9]$", names(notas))
@@ -76,15 +81,14 @@ round(apply(notas[, notas.col, drop = FALSE], 2, statm), 2)
 
 ## Notas individuais
 
-- `P1P` é a nota da prova escrita feita em sala (valendo 9.0).
+- `P1E` é a nota da prova escrita feita em sala (valendo 9.0).
 - `P1D` é a nota do Diagrama de Hasse entregue (valendo 1.0).
-- `P1` é a nota final (`P1P` + `P1D`).
-
-Observação: a nota `P1` será 70% do total, enquanto que a nota da prova
-prática será 30% do total.
+- `P1P` é a nota da prova prática (valendo 10.0).
+- `P1` é a nota final: $(\textrm{P1E} + \textrm{P1D}) \times 0.7 +
+  \textrm{P1P} \times 0.3$.
 
 ```{r, echo=FALSE, eval=TRUE, rownames.print=FALSE, rows.print=nrow(notas)}
-notas[, c(1, c(2:3, notas.col))]
+notas[, c(1, c(2:4, notas.col))]
 ```
 
 ```{r, eval=TRUE, include=FALSE, eval=FALSE}
