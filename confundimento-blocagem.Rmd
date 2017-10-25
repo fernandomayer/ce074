@@ -20,6 +20,10 @@ opts_chunk$set(
 options(show.signif.stars = TRUE)
 ```
 
+```{r external-code, cache=FALSE, include=FALSE}
+knitr::read_chunk("scripts/script_confundimento-blocagem-respostas.R")
+```
+
 # Introdução
 
 Existem certas situações em que é praticamente impossível fazer todas as
@@ -1223,172 +1227,17 @@ print(ex6, row.names = FALSE)
      c. Avalie os resíduos.
      d. Interprete os resultados e faça a projeção do experimento se
    necessário.
-```{r, eval=FALSE, include=FALSE}
-##======================================================================
-## Montgomery, Design and analysis of experiments, 5 ed., ex. 7-7, com
-## dados do ex. 6-21
-url <- "http://leg.ufpr.br/~fernandomayer/data/montgomery_DAE_6-26.txt"
-dados <- read.table(url, header = TRUE)
-row.names(dados) <- apply(dados, 1,
-                       function(i) paste(letters[1:5][i==1], collapse = ""))
-row.names(dados)[1] <- "(1)"
-dados
-
-##======================================================================
-## Analisando os dados originais, SEM considerar blocos ainda
-
-## Grafico de probabilidade normal dos efeitos
-tab <- model.matrix(~ A*B*C*D*E, data = dados)
-contr <- t(tab[, -1]) %*% dados$y
-n <- 1
-k <- 5
-ef <- contr/(n * 2^(k-1))
-aux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
-text(aux$x, aux$y, rownames(aux$y), cex = 0.8, pos = 3)
-
-## ANOVA
-## Efeitos importantes: A, B, C, e AB
-m0 <- lm(y ~ A + B + C + A:B, data = dados)
-anova(m0)
-
-## Analise dos residuos
-qqnorm(residuals(m0)); qqline(residuals(m0))
+```{r ex7, eval=FALSE, include=FALSE}
 ```
 8. Usando os mesmos dados do exercício 7, construa e analise o
    experimento com 2 blocos, com ABCDE confundido com blocos.
-```{r, eval=FALSE, include=FALSE}
-##======================================================================
-## Ex. 7-7. Dividindo o experimento em 2 blocos, usando ABCD como
-## confundimento
-
-## Usando o contraste de definição
-## Antes, converte para a codificação (0,1)
-dados[, 1:5] <- ifelse(dados[, 1:5] == -1, 0, 1)
-dados
-## Como o fator a ser confundido é ABCD, então
-## L = x_1 + x_2 + x_3 + x_4 + x_5
-alpha <- c(1, 1, 1, 1, 1)
-dados$bloco <- apply(dados[, 1:5], 1, contr.def, alpha = alpha)
-dados <- dados[order(dados$bloco), ]
-dados
-## Croqui do experimento
-matrix(row.names(dados), ncol = 2,
-       dimnames = list(1:16, paste("Bloco", 1:2)))
-
-## Analise dos dados
-## Note que para calcular os contrastes, precisamos dos dados na
-## codificação (-1,1)
-dados[, 1:5] <- ifelse(dados[, 1:5] == 0, -1, 1)
-## Monta a tebela de sinais. Repare que as interações vão até a quata
-## ordem, pois a interação de quinta ordem, ABCDE, está confundida com
-## bloco, que já está presente no modelo
-tab <- model.matrix(~ bloco + (A+B+C+D+E)^4, data = dados)
-contr <- t(tab[, -(1:2)]) %*% dados$y
-n <- 1
-k <- 5
-ef <- contr/(n * 2^(k-1))
-aux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
-text(aux$x, aux$y, rownames(aux$y), cex = 0.8, pos = 3)
-## Efeitos importantes: A, B, C, e AB
-m1 <- lm(y ~ bloco + A + B + C + A:B, data = dados)
-anova(m1)
-
-## Analise dos residuos
-qqnorm(residuals(m1)); qqline(residuals(m1))
+```{r ex8, eval=FALSE, include=FALSE}
 ```
 9. Repita o exercício 8, supondo que 4 blocos fossem necessários. Sugira
    um esquema de confundimento.
-```{r, eval=FALSE, include=FALSE}
-##======================================================================
-## Ex. 7-8. Mesmo experimento dividido em 4 blocos. Use ABC e CDE
-## (consequentemente ABDE) como confundimento
-
-## Usando contrastes de definição
-## Novamente converte os níveis dos fatores para a codificação (0,1)
-dados[, 1:5] <- ifelse(dados[, 1:5] == -1, 0, 1)
-## A interacção ABC tem o contraste de definição
-## L_1 = x_1 + x_2 + x_3
-alpha1 <- c(1, 1, 1, 0, 0)
-L1 <- apply(dados[, 1:5], 1, contr.def, alpha = alpha1)
-## E a interação CDE possui o contraste de definção
-## L_2 = x_3 + x_4 + x_5
-alpha2 <- c(0, 0, 1, 1, 1)
-L2 <- apply(dados[, 1:5], 1, contr.def, alpha = alpha2)
-## Juntando os pares (L1,L2) e criando os blocos
-dados$bloco2 <- interaction(L1, L2, sep = "")
-dados <- dados[order(dados$bloco2), ]
-## Croqui do exprimento
-matrix(row.names(dados), ncol = 4,
-       dimnames = list(1:8, paste("Bloco", 1:4)))
-
-## Analise dos dados
-## Note que para calcular os contrastes, precisamos dos dados na
-## codificação (-1,1)
-dados[, 1:5] <- ifelse(dados[, 1:5] == 0, -1, 1)
-## Monta a tebela de sinais. Note que é feita a tabela com todas as
-## interações, menos ABD, CDE, e ABDE, que estão confundidas com bloco,
-## e bloco já está no modelo
-tab <- model.matrix(~ bloco2 + (A+B+C+D+E)^5 - A:B:C - C:D:E - A:B:D:E,
-                    data = dados)
-colnames(tab)
-contr <- t(tab[, -(1:4)]) %*% dados$y
-n <- 1
-k <- 5
-ef <- contr/(n * 2^(k-1))
-aux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
-text(aux$x, aux$y, rownames(aux$y), cex = 0.8, pos = 3)
-## Efeitos importantes: A, B, C, e AB
-m2 <- lm(y ~ bloco2 + A + B + C + A:B, data = dados)
-anova(m2)
-
-## Analise dos residuos
-qqnorm(residuals(m2)); qqline(residuals(m2))
+```{r ex9, eval=FALSE, include=FALSE}
 ```
 10. Repita novamente o exercício 8, considerando 4 blocos com ACDE e BCD
 (consequentemente ABE) confundidos com bloco.
-```{r, eval=FALSE, include=FALSE}
-##======================================================================
-## Ex. 7-9. Mesmo experimento dividido em 4 blocos. Use ACDE e BCD
-## (consequentemente ABE) como confundimento
-
-## Usando contrastes de definição
-## Novamente converte os níveis dos fatores para a codificação (0,1)
-dados[, 1:5] <- ifelse(dados[, 1:5] == -1, 0, 1)
-## A interacção ACDE tem o contraste de definição
-## L_1 = x_1 + x_3 + x_4 + x_5
-alpha1 <- c(1, 0, 1, 1, 1)
-L1 <- apply(dados[, 1:5], 1, contr.def, alpha = alpha1)
-## E a interação BCD possui o contraste de definção
-## L_2 = x_2 + x_3 + x_4
-alpha2 <- c(0, 1, 1, 1, 0)
-L2 <- apply(dados[, 1:5], 1, contr.def, alpha = alpha2)
-## Juntando os pares (L1,L2) e criando os blocos
-dados$bloco3 <- interaction(L1, L2, sep = "")
-dados <- dados[order(dados$bloco3), ]
-## Croqui do exprimento
-matrix(row.names(dados), ncol = 4,
-       dimnames = list(1:8, paste("Bloco", 1:4)))
-
-## Analise dos dados
-## Note que para calcular os contrastes, precisamos dos dados na
-## codificação (-1,1)
-dados[, 1:5] <- ifelse(dados[, 1:5] == 0, -1, 1)
-## Monta a tebela de sinais. Note que é feita a tabela com todas as
-## interações, menos ACDE, BCD, e ABE, que estão confundidas com bloco,
-## e bloco já está no modelo
-tab <- model.matrix(~ bloco3 + (A+B+C+D+E)^5 - A:C:D:E - B:C:D - A:B:E,
-                    data = dados)
-colnames(tab)
-contr <- t(tab[, -(1:4)]) %*% dados$y
-n <- 1
-k <- 5
-ef <- contr/(n * 2^(k-1))
-aux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
-text(aux$x, aux$y, rownames(aux$y), cex = 0.8, pos = 3)
-## Efeitos importantes: A, B, C, e AB
-m3 <- lm(y ~ bloco3 + A + B + C + A:B, data = dados)
-anova(m3)
-
-## Analise dos residuos
-qqnorm(residuals(m3)); qqline(residuals(m3))
+```{r ex10, eval=FALSE, include=FALSE}
 ```
