@@ -3,6 +3,52 @@
 ##======================================================================
 
 ##======================================================================
+## ----- ex6
+url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-37.txt"
+dados <- read.table(url, header = TRUE)
+dados
+##----------------------------------------------------------------------
+## a. Quais efeitos estão confundidos com os blocos?
+## O efeito ABC está confundido com blocos, onde A = Suco, B =
+## Exercicio, C = Intervalo. Para ver isso, codifique cada coluna para
+## (-1, 1), faça o produto e veja que o resultado será a codificação de
+## Periodo (sendo pm = -1 e am = 1).
+## Muda a ordem dos niveis de Periodo
+levels(dados$Periodo)
+dados$Periodo <- relevel(dados$Periodo, ref = "pm")
+levels(dados$Periodo)
+## Cria uma função para codificar fatores em (-1, 1)
+cod.sum <- function(x){
+    baixo <- min(as.numeric(x))
+    alto <- max(as.numeric(x))
+    cod <- ifelse(as.numeric(x) == baixo, -1, 1)
+    return(cod)
+}
+## Aplica nos dados
+dados2 <- data.frame(sapply(dados[, 1:4], cod.sum), dados[, 5])
+names(dados2) <- c(LETTERS[1:3], "Bloco", "Glicose")
+dados2
+## Veja que
+cbind(with(dados2, A*B*C), dados2$Bloco)
+identical(with(dados2, A*B*C), dados2$Bloco)
+##----------------------------------------------------------------------
+## b. Analise os dados e tire conclusões.
+## Usando dados2 que já está na codificação (-1, 1)
+tab <- model.matrix(~ Bloco + (A + B + C)^2, data = dados2)
+contr <- t(tab[, -(1:2)]) %*% dados2$Glicose
+r <- 1
+k <- 3
+ef <- contr/(r * 2^(k-1))
+aux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
+text(aux$x, aux$y, rownames(aux$y), cex = 0.8, pos = 3)
+## Nenhum parece ter efeito, mas podemos fazer a ANOVA excluindo AB que
+## está mais próximo da linha
+m0 <- lm(Glicose ~ Bloco + (A + B + C)^2 - A:B, data = dados2)
+anova(m0)
+## Todos os efeitos são pouco significativos.
+summary(m0)
+
+##======================================================================
 ## ----- ex7
 url <- "http://leg.ufpr.br/~fernandomayer/data/montgomery_DAE_6-26.txt"
 dados <- read.table(url, header = TRUE)

@@ -1205,7 +1205,8 @@ de glicose no sangue. Os fatores foram: volume de suco ingerido antes de
 um exercício (`Suco`), tempo de exercíco em uma estação de esqui
 (`Exercicio`), intervalo de tempo entre tomar o suco e começar o
 exercício (`Intervalo`). O período do dia (`Periodo`) foi considerado
-como bloco. Os dados estão abaixo:
+como bloco. Os dados estão abaixo (disponíveis
+[aqui](http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-37.txt)):
 ```{r, echo=FALSE}
 url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-37.txt"
 ex6 <- read.table(url, header = TRUE)
@@ -1213,6 +1214,8 @@ print(ex6, row.names = FALSE)
 ```
    a. Quais efeitos estão confundidos com os blocos?
    b. Analise os dados e tire conclusões.
+```{r ex6, echo=FALSE, include=FALSE}
+```
 7. (Montgomery, DAE, ex. 6.26) Um experimento foi conduzido em uma
    fábrica de semicondutores com o objetivo de se aumentar o rendimento.
    Os fatores e níveis foram: A = abertura (pequena, grande), B =
