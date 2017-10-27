@@ -31,3 +31,17 @@ Elias
 Bruno Geronymo
 Hermann Mogiz Delgado
 Vinicius César Pedroso
+
+## Grupo 6
+
+Alcides
+Milton
+Caroline
+Natalia
+
+## Grupo 7
+
+Geverson
+Alexandre
+Pedro G.
+Everton
