@@ -1244,3 +1244,6 @@ print(ex6, row.names = FALSE)
 (consequentemente ABE) confundidos com bloco.
 ```{r ex10, eval=FALSE, include=FALSE}
 ```
+
+As respostas para os exercícios finais estão nesse
+[script](scripts/script_confundimento-blocagem-respostas.R).
