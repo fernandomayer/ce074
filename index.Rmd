@@ -14,9 +14,7 @@ source("setup_knitr.R")
 <div class="alert alert-danger" role="alert">
 **AVISOS:**
 
-- A aula desta quinta-feira (26/10) será no LABEST B (térreo do prédio
-de Exatas)
-- Trazer computador para esta aula se possível
+- A partir de 26/10 as aulas serão no LABEST B (térreo do prédio de Exatas)
 </div>
 
 # Detalhes da oferta da disciplina
