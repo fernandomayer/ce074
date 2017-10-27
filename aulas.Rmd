@@ -89,7 +89,9 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
   $2^k$ em blocos completos. Ver [material](confundimento-blocagem.html).
 - **23/10**: Técnicas de confundimento para dois blocos incompletos em
   fatoriais $2^k$. Ver [material](confundimento-blocagem.html).
-- **26/10**:
+- **26/10**: Técnicas de confundimento para quatro blocos incompletos em
+  fatoriais $2^k$. Ver [material](confundimento-blocagem.html) e
+  exercícios ao final daquela página.
 - **30/10**: Não haverá aula.
 - **02/11**: Feriado.
 - **06/11**: Apresentação do planejamento do experimento e primeiros
