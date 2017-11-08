@@ -24,8 +24,8 @@ source("setup_knitr.R")
 - **Professor Responsável:** [Fernando de Pol Mayer][], ([LEG][]:
   Laboratório de Estatística e Geoinformação)
 - **Horários e Locais:**
-    - Segunda, 20:40 - 22:00h, **PC-06**
-    - Quinta, 19:00 - 20:30h, **PC-06**
+    - Segunda, 20:40 - 22:00h, ~~PC-06~~ **LABEST B**
+    - Quinta, 19:00 - 20:30h, ~~PC-06~~ **LABEST B**
 - **Horários de atendimento do professor:**
     - Quartas e sextas, 14:00-20:00 (preferenciais). Outros horários
       podem ser agendados previamente por email.
