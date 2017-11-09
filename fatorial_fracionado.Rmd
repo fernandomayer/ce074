@@ -1,0 +1,1167 @@
+---
+title: "Experimentos fatoriais fracionados"
+output:
+  html_document:
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+library(knitr, quietly = TRUE)
+library(lattice, quietly = TRUE)
+opts_chunk$set(
+               cache = TRUE,
+               tidy = FALSE,
+               comment = "#",
+               collapse = TRUE,
+               fig.align = "center",
+               fig.path = "figures/",
+               cache.path = "cache/"
+           )
+options(show.signif.stars = TRUE)
+```
+
+# Introdução
+
+Nos experimentos fatoriais $2^k$, o número de corridas cresce
+rapidamente com o número de fatores.
+
+```
+k 2 3  4  5  6   7   8   9   10
+n 4 8 16 32 64 128 256 512 1024
+```
+
+Com isso, se existe necessidade de estudar muitos fatores, esse tipo de
+planejamento oferece limitação devido ao elevado número de corridas
+exigidas na sua execução. Ao correr um experimento $2^k$, é possível
+estimar efeitos principais, interações duplas e interações até de grau
+$k$. Porém, essas interações de ordem elevada podem ser desconsideradas,
+já que normalmente não são de interesse prático e muitas vezes possuem
+efeitos desprezíveis. O que se considera mais importante são os efeitos
+principais e interações baixas (duplas, triplas). Assim, correr o
+experimento $2^k$ iria permitir estimar interações altas que de fato não
+seriam aproveitadas. Então o ponto é: não seria possível reduzir o
+número de corridas do experimento já qua há pouco interesse nas
+interações altas? Sim. É exatamente esse o elemento central dos
+**experimentos fatoriais fracionados**.
+
+Os fatoriais fracionários tem um uso importante nos **experimentos
+exploratórios** (*screening experiments*). Estes são experimentos em que
+muitos fatores são considerados, com a finalidade de se identificar
+aqueles fatores que possuem efeitos grandes. Experimentos exploratórios
+geralmente são realizados nos estágios iniciais de um projeto, quando é
+provavel que muitos dos fatores considerados tenham pouco ou nenhum
+efeito na resposta. Os fatores que forem identificados como importantes
+serão então investigados mais a fundo em experimentos subsequentes.
+
+A idéia básica é dividir as corridas do fatorial $2^k$ em frações,
+exatamente da mesma forma que fazemos para aplicar blocagem. Na blocagem
+escolhemos um efeito para propositalmente confundirmos com o efeito dos
+blocos. Nos fatoriais fracionados é similar: define-se efeitos que
+serão propositalmente confundidos. **O confundimento entre efeitos é o
+preço que se paga para reduzir o número de corridas**. Perceba que
+nosso objetivo é estudar $k$ fatores onde seria possível estudar com todas
+as corridas um fatorial com k* < k. O ponto chave ao delinear o
+experimento é saber escolher os efeitos a serem confundidos para tirar a
+maior vantagem possível do experimento que é inferir sobre os efeitos
+principais e interações baixas.
+
+# Fatoriais fracionados $2^{k-1}$ ou meia-fração de um fatorial $2^k$
+
+Nesses experimentos avaliamos k fatores fazendo metade das corridas
+previstas para o fatorial $2^k$, ou seja
+
+$$
+2^{k-1} = 2^k 2^{-1} = \frac{2^k}{2}
+$$
+
+Para saber que níveis de cada fator serão corridos, temos que montar a
+matriz de delineamento do experimento com $k-1$ fatores. Os níveis do
+$k$-ésimo fator são determinados a partir dos precedentes e do efeito
+escolhido para o confundimento.
+
+Considere como exemplo, um experimento fatorial $2^{3-1}$, ou seja, uma
+meia-fração de um $2^3$. Esse planejamento possui apenas quatro
+corridas, em contraste com as oito corridas do planejamento original.
+
+A tabela de sinais para o planejamento $2^3$ é mostrada abaixo.
+
+```{r, echo=FALSE}
+da <- expand.grid(A = c(-1, 1), B = c(-1, 1), C = c(-1, 1))
+da <- transform(da, AB = A*B, AC = A*C, BC = B*C, ABC = A*B*C)
+row.names(da) <- apply(da[,1:3], 1,
+                       function(i) paste(letters[1:3][i==1], collapse = ""))
+row.names(da)[1] <- "(1)"
+da <- da[order(da$ABC, decreasing = TRUE), ]
+da <- data.frame(I = 1, da)
+da
+```
+
+Repare que esta tabela está propositalmente ordenada em ordem
+decrescente pela coluna ABC. Se selecionarmos as quatro combinações de
+tratamento onde a coluna ABC possui sinal positivo, ou seja, $a$, $b$,
+$c$, $abc$, estamos selecionando uma meia-fração desse
+planejamento. Sendo assim, dizemos que $ABC$ é o **gerador** dessa
+fração particular. Além disso, o elemento identidade $I$ possui também o
+mesmo sinal (positivo) para as quatro corridas. Assim, chamamos
+
+$$
+I = ABC
+$$
+
+de **relação de definção** para esse planejamento fracionário. Essa
+fração com sinal positivo na relação de definição é chamada de **fração
+principal**, enquanto que a fração com sinal negativo em ABC,
+
+$$
+I = -ABC
+$$
+
+é chamada de **fração alternada**.
+
+Ainda analisando a parte superior da tabela acima, note que os sinais
+que estimam os contrastes para o fator $A$ são os mesmos que estimam os
+contrastes para a interação $BC$. Da mesma forma, os contrastes de $B$
+são os mesmos de $AC$, e assim por diante. Isso ocorre pois a relação de
+definição gera uma série de **confundimentos** no fatorial
+fracionário. De fato, todos os efeitos e interações estão confundidos
+com algum outro efeito ou interação. Se multiplicarmos cada fator ou
+interação pela relação de definição, e usarmos as propriedades da tabela
+de sinais, podemos ver que:
+
+$$
+\begin{align}
+A \cdot I = A \cdot ABC = A^2BC = BC \\
+B \cdot I = B \cdot ABC = AB^2C = AC \\
+C \cdot I = C \cdot ABC = ABC^2 = AB \\
+\end{align}
+$$
+
+Portanto, só precisamos estimar os efeitos de A, B, e C, pois BC, AC, e
+AB estão confundidos com estes efeitos. À estes efeitos que estão
+confundidos chamamos de **pares associados**, ou *aliases*. Em
+experimentos fatoriais fracionados $2^{k-1}$ todo efeito possui um par
+associado. Nesse caso específico de um fracionário $2^{3-1}$, cada
+efeito principal tem um par associado de segunda ordem.
+
+Repare então que ao estimar o afeito de A, por exemplo, também estamos
+estimando o efeito de BC. Se este efeito for grande, não temos como saber
+se ele é causado por A ou por BC isoladamente, pois eles estão
+confundidos. No entanto, como vimos anteriormente, é muito mais comum
+que efeitos principais sejam mais importantes do que efeitos de ordens
+mais altas. Assim, se assumirmos que efeitos de ordens mais altas tem
+pouco ou nenhum efeito, então podemos concluir que um efeito grande de A
+seja exclusivamente desse efeito principal. O mesmo vale para os outros
+efeitos.
+
+Novamente aqui cabe uma frase já escrita anteriormente: *o confundimento
+entre efeitos é o preço que se paga para reduzir o número de
+corridas*. A ideia do experimento fatorial fracionário é de justamente
+correr experimentos com muitos fatores em frações menores, verificar os
+efeitos que realmente importam, e daí sim planejar fatoriais completos,
+mas com menos fatores, aqueles que realmente importam. Dessa forma,
+podemos correr uma sequência de experimentos pequenos e eficientes,
+combinar informações por meio de vários experimentos, e tirar vantagem
+de aprender sobre o processo que estamos experimentando à medida que
+continuamos. Esse é um bom exemplo do conceito de **experimentos
+sequenciais**.
+
+## Construção de um fatorial $2^{k-1}$
+
+Um planejamento $2^{k-1}$ pode ser construído escrevendo as combinações
+dos tratamentos para um fatorial completo com $k-1$ fatores, chamado de
+**planejamento básico**. Depois, adiciona-se o $k$-ésimo fator,
+identificando seus níveis alto e baixo com os sinais mais e menos da
+interação de mais alta ordem.
+
+Por exemplo, umm fatorial fracionário $2^{4-1}$ é construído escrevendo
+o planejamento básico $2^3$, e então igualando o fator $D$ com a
+interação $ABC$, pois a relação de definição é $I = ABCD$ e $D \cdot I =
+D \cdot ABCD = ABC$.
+
+```{r}
+##======================================================================
+## Exemplo 2^(4-1), tabela de sinais do 2^3
+da <- expand.grid(A = c(-1, 1), B = c(-1, 1), C = c(-1, 1))
+da
+## Níveis de D gerados pelo efeito ABC
+da$D <- with(da, A*B*C)
+row.names(da) <- apply(da, 1,
+                       function(i) paste(letters[1:4][i==1], collapse = ""))
+row.names(da)[1] <- "(1)"
+da
+```
+
+Veja que propositalmente atribuímos os níveis de D sobre o efeito ABC,
+ou seja, confundimos estes dois efeitos. Mas sabemos que este não é o
+único par de efeitos que está confundido. Se obtermos a tabela de
+sinais para todos os efeitos veremos mais efeitos confundidos.
+
+```{r}
+(tab <- model.matrix(~ A*B*C*D, da))
+```
+
+Os pares de efeitos $(A, BCD), (B, ACD), \ldots, (AB, CD)$ estão
+confundidos, pois têm os mesmos sinais. Verificar aos pares as colunas
+para encontrar os pares associados é demorado, por isso é mais fácil fazer
+operações com o contraste de definição, $I = ABCD$. Assim, para sabermos
+quem está confundido com quem, podemos fazer
+
+$$
+\begin{align}
+A \cdot I = A \cdot ABCD = A^2BCD = BCD \\
+B \cdot I = B \cdot ABCD = AB^2CD = ACD \\
+C \cdot I = C \cdot ABCD = ABC^2D = ABD \\
+D \cdot I = D \cdot ABCD = ABCD^2 = ABC \\
+\end{align}
+$$
+
+para os efeitos principais, e
+
+$$
+\begin{align}
+AB \cdot I = AB \cdot ABCD = A^2B^2CD = CD \\
+AC \cdot I = AC \cdot ABCD = A^2BC^2D = BD \\
+AD \cdot I = AD \cdot ABCD = A^2BCD^2 = BC \\
+\end{align}
+$$
+
+para os efeitos de segunda ordem. Veja que aqui, os efeitos principais
+estão confundidos com efeitos de terceira ordem, e efeitos de segunda
+ordem estão confundidos entre si.
+
+No R, podemos obter a tabela de sinais para os efeitos únicos através de
+
+```{r}
+(tab <- unique(tab, MARGIN = 2))
+```
+
+Veja que ao usar esta tabela para estimar os efeitos de I, A, B, C, D,
+AB, AC, e BC, também estamos estimando BCD, ACD, ABD, ABC, CD, BD, e AD,
+respectivamente (efeitos confundidos). Note que a interação de ordem
+mais alta, ABCD, não é estimável pois ela se iguala à média geral do
+experimento (intercepto), ou seja, é a prórpia relação de definição $I =
+ABCD$.
+
+Podemos escolher qualquer contraste para confundir, no entanto, usar as
+interações mais altas fazem com que os efeitos principais fiquem
+confundidos com estas, que podem ser assumidas como nulas. Então o
+valor observado do efeito pode ser considerado como exclusivamente do
+efeito principal.
+
+Uma outra forma de se construir um planejamento $2^{k-1}$ é usar a
+própria relação de definição para "fracionar" o experimento
+original. Nesse mesmo exemplo do fatorial $2^{4-1}$, podemos então obter
+o experimento completo $2^4$
+
+```{r}
+db <- expand.grid(A = c(-1, 1), B = c(-1, 1),
+                  C = c(-1, 1), D = c(-1, 1))
+row.names(db) <- apply(db, 1,
+                       function(i) paste(letters[1:4][i==1], collapse = ""))
+row.names(db)[1] <- "(1)"
+db
+```
+
+Como a relação de definição é $I = ABCD$, e ela é a geradora da
+meia-fração do experimento, então so precisamos calcular $ABCD$
+
+```{r}
+db$ABCD <- with(db, A*B*C*D)
+db[order(db$ABCD, decreasing = TRUE), ]
+```
+
+e selecionar a fração principal de $ABCD$, ou seja, aquela com sinal
+positivo em $ABCD$,
+
+```{r}
+db <- subset(db, ABCD == 1)
+db
+```
+
+Veja que automaticamente ficamos com a relação anterior de $D = ABC$
+
+```{r}
+db$D == with(db, A*B*C)
+```
+
+E as combinações de tratamentos selecionadas para a meia fração são as
+mesmas:
+
+```{r}
+cbind(row.names(da), row.names(db))
+```
+
+Portanto as duas formas mostradas acima podem ser utilizadas para
+construir qualquer experimento fatorial fracionado $2^{k-1}$.
+
+**Exercício**: construa um experimento fatorial $2^{5-1}$. Verifique os
+confundimentos.
+
+```{r, eval=FALSE, include=FALSE}
+##======================================================================
+## Exemplo 2^(5-1)
+## PLanejamento básico 2^4
+dc <- expand.grid(A = c(-1, 1), B = c(-1, 1),
+                  C = c(-1, 1), D = c(-1, 1))
+## Tabela do 2^4
+dc
+## Como I = ABCDE, então E.I = ABCD
+dc$E <- with(dc, A*B*C*D)
+dc
+## Efeitos totais
+(tab <- model.matrix(~ A*B*C*D*E, dc))
+## Efeitos únicos
+(tab <- unique(tab, MARGIN = 2))
+```
+
+## Exemplo de um fatorial $2^4$ convertido para um fatorial $2^{4-1}$
+
+Exemplo 14-5, Montgomery (EAPE): processo de ataque químico
+localizado sobre nitreto, por meio de uma sonda de plasma de pastilha
+única. Variável resposta: taxa de ataque do nitreto de
+silício. Variáveis explicativas:
+
+```
+                Fatores do experimento
+ Nível     Espaçamento   Pressão    Vazão de C2F6   Potência
+              (cm)       (m Torr)   (cm³ pad/min)     (W)
+ Baixo (-)    0.80         450           125          275
+ Alto  (+)    1.20         550           200          325
+```
+
+Este é um experimento fatorial $2^4$ completo, ou seja, foram corridas
+todas as 16 combinações de tratamentos possíveis. Vamos re-analisar
+estes dados completos aqui, e depois realizar o fracionamento desse
+experimento, com a intenção de verificar se chegamos à mesma conclusão.
+
+```{r}
+##----------------------------------------------------------------------
+## Importação
+url <- "http://www.leg.ufpr.br/~fernandomayer/data/mont_14-5.txt"
+dados <- read.table(url, header = TRUE)
+row.names(dados) <- apply(dados, 1,
+                          function(i) paste(letters[1:4][i==1], collapse = ""))
+row.names(dados)[1] <- "(1)"
+dados
+## Definições do experimento
+k <- 4
+r <- 1
+
+##----------------------------------------------------------------------
+## Montando a tabela de sinais
+(tab <- model.matrix(~A * B * C * D, data = dados))
+
+##----------------------------------------------------------------------
+## Estimativa dos efeitos
+y <- dados$y
+## Contrastes
+contr <- t(tab[, -1]) %*% y
+## Efeitos = contraste/(n2^{k-1})
+ef <- contr/(r * 2^(k - 1))
+
+##----------------------------------------------------------------------
+## Gráfico de probabilidade normal dos efeitos estimados
+qqaux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
+text(qqaux$x, qqaux$y, rownames(qqaux$y), cex = 0.8, pos = 3)
+
+##----------------------------------------------------------------------
+## Ajuste do modelo
+## Como vimos no gráfico anterior, as interações de ordem maior do que 2
+## são desnecessárias, portanto vamos ajustar o modelo com interações de
+## até segunda ordem apenas
+m0 <- lm(y ~ (A + B + C + D)^2, data = dados)
+anova(m0)
+
+## Modelo com efeitos significativos apenas
+m1 <- update(m0, . ~ A * D, data = dados)
+anova(m1)
+
+##----------------------------------------------------------------------
+## Residuos do modelo
+res <- residuals(m1)
+## Quantis normais
+qqnorm(res); qqline(res)
+```
+
+Para ilustrar o uso da meia-fração, suponha que decidimos usar o
+planejamento $2^{4-1}$, com a relação de definição $I = ABCD$, para
+investigar os quatro fatores deste experimento. Esse planejamento será
+construído com o planejamento básico $2^3$ nos fatores A, B, C, e então
+estabelecendo os níveis do quarto fator $D = ABC$, pois, através da
+relação de definição, temos que $D \cdot I = D \cdot ABCD = ABC$.
+
+O primeiro passo é então criar um planejamento $2^3$ completo, e incluir
+a coluna $D$ como sendo $D = ABC$
+
+```{r}
+dados2 <- expand.grid(A = c(-1, 1), B = c(-1, 1), C = c(-1, 1))
+dados2$D <- with(dados2, A*B*C)
+row.names(dados2) <- apply(dados2, 1,
+                          function(i) paste(letters[1:4][i==1], collapse = ""))
+row.names(dados2)[1] <- "(1)"
+dados2
+```
+
+Outra forma de montar esse experimento é a seguinte. Se a relação de
+definição é $I = ABCD$, então podemos usar os sinais dessa interação
+para separar as frações do experimento.
+
+```{r}
+dados$ABCD <- with(dados, A*B*C*D)
+dados[order(dados$ABCD, decreasing = TRUE), ]
+```
+
+As combinações de tratamento com sinal positivo em ABCD serão da fração
+principal, e os demais serão da fração alternada. Dessa forma, se
+ficarmos apenas com o sinal positivo de ABCD
+
+```{r}
+dados <- subset(dados, ABCD == 1)
+dados
+```
+
+Ficamos essencialmente com o mesmo planejamento fracionário. Note que
+dessa forma, automaticamente temos $D = ABC$
+
+```{r}
+all.equal(dados$D, with(dados, A * B * C))
+```
+
+Agora sabemos que as combinações de tratamento que serão corridas na
+meia-fração serão
+
+```{r}
+row.names(dados)
+```
+
+<!-- Para concluir essa base de dados, vamos supor que os resultados desse -->
+<!-- experimento fatorial fracionado tenha sido o mesmo do experimento -->
+<!-- completo, para estas combinações de tratamentos -->
+
+<!-- ```{r} -->
+<!-- dados2 <- merge(dados2, dados, sort = FALSE) -->
+<!-- row.names(dados2) <- apply(dados2[,1:4], 1, -->
+<!--                           function(i) paste(letters[1:4][i==1], collapse = "")) -->
+<!-- row.names(dados2)[1] <- "(1)" -->
+<!-- dados2 -->
+<!-- ``` -->
+
+O próximo passo então é criar a tabela de sinais
+
+```{r}
+(tab <- model.matrix(~ A*B*C*D, data = dados))
+```
+
+Note que os tratamentos possuem pares combinados (*aliases*), pois
+muitas colunas são idênticas. Isso é natural, uma vez que temos um
+efeito confundido por definição, $D = ABC$, outros também devem
+estar. Para saber quem são os pares combinados desse experimento, basta
+multiplicar cada fator pela relação de definição, por exemplo,
+
+$$
+\begin{align}
+A \cdot I = A \cdot ABCD = A^2BCD = BCD \\
+B \cdot I = B \cdot ABCD = AB^2CD = ACD \\
+C \cdot I = C \cdot ABCD = ABC^2D = ABD \\
+D \cdot I = D \cdot ABCD = ABCD^2 = ABC \\
+\end{align}
+$$
+
+Portanto, notamos que todos os efeitos principais estão confundidos com
+todas as interações de terceira ordem. Portanto, ao estimar um efeito
+principal, estamos também estimado a respectiva interação de terceira
+ordem. Como acreditamos que os efeitos das interações de ordem alta são
+desprezíveis, então podemos supor que o efeito estimado é de fato do
+efeto principal.
+
+Vemos também que as interações de segunda ordem estão associadas entre
+si, pois,
+
+$$
+\begin{align}
+AB \cdot I = AB \cdot ABCD = A^2B^2CD = CD \\
+AC \cdot I = AC \cdot ABCD = A^2BC^2D = BD \\
+AD \cdot I = AD \cdot ABCD = A^2BCD^2 = BC \\
+\end{align}
+$$
+
+Para facilitar a determinação dos pares associados, podemos usar a
+função abaixo:
+
+```{r}
+aliases <- function(ef, cd){
+    ## ef = efeitos
+    ## cd = contraste de definição
+    ali <- function(ef, cd){
+        ef <- gsub("\\W", "", ef)
+        ef <- unlist(strsplit(ef, ""))
+        cd <- gsub("\\W", "", cd)
+        cd <- unlist(strsplit(cd, ""))
+        x <- sort(c(ef, cd))
+        tb <- table(x)
+        paste(names(tb[tb==1]), collapse="")
+    }
+    sapply(ef, simplify=FALSE,
+           function(e){
+               x <- sapply(cd, function(i){
+                   x <- ali(e, i)
+               })
+               x[order(nchar(x))]
+           })
+}
+```
+
+Assim:
+
+```{r}
+aliases(colnames(tab)[-c(1,16)], "ABCD")
+```
+
+Com isso, não faz sentido estimar o efeito para todas as interações de
+segunda ordem, assim como estimar os efeitos de terceira
+ordem. Estimar os efeitos principais (que é de interesse), é
+virtualmente igual a estimar os efeitos de terceira ordem. Estimar os
+efeitos de segunda ordem AB, AC, e AD, é o mesmo que estimar CD, BD, e
+BC, respectivamente.
+
+Portanto, podemos identificar os fatores únicos na tabela de sinais
+
+```{r}
+(tab <- unique(tab, MARGIN = 2))
+```
+
+A partir desa tabela, podemos prosseguir a análise de forma usual,
+calculando os contrastes e efeitos, e verificando o tamanho dos efeitos
+através do gráfico de probabilidades normal. Note apenas que o $k$
+para esse experimento fracionado é 3, e não 4 como o original, pois ele
+é um $2^{4-1}$ = $2^{3}$
+
+```{r}
+##----------------------------------------------------------------------
+## Estimativa dos efeitos
+y <- dados$y
+## Contrastes
+contr <- t(tab[, -1]) %*% y
+## Efeitos = contraste/(r2^{k-1})
+## NOTE que agora o k é 3, pois o experimento básico é 2^{4-1} = 2^3
+k <- 3
+ef <- contr/(r * 2^(k-1))
+
+##----------------------------------------------------------------------
+## Gráfico de probabilidade normal dos efeitos estimados
+qqaux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
+text(qqaux$x, qqaux$y, rownames(qqaux$y), cex = 0.8, pos = 3)
+```
+
+Através destes resultados vemos que se destacam os fatores A, D, e a
+interação BC. Note que o par associado de BC é AD, portanto acreditamos
+que a interação que de fato é importante é AD. Esse resultado está de
+acordo com o resultado do experimento completo mostrado acima.
+
+Continuamos a análise como antes, ajustando um modelo apenas com os
+efeitos que notamos serem importantes na análise visual acima.
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste do modelo
+## Modelo com efeitos significativos apenas
+## NOTE que os efeitos importantes foram A, D, e BC, mas como vimos,
+## BC = AD, portanto podemos ajustar o modelo com A + D + A:D
+m2 <- lm(y ~ A * D, data = dados)
+anova(m2)
+
+##----------------------------------------------------------------------
+## Residuos do modelo
+res <- residuals(m2)
+## Quantis normais
+qqnorm(res); qqline(res)
+```
+
+# Frações menores: o fatorial fracionário $2^{k-p}$
+
+Em geral , um planejamento fatorial $2^k$ pode ser corrido em uma fração
+$1/2^p$, chamado de um planejamento fatorial fracionário $2^{k-p}$, pois
+
+$$
+2^{k-p} = 2^k 2^{-p} = \frac{2^k}{2^p}
+$$
+
+Portanto, uma fração $1/4$ é chamada de um planejamento $2^{k-2}$, uma
+fração $1/8$ é chamada de um planejamento $2^{k-3}$, uma fração $1/16$ é
+chamada de $2^{k-4}$, e assim por diante. Note que os experimentos com
+meia fração são um caso particular do planejamento $2^{k-p}$ com $p =
+1$.
+
+Com o objetivo de ilustrar a fração $1/4$, considere um experimento com
+seis fatores, e suponha que o pesquisador esteja interessado
+principalmente nos efeitos principais, com alguma informação sobre as
+interações de segunda ordem. Um planejamento $2^{6-1}$ iria requerer 32
+corridas. e necessitaríamos de 31 graus de liberdade para estimar os
+efeitos. Como há somente 6 efeitos principais e 15 interações de segunda
+ordem, a meia-fração é ineficiente pois ela requer mais corridas do que
+o necessário para o interesse do pesquisador. Suponha que consideramos
+uma fração $1/4$, ou um experimento $2^{6-2}$. Esse planejamento contém
+16 corridas, e com 15 graus de liberdade permitirá que todos os efeitos
+principais sejam estimados, com alguma capacidade de gerar informações
+sobre as interações de segunda ordem.
+
+De modo a gerar esse planejamento, escrevemos o planejamento básico
+$2^4$ nos fatores A, B, C, e D, e então adicionamos duas novas colunas
+para E e F.
+
+
+```{r}
+## Experimento básico 2^4
+da <- expand.grid(A = c(-1, 1), B = c(-1, 1),
+                  C = c(-1, 1), D = c(-1, 1))
+row.names(da) <- apply(da, 1,
+                       function(i) paste(letters[1:4][i==1], collapse = ""))
+row.names(da)[1] <- "(1)"
+da
+```
+
+Um experimento $2^{k-2}$ requer dois **contrastes de
+definição**, ou os **geradores do experimento**. Considere que os dois
+geradores são
+
+$$
+I = ABCE \qquad \text{e} \qquad I = BCDF
+$$
+
+Dessa forma, a coluna $E$ seria encontrada a partir de $E \cdot I = E
+\cdot ABCE = ABC$, e a coluna $F$ seria encontrada com $F \cdot I = F
+\cdot BCDF = BCD$.
+
+```{r}
+da$E <- with(da, A*B*C)
+da$F <- with(da, B*C*D)
+row.names(da) <- apply(da, 1,
+                       function(i) paste(letters[1:6][i==1], collapse = ""))
+row.names(da)[1] <- "(1)"
+da
+```
+
+No entanto, sabemos que o produto de quaisquer duas
+colunas na tabela de sinais do planejamento $2^k$ é apenas outra coluna
+da tabela. Consequentemente, o produto entre $ABCE$ e $BCDF$
+
+$$
+ABCE \cdot BCDF = AB^2C^2DEF = ADEF
+$$
+
+é a **interação generalizada** de ABCE com BCDF, e também uma coluna
+identidade. Como consequência, o planejamento $2^{6-2}$ possui uma
+**relação completa de definição** dada por
+
+$$
+I = ABCE = BCDF = ADEF
+$$
+
+Referimo-nos a cada termo em uma relação de definição (ex.: $ABCE$) como
+uma **palavra**. Para encontrar o par associado de qualquer efeito,
+simplesmente multiplicamos esse efeito por cada palavra na relação
+completa de definição acima. Por exemplo, o par associado de $A$ é
+
+$$
+A = BCE = ABCDF = DEF
+$$
+
+Para as duas relações de definição acima, vemos que os pares associados
+são
+
+$$
+\begin{align}
+E = ABC = ADF = BCDEF \\
+F = BCD = ADE = ABCEF
+\end{align}
+$$
+
+Portanto, poderíamos utilizar qualquer uma das interações $ABC$, $ADF$,
+ou $BCDEF$ para gerar a coluna $E$, e da mesma forma, o resultado seria
+o mesmo para a coluna $F$ se utilizásemos qualquer uma das interações:
+$BCD$, $ADE$, ou $ABCEF$.
+
+Com isso, vemos que as 16 combinações de tratamentos que deveriam ser
+corridas neste fatorial $2^{6-2}$ são
+
+```{r}
+row.names(da)
+```
+
+Outra forma de construir esse experimento $2^{6-2}$, é usando
+diretamente os contrastes de definição, assim como fizemos no caso da
+meia-fração. A diferença é que aqui, como temos duas relações de
+definição, precismos calcular as duas colunas com estas interações, e as
+frações serão definidas pelas combinações $(1,1), (1,-1), (-1,1),
+(-1,-1)$ destas duas colunas.
+
+Para fazer dessa forma, geramos o experimento $2^6$ completo
+
+```{r}
+db <- expand.grid(A = c(-1, 1), B = c(-1, 1),
+                  C = c(-1, 1), D = c(-1, 1),
+                  E = c(-1, 1), F = c(-1, 1))
+row.names(db) <- apply(db, 1,
+                       function(i) paste(letters[1:6][i==1], collapse = ""))
+row.names(db)[1] <- "(1)"
+db
+```
+
+Como as relações de definição são $I = ABCE$ e $I = BCDF$, calculamos
+estas duas colunas a partir desse experimento completo
+
+```{r}
+## Usando diretamente as relações de definição
+## I = ABCE e I = BCDF
+db$ABCE <- with(db, A*B*C*E)
+db$BCDF <- with(db, B*C*D*F)
+```
+
+Se olharmos este experimento ordenado por estas duas colunas, vemos que
+temos as quatro frações determinadas pela combinação de sinais destas
+duas colunas
+
+```{r}
+db[order(db$ABCE, db$BCDF, decreasing = TRUE), ]
+```
+
+Novamente se assumirmos que a combinação $(1,1)$ é a fração principal,
+então o experimento fracionado $2^{6-2}$ seria obtido com
+
+```{r}
+db <- subset(db, ABCE == 1 & BCDF == 1)
+db
+```
+
+Portanto, as 16 combinações de tratamentos a serem corridas neste
+experimento seriam
+
+```{r}
+row.names(db)
+```
+
+E note que é o mesmo resultado se tivessemos planejado o experimento com
+o método anterior
+
+```{r}
+cbind(sort(row.names(da)), sort(row.names(db)))
+```
+
+## Exemplo: fatorial $2^{6-2}$
+
+Exemplo 14-9, Montgomery (EAPE): encolhimento excessivo em
+peças de moldagem por injeção. Analisando 6 fatores em um experimento
+fatorial fracionado $2^{6-2}$, foram realizadas 16 corridas para estes
+seis fatores. O planejamento foi construído escrevendo um planejamento
+básico $2^4$ nos fatores $A$, $B$, $C$, e $D$, e então estabelecendo $E
+= ABC$, e $F = BCD$, pois as relações de definição escolhidas foram $I =
+ABCE$, e $I = BCDF$. O objetivo do planejamento era identificar os
+fatores que causavam o encolhimento excessivo, portanto as combinações
+de fatores que gerem **menores** valores da variável resposta
+(encolhimento) deverão ser utilizadas no processo de fabricação. Os
+dados deste experimento estão abaixo.
+
+```{r}
+##======================================================================
+## Importa a base de dados
+url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_ex_14-9.txt"
+dados <- read.table(url, header = TRUE)
+row.names(dados) <- apply(dados, 1,
+                          function(i) paste(letters[1:6][i==1], collapse = ""))
+row.names(dados)[1] <- "(1)"
+dados
+
+##----------------------------------------------------------------------
+## Montando a tabela de sinais
+(tab <- model.matrix(~A * B * C * D * E * F, data = dados))
+
+## Note que pela relação de definição I = ABCE = BCDF = ADEF, portanto
+tab[, which(apply(tab, 2, function(x) all(x == 1)))]
+```
+
+Como sabemos, a tabela de sinais completa contém diversos fatores que
+estão confundidos, por isso devemos selecionar dessa tabela apenas os
+efeitos que sejam únicos, pois estimando um teremos os demais. Os pares
+associados podem ser encontrados a mão, ou usando a função `aliases()`
+definida acima
+
+```{r}
+aliases(ef = colnames(tab)[-1], cd = c("ABCE", "BCDF", "ADEF"))
+
+## Portanto, montamos a tabela de sinais com os fatores únicos
+(tab <- unique(tab, MARGIN = 2))
+
+##----------------------------------------------------------------------
+## Estimativa dos efeitos
+## Contrastes
+contr <- t(tab[, -1]) %*% dados$y
+## Efeitos = contraste/(r 2^{k-1})
+## NOTE que o k é 4, pois o planejamento básico é 2^{6-2} = 2^4
+k <- 4
+r <- 1
+(ef <- contr/(r * 2^(k - 1)))
+
+##----------------------------------------------------------------------
+## Gráfico de probabilidade normal dos efeitos estimados
+qqaux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
+text(qqaux$x, qqaux$y, rownames(qqaux$y), cex = 0.8, pos = 3)
+
+##----------------------------------------------------------------------
+## Ajuste do modelo
+## Como vimos no gráfico anterior, os efeitos A, B, e as interações AB,
+## AD, e ACD parecem importantes, então podemos ajustar o modelo
+m0 <- lm(y ~ A + B + C + D + A:B + A:D + A:C:D, data = dados)
+anova(m0)
+
+## Como as interações AD e ACD requerem a permanencia dos efeitos
+## principais (não significativos) C e D, podemos ajustar um modelo mais
+## simples, sem estes termos
+m1 <- lm(y ~ A + B + A:B, data = dados)
+anova(m1)
+
+## E verificar se existe diferença com o nosso modelo inicial através
+## de um TRV. Se a diferença for significativa, significa que não podemos
+## ignorar os efeitos de AD e ACD (lembre que C e D precisam ser
+## mantidos, mesmo que não significativos, pelo princípio da
+## marginalidade)
+anova(m1, m0)
+
+## Como o resultado é que existe diferença, devemos ficar com o modelo
+## com mais parâmetros (m0)
+
+##----------------------------------------------------------------------
+## Residuos do modelo
+res <- residuals(m0)
+## Quantis normais
+qqnorm(res); qqline(res)
+```
+
+Esse exemplo ilustra a importância do fatorial fracionado. Se tivessemos
+feito o experimento $2^6 = 64$ corridas, poderíamos estimar interações
+de ordens altas, mas com a fração $1/4$, de 16 corridas, verificamos que
+só 2 efeitos principais, duas interações de segunda ordem e uma de
+terceira ordem são importantes. Com economia, selecionamos de 6
+variáveis, apenas 2 principais, que são importantes, e que agora serão
+investigadas com maior rigor em experimento mais elaborados
+subsequentes. O fundamento do planejamento de experimentos é exatamente
+esse: obter maior informação possível, tirar o máximo de vantagem e da
+forma mais econômica, ou seja, ser eficiente na investigação.
+
+# Resolução de um planejamento fatorial fracionado
+
+Resolução é uma propriedade dos experimentos fatoriais fracionados
+relacionada a ordem dos efeitos que estão confundidos. É representado
+por um subscrito romano. Considere a palavra resolução como sinônimo de
+grau de distinção, como em uma fotografia, com alta resolução é fácil
+distinguir elementos da imagem. Um experimento de alta resolução tem
+efeitos importantes (1º e 2º ordem) confundidos com interações de grau
+elevado enquanto que resoluções baixas indicam que efeitos de 2º estão
+confundidos entre si e com efeitos principais. Temos:
+
+- $III$: efeitos de 1º associados com de 2º e de 2º confundidos entre si;
+- $IV$: efeitos de 2º associados entre si;
+- $V$: efeitos de 2º associados com efeitos de ordem maior que 2º;
+
+```{r}
+##======================================================================
+# Vamos classificar os seguintes experimentos
+
+##----------------------------------------------------------------------
+# 2^(3-1) com I = ABC
+da <- expand.grid(A=c(-1,1), B=c(-1,1))
+da$C <- with(da, A*B)
+da
+
+da[sample(1:4),] # com isso eu aleatorizo as corridas
+
+X <- model.matrix(~A*B*C, da)
+ef <- colnames(X)[-1]
+ef # os nomes dos efeitos que são estimados
+
+aliases(ef=ef,    # efeitos
+        cd="ABC") # contraste de definição
+
+# Qual a resolução? R: III.
+
+##----------------------------------------------------------------------
+# 2^(4-1) com I = ABCD
+da <- expand.grid(A=c(-1,1), B=c(-1,1), C=c(-1,1))
+da$D <- with(da, A*B*C)
+da
+
+X <- model.matrix(~A*B*C*D, da)
+ef <- colnames(X)[-1]
+ef
+
+aliases(ef=ef,    # efeitos
+        cd="ABCD") # contraste de definição
+
+# Qual a resolução? R: IV.
+
+##----------------------------------------------------------------------
+# 2^(5-1) com I = ABCDE
+da <- expand.grid(A=c(-1,1), B=c(-1,1), C=c(-1,1), D=c(-1,1))
+da$E <- with(da, A*B*C*D)
+da
+
+X <- model.matrix(~A*B*C*D*E, da)
+ef <- colnames(X)[-1]
+ef
+
+aliases(ef=ef,      # efeitos
+        cd="ABCDE") # contraste de definição
+
+# Qual a resolução? R: V.
+```
+
+# Resumindo
+
+Em geral, um planejamento fracionário $2^k$, contendo $2^{k-p}$ corridas
+é chamado de uma fração $1/2^p$ do planejamento $2^k$, ou simplesmente
+de fatorial fracionado $2^{k-p}$. Esses experimentos requerem a seleção
+de $p$ geradores independentes. A relação de definição para o
+planejamento consiste em $p$ geradores, inicialmente escolhidos, e
+$2^p - p - 1$ interações generalizadas.
+
+A estrutura de associação pode ser encontrada multiplicando cada coluna
+de efeito pela relação de definição. Cuidado deve ser tomado ao escolher
+os geradores, de modo que os efeitos de interesse potencial não estejam
+associados entre si. Cada efeito tem $2^p - 1$ pares associados.
+
+É importante selecionar os $p$ geradores para o planejamento fatorial
+fracionário $2^{k-p}$, de tal maneira que obtenhamos as melhores
+relações possíveis de associação. Um critério razoável é selecionar os
+geradores de forma que o planejamento $2^{k-p}$ resultante tenha a **mais
+alta resolução possível**. Tabelas de geradores podem ser encontradas em
+livros como Montgomery (2009), e Montgomery e Runger (2012).
+
+
+# Exercícios
+
+Considere os dados de um experimento completo $2^5$
+
+```{r}
+url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-41.txt"
+dados <- read.table(url, header = TRUE)
+dados
+```
+
+Suponha que somente metade das 32 corridas pode ser feita. Com isso:
+
+a. Escolha a metade que você pensa que deve ser corrida
+b. Determine as relações associadas para seu planejamento
+c. Estime os efeitos dos fatores
+d. Faça um gráfico de probabilidade normal para os efeitos estimados
+e. Faça a análise de variância para os fatores identificados como
+importantes no item anterior
+f. Analise os resíduos do modelo
+g. Forneça uma interpretação prática dos resultados
+
+```{r}
+## a)
+## Escolhendo a relação de definição
+## I = ABCDE
+## então usamos essa definição como o separador das meia frações. Cria a
+## coluna ABCDE
+dados$ABCDE <- with(dados, A*B*C*D*E)
+## ordena pelos sinais dessa coluna
+dados[order(dados$ABCDE, decreasing = TRUE), ]
+## As combações com sinal positivo de ABCDE podem ser a fração
+## principal, portanto, fazemos a seleção desses elementos
+dados <- subset(dados, ABCDE == 1)
+## Portanto, as combinaçoes seriam
+row.names(dados)
+
+## b)
+## As relaçãoes associadas devem ser encontradas manualmente, ou usando
+## a função abaixo
+aliases <- function(ef, cd){
+    ali <- function(ef, cd){
+        ef <- gsub("\\W", "", ef)
+        ef <- unlist(strsplit(ef, ""))
+        cd <- gsub("\\W", "", cd)
+        cd <- unlist(strsplit(cd, ""))
+        x <- sort(c(ef, cd))
+        tb <- table(x)
+        paste(names(tb[tb==1]), collapse="")
+    }
+    sapply(ef, simplify=FALSE,
+           function(e){
+               x <- sapply(cd, function(i){
+                   x <- ali(e, i)
+               })
+               x[order(nchar(x))]
+           })
+}
+
+## Cria a tabela de sinais
+(tab <- model.matrix(~ A*B*C*D*E, data = dados))
+## Aplicando a função, encontrando os pares associados
+aliases(colnames(tab)[-c(1, 32)], "ABCDE")
+
+## c)
+## Como vimos que existem colunas confundidas, vamos estimar os efeitos
+## apenas daquelas únicas
+(tab <- unique(tab, MARGIN = 2))
+## Contrastes
+contr <- t(tab[, -1]) %*% dados$Y
+## Efeitos = contraste/(n2^{k-1})
+## NOTE que agora o k é 4, pois o experimento básico é 2^{5-1} = 2^4
+k <- 4
+n <- 1
+(ef <- contr/(n * 2^(k-1)))
+
+## d)
+## Gráfico de probabilidade normal dos efeitos estimados
+qqaux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
+text(qqaux$x, qqaux$y, rownames(qqaux$y), cex = 0.8, pos = 3)
+
+## e)
+## Os efeitos iportantes foram A, B, C, AB, e DE. Note que
+## DE . ADCDE = ABC
+## entao podemos especificar o modelo com
+m0 <- lm(Y ~ A + B + C + A:B + A:B:C, data = dados)
+anova(m0)
+
+## f)
+res <- residuals(m0)
+qqnorm(res); qqline(res)
+```
+
+Considere que no experimento $2^5$ abaixo:
+
+```{r}
+url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-14.txt"
+dados <- read.table(url, header = TRUE)
+dados
+```
+
+Suponha que somente duas meia-frações ($1/4$) das 32 corridas pode ser
+feita (fatorial $2^{5-2}$). Com isso:
+
+a. Escolha duas relações de definição, e selecione a fração que você
+pensa que deve ser corrida
+b. Determine as relações associadas para seu planejamento
+c. Estime os efeitos dos fatores
+d. Faça um gráfico de probabilidade normal para os efeitos estimados
+e. Faça a análise de variância para os fatores identificados como
+importantes no item anterior
+f. Analise os resíduos do modelo
+g. Forneça uma interpretação prática dos resultados
+
+```{r}
+## a)
+## Escolhendo as relações de definição
+## I = ABD
+## I = ACE
+## então usamos essas definições como o separador das meia-frações.
+## Cria as colunas ABD e ACE
+dados$ABD <- with(dados, A*B*D)
+dados$ACE <- with(dados, A*C*E)
+## ordena pelos sinais das duas colunas geradas
+dados[order(dados$ABD, dados$ACE, decreasing = TRUE), ]
+## As combinações com sinal positivo das duas colunas podem ser a fração
+## principal, portanto, fazemos a seleção desses elementos
+dados <- subset(dados, ABD == 1 & ACE == 1)
+## Portanto, as combinaçoes seriam
+row.names(dados)
+
+## b)
+## As relaçãoes associadas devem ser encontradas manualmente, ou usando
+## a função abaixo
+aliases <- function(ef, cd){
+    ali <- function(ef, cd){
+        ef <- gsub("\\W", "", ef)
+        ef <- unlist(strsplit(ef, ""))
+        cd <- gsub("\\W", "", cd)
+        cd <- unlist(strsplit(cd, ""))
+        x <- sort(c(ef, cd))
+        tb <- table(x)
+        paste(names(tb[tb==1]), collapse="")
+    }
+    sapply(ef, simplify=FALSE,
+           function(e){
+               x <- sapply(cd, function(i){
+                   x <- ali(e, i)
+               })
+               x[order(nchar(x))]
+           })
+}
+
+## Cria a tabela de sinais
+(tab <- model.matrix(~ A*B*C*D*E, data = dados))
+## Aplicando a função, encontrando os pares associados
+aliases(colnames(tab)[-1], c("ABD", "ACE"))
+
+## c)
+## Como vimos que existem colunas confundidas, vamos estimar os efeitos
+## apenas daquelas únicas
+(tab <- unique(tab, MARGIN = 2))
+## Contrastes
+contr <- t(tab[, -1]) %*% dados$y
+## Efeitos = contraste/(n2^{k-1})
+## NOTE que agora o k é 3, pois o experimento básico é 2^{5-2} = 2^3
+k <- 3
+n <- 1
+(ef <- contr/(n * 2^(k-1)))
+
+## d)
+## Gráfico de probabilidade normal dos efeitos estimados
+qqaux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
+text(qqaux$x, qqaux$y, rownames(qqaux$y), cex = 0.8, pos = 3)
+
+## e)
+## Como existe dúvida sobre quais fatores são importantes pelo gráfico,
+## podemos ajustar um modelo com todos os efitos principais e verificar
+## quais são significativos
+m0 <- lm(y ~ A + B + C + D + E, data = dados)
+anova(m0)
+## Pelo resultado, podemos remover o fator C
+m1 <- update(m0, . ~ . - C)
+anova(m1)
+
+## f)
+res <- residuals(m1)
+qqnorm(res); qqline(res)
+```
+
+
+```{r, eval=FALSE, echo=FALSE, include=FALSE}
+##======================================================================
+## 2^(6-2), requer 2 contrastes de definição
+
+dc <- expand.grid(A=c(-1,1), B=c(-1,1), C=c(-1,1), D=c(-1,1))
+dc # tabela de sinais do fatorial 2^4
+
+dc$E <- with(db, A*B*C) # I = ABCE
+dc$F <- with(db, B*C*D) # I = BCDF, e ABCE*BCDF = ADEF
+dc
+
+##----------------------------------------------------------------------
+## Quais são os efeitos que estão confundidos?
+
+ef <- colnames(model.matrix(~A*B*C*D*E*F, dc))  # efeitos
+cd <- c("ABCE","BCDF","ADEF")                   # contrastes de definição
+
+efconfun <- aliases(ef[-1], cd)
+efconfun
+
+# Os efeitos principais estão confundidos com:
+efconfun[nchar(names(efconfun))==1] # com de 4º grau (bom)
+
+# As interações duplas estão confundidas com:
+efconfun[nchar(names(efconfun))==3] # com duplas
+
+
+##======================================================================
+## 2^{3-1}
+dc <- expand.grid(A=c(-1,1), B=c(-1,1), C=c(-1,1))
+row.names(dc) <- apply(dc, 1,
+                       function(i) paste(letters[1:3][i==1], collapse = ""))
+row.names(dc)[1] <- "(1)"
+dc
+
+## A relação de definição é I = ABC
+dc$ABC <- with(dc, A*B*C)
+dc[order(dc$ABC, decreasing = TRUE), ]
+```
