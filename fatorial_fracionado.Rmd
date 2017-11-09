@@ -854,64 +854,47 @@ relacionada a ordem dos efeitos que estão confundidos. É representado
 por um subscrito romano. Considere a palavra resolução como sinônimo de
 grau de distinção, como em uma fotografia, com alta resolução é fácil
 distinguir elementos da imagem. Um experimento de alta resolução tem
-efeitos importantes (1º e 2º ordem) confundidos com interações de grau
-elevado enquanto que resoluções baixas indicam que efeitos de 2º estão
-confundidos entre si e com efeitos principais. Temos:
+efeitos importantes (1ª e 2ª ordem) confundidos com interações de grau
+elevado, enquanto que resoluções baixas indicam que efeitos de 2ª ordem
+estão confundidos entre si e com efeitos principais.
 
-- $III$: efeitos de 1º associados com de 2º e de 2º confundidos entre si;
-- $IV$: efeitos de 2º associados entre si;
-- $V$: efeitos de 2º associados com efeitos de ordem maior que 2º;
+Planejamentos de resolução III, IV, e V são particularmente importantes,
+e possuem as seguintes características:
 
+- **Planejamentos de resolução III**: nenhum efeito principal está
+  associado com qualquer outro efeito principal, porém efeitos
+  principais estão associados com interações de segunda ordem, e algumas
+  interações de segunda ordem **podem** estar associadas entre si.
+  Exemplo: fatorial $2^{3-1}_{III}$
 ```{r}
-##======================================================================
-# Vamos classificar os seguintes experimentos
-
-##----------------------------------------------------------------------
-# 2^(3-1) com I = ABC
-da <- expand.grid(A=c(-1,1), B=c(-1,1))
-da$C <- with(da, A*B)
-da
-
-da[sample(1:4),] # com isso eu aleatorizo as corridas
-
-X <- model.matrix(~A*B*C, da)
-ef <- colnames(X)[-1]
-ef # os nomes dos efeitos que são estimados
-
-aliases(ef=ef,    # efeitos
-        cd="ABC") # contraste de definição
-
-# Qual a resolução? R: III.
-
-##----------------------------------------------------------------------
-# 2^(4-1) com I = ABCD
-da <- expand.grid(A=c(-1,1), B=c(-1,1), C=c(-1,1))
-da$D <- with(da, A*B*C)
-da
-
-X <- model.matrix(~A*B*C*D, da)
-ef <- colnames(X)[-1]
-ef
-
-aliases(ef=ef,    # efeitos
-        cd="ABCD") # contraste de definição
-
-# Qual a resolução? R: IV.
-
-##----------------------------------------------------------------------
-# 2^(5-1) com I = ABCDE
-da <- expand.grid(A=c(-1,1), B=c(-1,1), C=c(-1,1), D=c(-1,1))
-da$E <- with(da, A*B*C*D)
-da
-
-X <- model.matrix(~A*B*C*D*E, da)
-ef <- colnames(X)[-1]
-ef
-
-aliases(ef=ef,      # efeitos
-        cd="ABCDE") # contraste de definição
-
-# Qual a resolução? R: V.
+## Experimento fatorial 2^(3-1) com I = ABC
+da <- expand.grid(A = c(-1, 1), B = c(-1, 1))
+da$C <- with(da, A * B)
+tab <- model.matrix(~ A * B * C, da)
+aliases(ef = colnames(tab)[-c(1, 8)], cd = "ABC")
+```
+- **Planejamentos de resolução IV**: nenhum efeito principal está
+  associado com qualquer outro efeito principal ou com interações de
+  segunda ordem, porém interações de segunda ordem estão associadas
+  entre si. Exemplo: fatorial $2^{4-1}_{IV}$
+```{r}
+## Experimento fatorial 2^(4-1) com I = ABCD
+da <- expand.grid(A = c(-1, 1), B = c(-1, 1), C = c(-1, 1))
+da$D <- with(da, A * B * C)
+tab <- model.matrix(~ A * B * C * D, da)
+aliases(ef = colnames(tab)[-c(1, 16)], cd = "ABCD")
+```
+- **Planejamentos de resolução V**: nenhum efeito principal ou interação
+  de segunda ordem estão associados com qualquer outro efeito principal
+  ou interaçõa de segunda ordem, porém interações de segunda ordem estão
+  associadas com interações de terceira ordem. Exemplo: fatorial
+  $2^{5-1}_{V}$
+```{r}
+## Experimento fatorial 2^(5-1) com I = ABCDE
+da <- expand.grid(A = c(-1, 1), B = c(-1, 1), C = c(-1, 1), D = c(-1, 1))
+da$E <- with(da, A * B * C * D)
+tab <- model.matrix(~ A * B * C * D * E, da)
+aliases(ef = colnames(tab)[-c(1, 32)], cd = "ABCDE")
 ```
 
 # Resumindo
