@@ -173,7 +173,7 @@ dos tratamentos para um fatorial completo com $k-1$ fatores, chamado de
 identificando seus níveis alto e baixo com os sinais mais e menos da
 interação de mais alta ordem.
 
-Por exemplo, umm fatorial fracionário $2^{4-1}$ é construído escrevendo
+Por exemplo, um fatorial fracionário $2^{4-1}$ é construído escrevendo
 o planejamento básico $2^3$, e então igualando o fator $D$ com a
 interação $ABC$, pois a relação de definição é $I = ABCD$ e $D \cdot I =
 D \cdot ABCD = ABC$.
@@ -530,7 +530,7 @@ Portanto, podemos identificar os fatores únicos na tabela de sinais
 (tab <- unique(tab, MARGIN = 2))
 ```
 
-A partir desa tabela, podemos prosseguir a análise de forma usual,
+A partir dessa tabela, podemos prosseguir a análise de forma usual,
 calculando os contrastes e efeitos, e verificando o tamanho dos efeitos
 através do gráfico de probabilidades normal. Note apenas que o $k$
 para esse experimento fracionado é 3, e não 4 como o original, pois ele
@@ -916,7 +916,7 @@ fracionário $2^{k-p}$, de tal maneira que obtenhamos as melhores
 relações possíveis de associação. Um critério razoável é selecionar os
 geradores de forma que o planejamento $2^{k-p}$ resultante tenha a **mais
 alta resolução possível**. Tabelas de geradores podem ser encontradas em
-livros como Montgomery (2009), e Montgomery e Runger (2012).
+livros como [Montgomery (2013)](http://www.wiley.com/WileyCDA/WileyTitle/productCd-EHEP002024.html).
 
 
 # Exercícios
@@ -940,7 +940,7 @@ importantes no item anterior
 f. Analise os resíduos do modelo
 g. Forneça uma interpretação prática dos resultados
 
-```{r}
+```{r, eval=FALSE, include=FALSE}
 ## a)
 ## Escolhendo a relação de definição
 ## I = ABCDE
@@ -1032,7 +1032,7 @@ importantes no item anterior
 f. Analise os resíduos do modelo
 g. Forneça uma interpretação prática dos resultados
 
-```{r}
+```{r, eval=FALSE, include=FALSE}
 ## a)
 ## Escolhendo as relações de definição
 ## I = ABD
