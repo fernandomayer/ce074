@@ -20,6 +20,10 @@ opts_chunk$set(
 options(show.signif.stars = TRUE)
 ```
 
+```{r external-code, cache=FALSE, include=FALSE}
+knitr::read_chunk("scripts/fatorial_fracionado-respostas.R")
+```
+
 # Introdução
 
 Nos experimentos fatoriais $2^k$, o número de corridas cresce
@@ -691,7 +695,7 @@ row.names(da)
 Outra forma de construir esse experimento $2^{6-2}$, é usando
 diretamente os contrastes de definição, assim como fizemos no caso da
 meia-fração. A diferença é que aqui, como temos duas relações de
-definição, precismos calcular as duas colunas com estas interações, e as
+definição, precisamos calcular as duas colunas com estas interações, e as
 frações serão definidas pelas combinações $(1,1), (1,-1), (-1,1),
 (-1,-1)$ destas duas colunas.
 
@@ -886,7 +890,7 @@ aliases(ef = colnames(tab)[-c(1, 16)], cd = "ABCD")
 ```
 - **Planejamentos de resolução V**: nenhum efeito principal ou interação
   de segunda ordem estão associados com qualquer outro efeito principal
-  ou interaçõa de segunda ordem, porém interações de segunda ordem estão
+  ou interaçõs de segunda ordem, porém interações de segunda ordem estão
   associadas com interações de terceira ordem. Exemplo: fatorial
   $2^{5-1}_{V}$
 ```{r}
@@ -916,196 +920,38 @@ fracionário $2^{k-p}$, de tal maneira que obtenhamos as melhores
 relações possíveis de associação. Um critério razoável é selecionar os
 geradores de forma que o planejamento $2^{k-p}$ resultante tenha a **mais
 alta resolução possível**. Tabelas de geradores podem ser encontradas em
-livros como [Montgomery (2013)](http://www.wiley.com/WileyCDA/WileyTitle/productCd-EHEP002024.html).
+livros como [Montgomery
+(2013)](http://www.wiley.com/WileyCDA/WileyTitle/productCd-EHEP002024.html).
+Veja um exemplo [aqui](img/tab_fat_frac.pdf).
 
 
 # Exercícios
 
-Considere os dados de um experimento completo $2^5$
-
-```{r}
-url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-41.txt"
-dados <- read.table(url, header = TRUE)
-dados
-```
-
+1. Considere os dados de um experimento completo $2^5$ disponível
+[aqui](http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-41.txt).
 Suponha que somente metade das 32 corridas pode ser feita. Com isso:
-
-a. Escolha a metade que você pensa que deve ser corrida
-b. Determine as relações associadas para seu planejamento
-c. Estime os efeitos dos fatores
-d. Faça um gráfico de probabilidade normal para os efeitos estimados
-e. Faça a análise de variância para os fatores identificados como
-importantes no item anterior
-f. Analise os resíduos do modelo
-g. Forneça uma interpretação prática dos resultados
-
-```{r, eval=FALSE, include=FALSE}
-## a)
-## Escolhendo a relação de definição
-## I = ABCDE
-## então usamos essa definição como o separador das meia frações. Cria a
-## coluna ABCDE
-dados$ABCDE <- with(dados, A*B*C*D*E)
-## ordena pelos sinais dessa coluna
-dados[order(dados$ABCDE, decreasing = TRUE), ]
-## As combações com sinal positivo de ABCDE podem ser a fração
-## principal, portanto, fazemos a seleção desses elementos
-dados <- subset(dados, ABCDE == 1)
-## Portanto, as combinaçoes seriam
-row.names(dados)
-
-## b)
-## As relaçãoes associadas devem ser encontradas manualmente, ou usando
-## a função abaixo
-aliases <- function(ef, cd){
-    ali <- function(ef, cd){
-        ef <- gsub("\\W", "", ef)
-        ef <- unlist(strsplit(ef, ""))
-        cd <- gsub("\\W", "", cd)
-        cd <- unlist(strsplit(cd, ""))
-        x <- sort(c(ef, cd))
-        tb <- table(x)
-        paste(names(tb[tb==1]), collapse="")
-    }
-    sapply(ef, simplify=FALSE,
-           function(e){
-               x <- sapply(cd, function(i){
-                   x <- ali(e, i)
-               })
-               x[order(nchar(x))]
-           })
-}
-
-## Cria a tabela de sinais
-(tab <- model.matrix(~ A*B*C*D*E, data = dados))
-## Aplicando a função, encontrando os pares associados
-aliases(colnames(tab)[-c(1, 32)], "ABCDE")
-
-## c)
-## Como vimos que existem colunas confundidas, vamos estimar os efeitos
-## apenas daquelas únicas
-(tab <- unique(tab, MARGIN = 2))
-## Contrastes
-contr <- t(tab[, -1]) %*% dados$Y
-## Efeitos = contraste/(n2^{k-1})
-## NOTE que agora o k é 4, pois o experimento básico é 2^{5-1} = 2^4
-k <- 4
-n <- 1
-(ef <- contr/(n * 2^(k-1)))
-
-## d)
-## Gráfico de probabilidade normal dos efeitos estimados
-qqaux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
-text(qqaux$x, qqaux$y, rownames(qqaux$y), cex = 0.8, pos = 3)
-
-## e)
-## Os efeitos iportantes foram A, B, C, AB, e DE. Note que
-## DE . ADCDE = ABC
-## entao podemos especificar o modelo com
-m0 <- lm(Y ~ A + B + C + A:B + A:B:C, data = dados)
-anova(m0)
-
-## f)
-res <- residuals(m0)
-qqnorm(res); qqline(res)
+    a. Escolha a metade que você pensa que deve ser corrida
+    b. Determine as relações associadas para seu planejamento
+    c. Estime os efeitos dos fatores
+    d. Faça um gráfico de probabilidade normal para os efeitos estimados
+    e. Faça a análise de variância para os fatores identificados como
+    importantes no item anterior
+    f. Analise os resíduos do modelo
+```{r ex1, eval=FALSE, include=FALSE}
 ```
-
-Considere que no experimento $2^5$ abaixo:
-
-```{r}
-url <- "http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-14.txt"
-dados <- read.table(url, header = TRUE)
-dados
-```
-
-Suponha que somente duas meia-frações ($1/4$) das 32 corridas pode ser
-feita (fatorial $2^{5-2}$). Com isso:
-
-a. Escolha duas relações de definição, e selecione a fração que você
-pensa que deve ser corrida
-b. Determine as relações associadas para seu planejamento
-c. Estime os efeitos dos fatores
-d. Faça um gráfico de probabilidade normal para os efeitos estimados
-e. Faça a análise de variância para os fatores identificados como
-importantes no item anterior
-f. Analise os resíduos do modelo
-g. Forneça uma interpretação prática dos resultados
-
-```{r, eval=FALSE, include=FALSE}
-## a)
-## Escolhendo as relações de definição
-## I = ABD
-## I = ACE
-## então usamos essas definições como o separador das meia-frações.
-## Cria as colunas ABD e ACE
-dados$ABD <- with(dados, A*B*D)
-dados$ACE <- with(dados, A*C*E)
-## ordena pelos sinais das duas colunas geradas
-dados[order(dados$ABD, dados$ACE, decreasing = TRUE), ]
-## As combinações com sinal positivo das duas colunas podem ser a fração
-## principal, portanto, fazemos a seleção desses elementos
-dados <- subset(dados, ABD == 1 & ACE == 1)
-## Portanto, as combinaçoes seriam
-row.names(dados)
-
-## b)
-## As relaçãoes associadas devem ser encontradas manualmente, ou usando
-## a função abaixo
-aliases <- function(ef, cd){
-    ali <- function(ef, cd){
-        ef <- gsub("\\W", "", ef)
-        ef <- unlist(strsplit(ef, ""))
-        cd <- gsub("\\W", "", cd)
-        cd <- unlist(strsplit(cd, ""))
-        x <- sort(c(ef, cd))
-        tb <- table(x)
-        paste(names(tb[tb==1]), collapse="")
-    }
-    sapply(ef, simplify=FALSE,
-           function(e){
-               x <- sapply(cd, function(i){
-                   x <- ali(e, i)
-               })
-               x[order(nchar(x))]
-           })
-}
-
-## Cria a tabela de sinais
-(tab <- model.matrix(~ A*B*C*D*E, data = dados))
-## Aplicando a função, encontrando os pares associados
-aliases(colnames(tab)[-1], c("ABD", "ACE"))
-
-## c)
-## Como vimos que existem colunas confundidas, vamos estimar os efeitos
-## apenas daquelas únicas
-(tab <- unique(tab, MARGIN = 2))
-## Contrastes
-contr <- t(tab[, -1]) %*% dados$y
-## Efeitos = contraste/(n2^{k-1})
-## NOTE que agora o k é 3, pois o experimento básico é 2^{5-2} = 2^3
-k <- 3
-n <- 1
-(ef <- contr/(n * 2^(k-1)))
-
-## d)
-## Gráfico de probabilidade normal dos efeitos estimados
-qqaux <- qqnorm(ef, col = 2, pch = 19); qqline(ef)
-text(qqaux$x, qqaux$y, rownames(qqaux$y), cex = 0.8, pos = 3)
-
-## e)
-## Como existe dúvida sobre quais fatores são importantes pelo gráfico,
-## podemos ajustar um modelo com todos os efitos principais e verificar
-## quais são significativos
-m0 <- lm(y ~ A + B + C + D + E, data = dados)
-anova(m0)
-## Pelo resultado, podemos remover o fator C
-m1 <- update(m0, . ~ . - C)
-anova(m1)
-
-## f)
-res <- residuals(m1)
-qqnorm(res); qqline(res)
+2. Considere que no experimento $2^5$ disponível
+   [aqui](http://www.leg.ufpr.br/~fernandomayer/data/montgomery_14-14.txt),
+   somente duas meia-frações ($1/4$) das 32 corridas pode ser feita
+   (fatorial $2^{5-2}$). Com isso:
+    a. Escolha duas relações de definição, e selecione a fração que você
+    pensa que deve ser corrida
+    b. Determine as relações associadas para seu planejamento
+    c. Estime os efeitos dos fatores
+    d. Faça um gráfico de probabilidade normal para os efeitos estimados
+    e. Faça a análise de variância para os fatores identificados como
+    importantes no item anterior
+    f. Analise os resíduos do modelo
+```{r ex2, eval=FALSE, include=FALSE}
 ```
 
 
