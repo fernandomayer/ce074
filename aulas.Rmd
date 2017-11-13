@@ -99,14 +99,14 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
   [guia](misc/guia-planejamento.html) para o planejamento de
   experimentos preenchido. O código fonte do guia está
   [aqui](misc/guia-planejamento.Rmd).
-- **09/11**:
+- **09/11**: Fatorial fracionado $2^{k-1}$.
 - **13/11**:
 - **16/11**:
-- **20/11**: **Prova 2**.
+- **20/11**: Apresentações dos resultados dos experimentos realizados em grupo.
 - **23/11**: Apresentações dos resultados dos experimentos realizados em grupo.
 - **27/11**: Dia não letivo, de acordo com a [Resolução 62/16 -
   CEPE](http://www.est.ufpr.br/calendario/cepe6216.pdf).
-- **30/11**: Apresentações dos resultados dos experimentos realizados em grupo.
+- **30/11**: **Prova 2**.
 
 ## Exercícios
 
