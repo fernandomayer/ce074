@@ -99,7 +99,8 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
   [guia](misc/guia-planejamento.html) para o planejamento de
   experimentos preenchido. O código fonte do guia está
   [aqui](misc/guia-planejamento.Rmd).
-- **09/11**: Fatorial fracionado $2^{k-1}$.
+- **09/11**: Fatorial fracionado $2^{k-1}$. Ver
+  [material](fatorial_fracionado.html).
 - **13/11**:
 - **16/11**:
 - **20/11**: Apresentações dos resultados dos experimentos realizados em grupo.
