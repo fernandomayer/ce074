@@ -954,6 +954,9 @@ Suponha que somente metade das 32 corridas pode ser feita. Com isso:
 ```{r ex2, eval=FALSE, include=FALSE}
 ```
 
+As respostas para os exercícios estão nesse
+[script](scripts/fatorial_fracionado-respostas.R).
+
 
 ```{r, eval=FALSE, echo=FALSE, include=FALSE}
 ##======================================================================
