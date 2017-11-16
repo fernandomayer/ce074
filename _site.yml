@@ -48,6 +48,8 @@ navbar:
         href: confundimento-blocagem.html
       - text: "Experimentos fatorias fracionados 2^{k-p} [HTML]"
         href: fatorial_fracionado.html
+      - text: "Metodologia de Superfície de Resposta [HTML]"
+        href: msr.html
       - text: "----------"
       - text: "Scripts"
       - text: "Tipos de contrastes em modelos lineares [R]"
