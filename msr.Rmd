@@ -22,6 +22,32 @@ options(show.signif.stars = TRUE)
 
 # Introdução
 
+- A metodologia de superfície de resposta (MSR) é aplicada quando o
+  interesse é **otimizar** uma resposta influenciada por diversos
+  fatores.
+- Na maioria dos problemas a forma da relação da resposta com os fatores
+  é desconhecida.
+- A primeira parte da MSR é encontrar uma aproximação adequada para essa
+  relação (geralmente através de polinômios de baixo grau).
+- **MSR é um procedimento sequencial**.
+- Quando estivermos em um ponto da superfície longe do ótimo, exietirá
+  pouca curvatura, e um modleo de primeira ordem é adequado.
+- O objetivo é chegar o mais próximo possível do ótimo.
+- Uma vez que o ótimo tenha sido encontrado, uma análise mais elaborada,
+  como um modelo de segunda ordem, pode ser empregada.
+- Uma análise de MSR pode ser pensada como "subindo o morro", onde o
+  topo representa a resposta máxima.
+- O **método da ascendente de maior inclinação** (*steepest ascent*) é
+  utilizado para se determinar a **direção de aumento máximo da
+  resposta**.
+- Geralmente o caminho ascendente de maior inclinação é a linha que
+  passa pelo centro da região de interesse e é perpendicular aos
+  contornos da superfície ajustada.
+- Por isso, as etapas ao longo do caminho são **proporcionais aos
+  coeficientes de regressão** $\beta_i$.
+- Os experimentos são conduzidos ao longo do caminho ascendente de maior
+  inclinação até que mais nenhum aumento seja observado na resposta.
+
 # Simulação de uma superficie
 
 Aqui vamos gerar uma superfície teórica de um fenômeno. O ponto
