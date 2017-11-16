@@ -103,7 +103,8 @@ cat(paste0("- **", datas.seg, "**:\n", "- **", datas.qui, "**:\n"))
   [material](fatorial_fracionado.html).
 - **13/11**: Fatorial fracionado $2^{k-p}$ e resolução de um experimento
   fatorial fracionado. Ver [material](fatorial_fracionado.html).
-- **16/11**:
+- **16/11**: Conceitos básicos sobre Metodologia de Superfície de Resposta
+  (MSR). Ver [material](msr.html).
 - **20/11**: Apresentações dos resultados dos experimentos realizados em grupo.
 - **23/11**: Apresentações dos resultados dos experimentos realizados em grupo.
 - **27/11**: Dia não letivo, de acordo com a [Resolução 62/16 -
