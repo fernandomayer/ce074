@@ -1,0 +1,571 @@
+---
+title: "Metodologia de Superfície de Resposta"
+output:
+  html_document:
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+library(knitr, quietly = TRUE)
+library(lattice, quietly = TRUE)
+opts_chunk$set(
+               cache = TRUE,
+               tidy = FALSE,
+               comment = "#",
+               collapse = TRUE,
+               fig.align = "center",
+               fig.path = "figures/",
+               cache.path = "cache/"
+           )
+options(show.signif.stars = TRUE)
+```
+
+# Introdução
+
+# Simulação de uma superficie
+
+Aqui vamos gerar uma superfície teórica de um fenômeno. O ponto
+estácionário (nesse caso ponto de máxima) é em x1 = 8 e x2 = 8, e o
+valor da resposta no ponto estacionário é y = 10.
+
+```{r sim}
+##----------------------------------------------------------------------
+## Carregando pacotes e funções.
+library(lattice)
+library(latticeExtra)
+
+## Função para gerar a superfície com x1 = x2 = 8 e y = 10
+superficie <- function(x1, x2) {
+    x1 <- x1 - 8
+    x2 <- x2 - 8
+    y <- 10 +
+        -0.02 * (x1^2) +
+         -0.02 * (x2^2) +
+         0.01 * x1 * x2
+    return(y)
+}
+
+## Para criar uma sequência de valores.
+eseq <- function(x, n = 20) {
+    r <- extendrange(x)
+    s <- seq(r[1], r[2], length.out = n[1])
+    return(s)
+}
+
+
+## Para adicionar um erro aos valores simulados.
+erro <- function(y, sd = 0.05) {
+    y <- y + rnorm(length(y), 0, sd = sd)
+    return(y)
+}
+
+## Visualizando a superfície teórica.
+da <- expand.grid(x1 = seq(-1, 10, length.out = 20),
+                  x2 = seq(-1, 10, length.out = 20))
+da$y <- with(da, superficie(x1, x2))
+
+levelplot(y ~ x1 + x2, data = da, contour = TRUE, aspect = "iso") +
+    layer(panel.abline(v = 8, h = 8, lty = 2))
+
+wireframe(y ~ x1 + x2, data = da, drape = TRUE)
+```
+
+## Experimento 1
+
+Experimento fatorial $2^2$ completo com adição de pontos centrais.
+
+```{r exp1}
+## Centro do experimento
+ct1 <- c(0, 0)
+
+## Pontos fatoriais
+exp1 <- expand.grid(x1 = c(-1, 1),
+                    x2 = c(-1, 1))
+## Pontos centrais
+exp1 <- rbind(exp1, matrix(ct1,
+                           byrow = TRUE,
+                           nrow = 4,
+                           ncol = 2,
+                           dimnames = list(NULL, names(exp1))))
+## Classificando observações do centro para estimar efeito de curvatura
+exp1$centro <- gl(n = 2, k = 4)
+## Plano experimental
+exp1
+
+## Simulando valores da resposta.
+set.seed(123)
+exp1$y <- with(exp1, erro(superficie(x1, x2)))
+
+## Ajustando o modelo
+m1 <- lm(y ~ x1 * x2 + centro, data = exp1)
+anova(m1)
+
+## Reduzindo o modelo
+m1 <- lm(y ~ x1 + x2, data = exp1)
+anova(m1)
+
+## Estimativas dos coeficientes.
+summary(m1)
+
+## Efeitos de x1 e x2 para obter a direção do próximo plano.
+(b1 <- coef(m1)[-1])
+
+## Predição
+pred <- with(exp1,
+             expand.grid(x1 = eseq(x1),
+                         x2 = eseq(x2)))
+pred$y <- predict(m1, newdata = pred)
+## Gráficos de predição
+wireframe(y ~ x1 + x2, data = pred, drape = TRUE)
+levelplot(y ~ x1 + x2, data = pred, contour = TRUE, aspect = "iso")
+
+## Gráfico de predição com direção de maior inclinação
+levelplot(y ~ x1 + x2, data = pred, contour = TRUE, aspect = "iso") +
+    layer(panel.arrows(ct1[1],
+                       ct1[2],
+                       ct1[1] + b1[1],
+                       ct1[2] + b1[2],
+                       length = 0.1)) +
+    layer(panel.abline(h = 0, v = 0, lty = 2))
+
+## Direção de maior inclinação
+b1[2]/b1[1]
+```
+
+## Experimento 2
+
+O próximo passo é realizar um novo experimento, com novos valores de x1
+e x2, guiado pela direção de maior inclinação. A direção nós já
+determinamos, o que falta agora é saber qualo tamanho do passo que
+queremos dar. Normalmente, o tamanho do passo é determinado pelo
+experimentador, com base em experiências anteriores, conveniência para
+gerar os tratamentos ou simplesmente avançando à uma taxa proporcional à
+direção de maior inclinação. Aqui, por exempo, vamos considerar 10 vezes
+a taxa da direção de maior inclinação.
+
+```{r exp2}
+## Gráfico da superfície com direção de maior inclinação multiplicada
+## por um fator 10
+levelplot(y ~ x1 + x2, data = da, contour = TRUE, aspect = "iso") +
+    layer(panel.levelplot(x = pred$x1, y = pred$x2, z = pred$y,
+                          subscripts = 1:length(pred$x1),
+                          contour = TRUE,
+                          col.regions = grey.colors)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp1) +
+    layer(panel.arrows(ct1[1],
+                       ct1[2],
+                       ct1[1] + 10 * b1[1],
+                       ct1[2] + 10 * b1[2],
+                       length = 0.1))
+
+## O centro do novo plano experimental é então a ponta da seta
+(ct2 <- 10 * b1)
+
+## Plano experimental centrado no novo ponto
+exp2 <- expand.grid(x1 = ct2[1] + c(-1, 1),
+                    x2 = ct2[2] + c(-1, 1))
+exp2 <- rbind(exp2, matrix(ct2,
+                           byrow = TRUE,
+                           nrow = 4,
+                           ncol = 2,
+                           dimnames = list(NULL, names(exp2))))
+exp2$centro <- gl(n = 2, k = 4)
+
+## Resposta observada
+set.seed(234)
+exp2$y <- with(exp2, erro(superficie(x1, x2)))
+exp2
+
+## Na prática, as variáveis x1 e x2 devem ser codificadas como (-1, 0,
+## 1) para ajustar o modelo. Aqui vamos manter essa escala original para
+## efeitos de ilustração do processo.
+transform(exp2,
+          x1 = x1 - mean(x1),
+          x2 = x2 - mean(x2))
+
+## Ajuste do modelo
+m2 <- lm(y ~ x1 * x2 + centro, data = exp2)
+anova(m2)
+
+## Ajuste do modelo reduzido
+m2 <- lm(y ~ x1 + x2, data = exp2)
+anova(m2)
+
+## Estimativas dos efeitos
+summary(m2)
+
+## Efeitos de x1 e x2
+(b2 <- coef(m2)[-1])
+
+## Predição
+pred <- with(exp2,
+             expand.grid(x1 = eseq(x1),
+                         x2 = eseq(x2)))
+pred$y <- predict(m2, newdata = pred)
+
+## Gráfico da predição com direção de maior inclinação
+levelplot(y ~ x1 + x2, data = pred, contour = TRUE, aspect = "iso") +
+    layer(panel.arrows(ct2[1],
+                       ct2[2],
+                       ct2[1] + b2[1],
+                       ct2[2] + b2[2],
+                       length = 0.1)) +
+    layer(panel.abline(h = ct2[2], v = ct2[1], lty = 2))
+
+## Direção de maior inclinação
+b2[2]/b2[1]
+
+## Gráfico da superfície com direção de maior inclinação multiplicada
+## por um fator 10 a partir do centro do experimento 2
+levelplot(y ~ x1 + x2, data = da, contour = TRUE, aspect = "iso") +
+    layer(panel.levelplot(x = pred$x1, y = pred$x2, z = pred$y,
+                          subscripts = 1:length(pred$x1),
+                          contour = TRUE,
+                          col.regions = grey.colors)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp2) +
+    layer(panel.arrows(ct2[1],
+                       ct2[2],
+                       ct2[1] + 10 * b2[1],
+                       ct2[2] + 10 * b2[2],
+                       length = 0.1)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp1) +
+    layer(panel.arrows(ct1[1],
+                       ct1[2],
+                       ct1[1] + 10 * b1[1],
+                       ct1[2] + 10 * b1[2],
+                       length = 0.1))
+```
+
+## Experimento 3
+
+Continuamos com um novo experimento, dando mais um passo de fator 10 na
+direção de maior inclinação.
+
+```{r exp3a}
+## Centro do novo plano
+(ct3 <- ct2 + 10 * b2)
+
+## Novo plano experimental
+exp3 <- expand.grid(x1 = ct3[1] + c(-1, 1),
+                    x2 = ct3[2] + c(-1, 1))
+exp3 <- rbind(exp3, matrix(ct3,
+                           byrow = TRUE,
+                           nrow = 4,
+                           ncol = 2,
+                           dimnames = list(NULL, names(exp3))))
+exp3$centro <- gl(n = 2, k = 4)
+
+## Obtendo a resposta.
+set.seed(234)
+exp3$y <- with(exp3, erro(superficie(x1, x2)))
+exp3
+
+## Ajuste do modelo
+m3 <- lm(y ~ x1 * x2 + centro, data = exp3)
+anova(m3)
+
+## Ajuste do modelo reduzido
+m3 <- lm(y ~ x1 + x2, data = exp3)
+anova(m3)
+
+## Estimativas dos efeitos.
+summary(m3)
+```
+
+NOTE que x1 e x2 não foram significativos (à 5%) nesse experimento e
+isso já é um indicativo de proximidade da região estacionária.
+
+```{r exp3b}
+## Efeitos de x1 e x2.
+(b3 <- coef(m3)[-1])
+
+## Predição
+pred <- with(exp3,
+             expand.grid(x1 = eseq(x1),
+                         x2 = eseq(x2)))
+pred$y <- predict(m3, newdata = pred)
+
+## Gráfico da predição com direção de maior inclinação
+levelplot(y ~ x1 + x2, data = pred, contour = TRUE, aspect = "iso") +
+    layer(panel.arrows(ct3[1],
+                       ct3[2],
+                       ct3[1] + b3[1],
+                       ct3[2] + b3[2],
+                       length = 0.1)) +
+    layer(panel.abline(h = ct3[2], v = ct3[1], lty = 2))
+
+## Direção de maior inclinação
+b3[2]/b3[1]
+
+## Gráfico da superfície com direção de maior inclinação multiplicada
+## por um fator 10 a partir do centro do experimento 3
+levelplot(y ~ x1 + x2, data = da, contour = TRUE, aspect = "iso") +
+    layer(panel.levelplot(x = pred$x1, y = pred$x2, z = pred$y,
+                          subscripts = 1:length(pred$x1),
+                          contour = TRUE,
+                          col.regions = grey.colors)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp3) +
+    layer(panel.arrows(ct3[1],
+                       ct3[2],
+                       ct3[1] + 10 * b3[1],
+                       ct3[2] + 10 * b3[2],
+                       length = 0.1)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp2) +
+    layer(panel.arrows(ct2[1],
+                       ct2[2],
+                       ct2[1] + 10 * b2[1],
+                       ct2[2] + 10 * b2[2],
+                       length = 0.1)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp1) +
+    layer(panel.arrows(ct1[1],
+                       ct1[2],
+                       ct1[1] + 10 * b1[1],
+                       ct1[2] + 10 * b1[2],
+                       length = 0.1))
+```
+
+## Experimento 4
+
+```{r exp4a}
+## Centro do novo plano
+(ct4 <- ct3 + 10 * b3)
+
+## Novo plano experimental
+exp4 <- expand.grid(x1 = ct4[1] + c(-1, 1),
+                    x2 = ct4[2] + c(-1, 1))
+exp4 <- rbind(exp4, matrix(ct4,
+                           byrow = TRUE,
+                           nrow = 4,
+                           ncol = 2,
+                           dimnames = list(NULL, names(exp4))))
+exp4$centro <- gl(n = 2, k = 4)
+
+## Obtendo a resposta.
+set.seed(456)
+exp4$y <- with(exp4, erro(superficie(x1, x2)))
+exp4
+
+## Ajuste do modelo
+m4 <- lm(y ~ x1 * x2 + centro, data = exp4)
+anova(m4)
+```
+
+NOTE que aqui já existe falta de ajuste, o que indica fortemente que
+estamos próximos de região de ótimo (estacionária).
+
+```{r exp4b}
+## Estimativas dos efeitos
+summary(m4)
+
+## Efeitos de x1 e x2
+(b4 <- coef(m4)[-c(1,4,5)])
+
+## Predição
+pred <- with(exp4,
+             expand.grid(x1 = eseq(x1),
+                         x2 = eseq(x2),
+                         centro = centro))
+pred$y <- predict(m4, newdata = pred)
+
+## Gráfico da predição com direção de maior inclinação
+levelplot(y ~ x1 + x2, data = pred, contour = TRUE, aspect = "iso") +
+    layer(panel.arrows(ct4[1],
+                       ct4[2],
+                       ct4[1] + b4[1],
+                       ct4[2] + b4[2],
+                       length = 0.1)) +
+    layer(panel.abline(h = ct4[2], v = ct4[1], lty = 2))
+
+## Direção de maior inclinação
+b4[2]/b4[1]
+
+## Gráfico da superfície com direção de maior inclinação multiplicada
+## por um fator 5
+levelplot(y ~ x1 + x2, data = da, contour = TRUE, aspect = "iso") +
+    layer(panel.levelplot(x = pred$x1, y = pred$x2, z = pred$y,
+                          subscripts = 1:length(pred$x1),
+                          contour = TRUE,
+                          col.regions = grey.colors)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp4) +
+    layer(panel.arrows(ct4[1],
+                       ct4[2],
+                       ct4[1] + 5 * b4[1],
+                       ct4[2] + 5 * b4[2],
+                       length = 0.1)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp3) +
+    layer(panel.arrows(ct3[1],
+                       ct3[2],
+                       ct3[1] + 10 * b3[1],
+                       ct3[2] + 10 * b3[2],
+                       length = 0.1)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp2) +
+    layer(panel.arrows(ct2[1],
+                       ct2[2],
+                       ct2[1] + 10 * b2[1],
+                       ct2[2] + 10 * b2[2],
+                       length = 0.1)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp1) +
+    layer(panel.arrows(ct1[1],
+                       ct1[2],
+                       ct1[1] + 10 * b1[1],
+                       ct1[2] + 10 * b1[2],
+                       length = 0.1))
+```
+
+## Experimento 5: Planejamento Composto Central
+
+```{r exp5a}
+## Centro do novo plano
+(ct5 <- ct4 + 5 * b4)
+```
+
+Os PCC são largamente usados na prática porque são relativamente
+eficientes com respeito ao número de corridas requeridas. Em geral, um
+PCC com $k$ fatores requer:
+
+- $2^k$ **pontos fatoriais** ou de **vértice**
+- $2k$ **pontos axiais** ou **estrela**
+- $n_0$ **pontos centrais** (geralmente entre 3 e 5)
+
+Portanto, para 2 fatores e apenas um ponto central (mínimo), teremos
+então $2^2 + 2\cdot 2 + 1 = 9$ pontos no total.
+
+A distância dos pontos axiais a partir do centro será dada por $\alpha$.
+A escolha do valor de $\alpha$ depende de vários fatores e de algumas
+propriedades de experimentos axiais. Por exemplo, um experimento
+composto central é chamado de **rotacionável** quando o desvio-padrão
+das predições for constante em todos os pontos que estiverem à mesma
+distância do centro do planejamento.
+
+Portanto, para que o experimento seja rotacionável, o valor de $\alpha$
+deve ser $\alpha = (F)^{1/4}$, onde $F$ é o número de pontos na porção
+fatorial do planejamento (geralmente $F = 2^k$). Para $k=2$, $\alpha =
+(2^2)^{1/4} = 2^{1/2} = \sqrt{2} = 1.414$.
+
+```{r exp5b}
+## Planejamento composto central
+
+## Determinação dos pontos axiais: alpha = r = \sqrt{2}
+r <- sqrt(2)
+exp5 <- expand.grid(x1 = ct5[1] + c(-1, 1),
+                    x2 = ct5[2] + c(-1, 1))
+exp5 <- rbind(exp5,
+              data.frame(x1 = ct5[1] + c(r, -r, 0, 0),
+                         x2 = ct5[2] + c(0, 0, r, -r)))
+exp5 <- rbind(exp5, matrix(ct5,
+                           byrow = TRUE,
+                           nrow = 4,
+                           ncol = 2,
+                           dimnames = list(NULL, names(exp5))))
+exp5$centro <- rep(1:2, c(nrow(exp5) - 4, 4))
+
+## Veja como fica o planejamento com as variáveis codificadas
+transform(exp5,
+          x1 = x1 - mean(x1),
+          x2 = x2 - mean(x2))
+
+## Visualizando o planejamento.
+xyplot(x1 ~ x2, data = exp5, aspect = "iso", pch = 19) +
+    layer(panel.segments(ct5[2] + c(-r, 0),
+                         ct5[1] + c(0, -r),
+                         ct5[2] + c(r, 0),
+                         ct5[1] + c(0, r),
+                         col = 1, lty = 2)) +
+    layer(panel.lines(ct5[2] + c(-1, 1, 1, -1, -1),
+                      ct5[1] + c(-1, -1, 1, 1, -1),
+                      col = 1, lty = 2))
+
+## Obtendo os resultados.
+set.seed(301)
+exp5$y <- with(exp5, erro(superficie(x1, x2)))
+exp5
+```
+
+Com a inclusão dos pontos axiais, podemos agora ajustar um modelo de
+segunda ordem,
+
+$$
+y = \beta_0 + \sum_{j=1}^{k} \beta_{j} x_j +
+	\mathop{\sum\sum}\limits_{i < j} \beta_{ij} x_i x_j +
+	\sum_{j=1}^{k} \beta_{jj} x_{j}^{2} +
+	\epsilon
+$$
+
+onde $\beta_{jj}$ representa **efeitos quadráticos** ou de **segunda
+ordem**. Este modelo também é chamado de **superfície de resposta de
+segunda ordem**.
+
+```{r exp5c}
+## Ajustando o modelo de segunda ordem
+m5 <- lm(y ~ x1 * x2 + I(x1^2) + I(x2^2), data = exp5)
+anova(m5)
+
+## Estimativa dos coeficientes
+summary(m5)
+
+## Predição
+pred <- with(exp5,
+             expand.grid(x1 = eseq(x1),
+                         x2 = eseq(x2)))
+pred$y <- predict(m5, newdata = pred)
+
+## Gráfico da predição com indicação do ponto estacionário
+levelplot(y ~ x1 + x2, data = pred, contour = TRUE, aspect = "iso") +
+    layer(panel.points(8, 8, pch = 19, col = "red"))
+
+## Gráfico da superfície com todos os experimentos e pontos fatoriais,
+## centrais e axiais
+levelplot(y ~ x1 + x2, data = da, contour = TRUE, aspect = "iso") +
+    layer(panel.levelplot(x = pred$x1, y = pred$x2, z = pred$y,
+                          subscripts = 1:length(pred$x1),
+                          contour = TRUE,
+                          col.regions = grey.colors)) +
+    layer(panel.points(x1, x2),
+          data = exp5) +
+    layer(panel.points(x1, x2),
+          data = exp4) +
+    layer(panel.points(x1, x2),
+          data = exp3) +
+    layer(panel.points(x1, x2),
+          data = exp2) +
+    layer(panel.points(x1, x2),
+          data = exp1) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp4) +
+    layer(panel.arrows(ct4[1],
+                       ct4[2],
+                       ct4[1] + 5 * b4[1],
+                       ct4[2] + 5 * b4[2],
+                       length = 0.1)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp3) +
+    layer(panel.arrows(ct3[1],
+                       ct3[2],
+                       ct3[1] + 10 * b3[1],
+                       ct3[2] + 10 * b3[2],
+                       length = 0.1)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp2) +
+    layer(panel.arrows(ct2[1],
+                       ct2[2],
+                       ct2[1] + 10 * b2[1],
+                       ct2[2] + 10 * b2[2],
+                       length = 0.1)) +
+    layer(panel.rect(min(x1), min(x2), max(x1), max(x2)),
+          data = exp1) +
+    layer(panel.arrows(ct1[1],
+                       ct1[2],
+                       ct1[1] + 10 * b1[1],
+                       ct1[2] + 10 * b1[2],
+                       length = 0.1))
+```
