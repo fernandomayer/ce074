@@ -13,12 +13,15 @@ output:
 - Brien, CJ. Design and randomization-based analysis of experiments in
   R. URL: http://chris.brien.name/ee2. 2010.
 - Montgomery, DC.
- [Design and analysis of experiments](http://www.wiley.com/WileyCDA/WileyTitle/productCd-EHEP002024.html). John Wiley & Sons, 2001.
+ [Design and analysis of experiments](http://www.wiley.com/WileyCDA/WileyTitle/productCd-EHEP002024.html). Wiley, 2013.
 - Montgomery, DC.
   [Introdução ao controle estatístico de qualidade](http://www.grupogen.com.br/introduc-o-ao-controle-estatistico-da-qualidade.html).
   7 ed. Rio de Janeiro: LTC, 2016.
 - Pimentel-Gomes, F. [Curso de estatística experimental](http://fealq.org.br/produto/curso-de-estatistica-experimental-15a-edicao). 15 ed.
   Piracicaba: FEALQ, 2009.
+- Wu, CFJ; Hamada, MS. [Experiments: Planning, Analysis, and
+  Optimization](http://www.wiley.com/WileyCDA/WileyTitle/productCd-0471699462.html).
+  Wiley, 2009.
 
 ## Referências complementares
 
