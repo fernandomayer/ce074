@@ -11,11 +11,13 @@ source("setup_knitr.R")
 
 [![Build Status](https://travis-ci.org/fernandomayer/ce074.svg?branch=master)](https://travis-ci.org/fernandomayer/ce074)
 
-<!-- <div class="alert alert-danger" role="alert"> -->
-<!-- **AVISO:** -->
+<div class="alert alert-danger" role="alert">
+**AVISO:**
 
-<!-- - Trazer computador para a aula de hoje (13/11). -->
-<!-- </div> -->
+- O exame final será realizado dia 14/12 (quinta-feira) às 19:00 hs no
+LABEST B
+- O conteúdo será toda a matéria
+</div>
 
 # Detalhes da oferta da disciplina
 
